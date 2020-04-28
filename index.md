@@ -6,7 +6,10 @@
 </head>
 <body>
     <h1>THIS IS SHERMAN'S PORTFOLIO</h1>
+
+    Click <a href="webapp/resume.html">here</a> for my resume
     <br>
     p.s. work in progress
+
 </body>
 </html>
