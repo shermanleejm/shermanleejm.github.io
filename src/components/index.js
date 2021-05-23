@@ -8,7 +8,12 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
 const Pages = [
-  { name: 'About Me', link: '/', component: AboutMe, icon: <AccountCircleIcon /> },
+  {
+    name: 'About Me',
+    link: '/about-me',
+    component: AboutMe,
+    icon: <AccountCircleIcon />,
+  },
   { name: 'Contact Me', link: '/contact-me', component: ContactMe, icon: <CallIcon /> },
   {
     name: 'Asset Tracker',

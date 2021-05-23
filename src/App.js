@@ -1,6 +1,6 @@
 import React from 'react';
-import { HashRouter, Switch, Route, Link } from 'react-router-dom';
-import { ContactMe, AboutMe, SideBar, Pages } from './components';
+import { HashRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { SideBar, Pages } from './components';
 
 const App = () => {
   return (
@@ -8,6 +8,18 @@ const App = () => {
       <HashRouter basename={'/'}>
         <SideBar />
         <Switch>
+          <Route
+            exact
+            path="/"
+            render={() => {
+              return localStorage.getItem('homepage') === null ||
+                localStorage.getItem('homepage') === '' ? (
+                <Redirect to="/about-me" />
+              ) : (
+                <Redirect to={localStorage.getItem('homepage')} />
+              );
+            }}
+          />
           {Pages.map((page) => {
             return <Route exact path={page.link} component={page.component} />;
           })}
