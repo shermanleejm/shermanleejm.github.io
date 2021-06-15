@@ -386,7 +386,7 @@ const CryptoTracker = () => {
         </Table>
       </TableContainer>
       {showAddEntry ? (
-        <>
+        <div>
           <Button
             onClick={() => {
               if (
@@ -414,7 +414,7 @@ const CryptoTracker = () => {
           >
             cancel
           </Button>
-        </>
+        </div>
       ) : (
         <Button onClick={() => setShowAddEntry(true)}>+ add item</Button>
       )}
