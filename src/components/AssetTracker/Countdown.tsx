@@ -1,8 +1,8 @@
 import { Grid, Radio, RadioGroup, Typography, FormControlLabel } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 
-const Countdown = (props) => {
-  const timings = {
+const Countdown = () => {
+  const timings: any = {
     lse_close: Date.UTC(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -37,7 +37,7 @@ const Countdown = (props) => {
     ),
   };
 
-  function timeleft(endDate) {
+  function timeleft(endDate: any) {
     endDate = new Date(endDate);
     let difference = endDate - +new Date();
     let timeLeft = {};
@@ -52,7 +52,7 @@ const Countdown = (props) => {
     return timeLeft;
   }
   const [radioSelect, setRadioSelect] = useState('lse_open');
-  const [remainingTime, setRemainingTime] = useState(timeleft(timings[radioSelect]));
+  const [remainingTime, setRemainingTime] = useState(timeleft(timings[radioSelect])) as any;
 
   useEffect(() => {
     setTimeout(() => {

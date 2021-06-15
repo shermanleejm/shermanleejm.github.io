@@ -32,7 +32,7 @@ const BoringTracker = () => {
   const classes = useStyles();
   const [isLoading, setIsLoading] = useState(true);
   const [apiKey, setAPIKey] = useState() as any;
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -77,14 +77,15 @@ const BoringTracker = () => {
     }
 
     async function fetchLocalData() {
-      let item = JSON.parse(localStorage.getItem('apikey') || "");
-      if (item !== "") {
+      let item = JSON.parse(localStorage.getItem('apikey') || '[]');
+      console.log(item);
+      if (item.length > 0) {
         setAPIKey(item);
       } else {
         setAPIKey('1111111');
       }
-      item = JSON.parse(localStorage.getItem('boring') || "");
-      if (item !== "") {
+      item = JSON.parse(localStorage.getItem('boring') || '[]');
+      if (item.length > 0) {
         for (let line of item) {
           let tickerData: any = await getPrice(line.ticker);
           if (tickerData === undefined) {
