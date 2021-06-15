@@ -31,19 +31,19 @@ const useStyles = makeStyles((theme) => {
 const BoringTracker = () => {
   const classes = useStyles();
   const [isLoading, setIsLoading] = useState(true);
-  const [apiKey, setAPIKey] = useState();
-  const [keyword, setKeyword] = useState();
-  const [showSearchResults, setShowSearchResults] = useState();
+  const [apiKey, setAPIKey] = useState() as any;
+  const [keyword, setKeyword] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formStuff, setFormStuff] = useState();
-  const [formQuantity, setFormQuantity] = useState();
+  const [formStuff, setFormStuff] = useState() as any;
+  const [formQuantity, setFormQuantity] = useState() as any;
   const [formPrice, setFormPrice] = useState('');
-  const [boringData, setBoringData] = useState([]);
-  const [errorMessage, setErrorMessage] = useState();
+  const [boringData, setBoringData] = useState([]) as any;
+  const [errorMessage, setErrorMessage] = useState() as any;
   const [refresh, setRefresh] = useState(false);
 
-  function shuffle(array) {
+  function shuffle(array: any[]) {
     var currentIndex = array.length,
       temporaryValue,
       randomIndex;
@@ -64,7 +64,7 @@ const BoringTracker = () => {
   }
 
   useEffect(() => {
-    async function getPrice(ticker) {
+    async function getPrice(ticker: string) {
       let result = {};
       await axios
         .get(
@@ -77,16 +77,16 @@ const BoringTracker = () => {
     }
 
     async function fetchLocalData() {
-      let item = JSON.parse(localStorage.getItem('apikey'));
-      if (item) {
+      let item = JSON.parse(localStorage.getItem('apikey') || "");
+      if (item !== "") {
         setAPIKey(item);
       } else {
         setAPIKey('1111111');
       }
-      item = JSON.parse(localStorage.getItem('boring'));
-      if (item) {
+      item = JSON.parse(localStorage.getItem('boring') || "");
+      if (item !== "") {
         for (let line of item) {
-          let tickerData = await getPrice(line.ticker);
+          let tickerData: any = await getPrice(line.ticker);
           if (tickerData === undefined) {
             setErrorMessage('Alpha Vantage only allows 5 requests every minute.');
             setIsLoading(false);
@@ -110,7 +110,7 @@ const BoringTracker = () => {
     fetchLocalData();
   }, [refresh]);
 
-  async function queryTicker(kw) {
+  async function queryTicker(kw: string) {
     await axios
       .get(
         `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${kw}&apikey=${apiKey}`
@@ -123,7 +123,8 @@ const BoringTracker = () => {
   function calculatePL() {
     let starting = 0;
     let end = 0;
-    for (let line of boringData) {
+    for (let i = 0; i < boringData.length; i++) {
+      let line: any = boringData[i];
       starting += line.quantity * line.price;
       end += line.quantity * line.open;
     }
@@ -239,7 +240,7 @@ const BoringTracker = () => {
               <TextField
                 label="Quantity"
                 type="number"
-                step={0.001}
+                // step={0.001}
                 value={formQuantity}
                 onChange={(e) => {
                   setFormQuantity(e.target.value);
@@ -250,7 +251,7 @@ const BoringTracker = () => {
               <TextField
                 label="Price"
                 type="number"
-                step={0.001}
+                // step={0.001}
                 value={formPrice}
                 onChange={(e) => {
                   setFormPrice(e.target.value);
@@ -294,7 +295,7 @@ const BoringTracker = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {boringData.map((row, index) => {
+              {boringData.map((row: any, index: number) => {
                 return (
                   <TableRow key={index}>
                     <TableCell>{row.ticker}</TableCell>

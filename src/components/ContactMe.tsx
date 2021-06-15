@@ -49,21 +49,19 @@ class ContactMe extends Component {
       );
     } else {
       return (
-        <div
-          style={{ height: "100vh", width: "90vw", padding: 20, margin: "auto" }}
-        >
+        <div style={{ height: '100vh', width: '90vw', padding: 20, margin: 'auto' }}>
           <form
             name="gform"
             id="gform"
-            enctype="text/plain"
+            encType="text/plain"
             action="https://docs.google.com/forms/d/e/1FAIpQLSeRk58rRnbE1XDd_6RZ6i9RIPTDPZT9YgsQ_4B7-Ff0mqQE3w/formResponse?"
             target="hidden_iframe"
-            onsubmit="submitted=true;"
+            onSubmit="submitted=true;"
           >
             <Grid container direction="column" spacing={2}>
               <Grid item>
                 <Typography variant="h5">
-                  You may contact me at +65 86601996 and at{" "}
+                  You may contact me at +65 86601996 and at{' '}
                   <Link href="mailto:leesherman@live.com.sg" color="secondary">
                     leesherman@live.com.sg
                   </Link>
@@ -71,8 +69,8 @@ class ContactMe extends Component {
               </Grid>
               <Grid item>
                 <Typography variant="h6">
-                  Alternatively, you may fill in the form below and I shall get
-                  back to you as soon as possible.
+                  Alternatively, you may fill in the form below and I shall get back to
+                  you as soon as possible.
                 </Typography>
               </Grid>
               <Grid item>
@@ -136,11 +134,11 @@ class ContactMe extends Component {
                   value="submit"
                   onClick={() => this.handleSubmit()}
                   style={{
-                    border: "none",
-                    backgroundColor: "#ffffff",
-                    fontSize: "15px",
-                    textTransform: "uppercase",
-                    cursor: "pointer",
+                    border: 'none',
+                    backgroundColor: '#ffffff',
+                    fontSize: '15px',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
                   }}
                 />
               </Grid>
@@ -156,8 +154,8 @@ class ContactMe extends Component {
           <iframe
             name="hidden_iframe"
             id="hidden_iframe"
-            style={{ display: "none" }}
-            onload="if(submitted) {}"
+            style={{ display: 'none' }}
+            onLoad="if(submitted) {}"
           ></iframe>
         </div>
       );

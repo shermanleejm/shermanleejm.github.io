@@ -18,7 +18,6 @@ import React, { useState, useEffect } from 'react';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-
 const useStyles = makeStyles((theme) => {
   return {
     root: { margin: '0 4% 0 4%' },
@@ -28,27 +27,25 @@ const useStyles = makeStyles((theme) => {
     arrangeHorizontally: { display: 'inline-block', textAlign: 'center' },
   };
 });
-
 const CryptoTracker = () => {
   const classes = useStyles();
-  const [currencies, setCurrencies] = useState([]);
+  const [currencies, setCurrencies] = useState([]) as any;
   const [cryptoCurrencies, setCryptoCurrencies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectCurrency, setSelectCurrency] = useState('SGD');
-  const [cryptoData, setCryptoData] = useState([]);
+  const [cryptoData, setCryptoData] = useState([]) as any;
   const [showAddEntry, setShowAddEntry] = useState(false);
-  const [formCrypto, setFormCrypto] = useState();
-  const [formValue, setFormValue] = useState();
-  const [formPrincipal, setFormPrincipal] = useState();
+  const [formCrypto, setFormCrypto] = useState() as any;
+  const [formValue, setFormValue] = useState() as any;
+  const [formPrincipal, setFormPrincipal] = useState() as any;
   const [editValuesIndex, setEditValuesIndex] = useState({
     crypto: -1,
     quantity: -1,
     principal: -1,
   });
-
   useEffect(() => {
     // get current sell price
-    async function getCurrentPrice(crypto, fiat) {
+    async function getCurrentPrice(crypto: string, fiat: string) {
       let result = 0;
       await axios
         .get(`https://api.coinbase.com/v2/prices/${crypto}-${fiat}/sell`)
@@ -57,10 +54,9 @@ const CryptoTracker = () => {
         });
       return result;
     }
-
     // get currencies
     async function fetchCurrency() {
-      let result = [];
+      let result = [] as any;
       await axios.get('https://api.coinbase.com/v2/currencies').then((resp) => {
         let tempcurrencies = [];
         for (let c of resp.data.data) {
@@ -71,9 +67,8 @@ const CryptoTracker = () => {
       });
       return result;
     }
-
-    async function fetchCryptoCurrency(fiatCurrencies) {
-      let result = [];
+    async function fetchCryptoCurrency(fiatCurrencies: string[]) {
+      let result = [] as any;
       await axios
         .get('https://api.coinbase.com/v2/exchange-rates?currency=BTC')
         .then((resp) => {
@@ -85,14 +80,12 @@ const CryptoTracker = () => {
           setCryptoCurrencies(result);
         });
     }
-
     // get stored values
     async function fetchStoredValues() {
       let x = await fetchCurrency();
       fetchCryptoCurrency(x);
-
-      let temp = JSON.parse(localStorage.getItem('crypto'));
-      if (temp) {
+      let temp = JSON.parse(localStorage.getItem('crypto') || "");
+      if (temp !== "") {
         for (let line of temp) {
           let currPrice = await getCurrentPrice(line.name, selectCurrency);
           line.pl = parseFloat(
@@ -105,37 +98,34 @@ const CryptoTracker = () => {
       } else {
         temp = [];
       }
-
       setCryptoData(temp);
       localStorage.setItem('crypto', JSON.stringify(temp));
       setIsLoading(false);
     }
-
     setTimeout(() => {
       fetchStoredValues();
     }, 60000);
-
     fetchStoredValues();
   }, [isLoading]);
 
-  function calculateNetProfit() {
+  function calculateNetProfit(): number {
     let total = 0;
     let pl = 0;
     for (let line of cryptoData) {
       pl += (line.principal * line.pl) / 100;
       total += line.principal;
     }
-    return ((pl / total) * 100).toFixed(2);
+    return parseFloat(((pl / total) * 100).toFixed(2));
   }
 
-  function displayPrincipal(principal) {
+  function displayPrincipal(principal: any) {
     principal = principal.toLocaleString(undefined, { maximumFractionDigits: 2 });
     return principal;
   }
 
-  const EditValuesButtons = () => {
+  const EditValuesButtons: React.FC<{}> = () => {
     return (
-      <span className={classes.arrangeHorizontally}>
+      <div className={classes.arrangeHorizontally}>
         <IconButton
           onClick={() => {
             setEditValuesIndex({
@@ -160,10 +150,9 @@ const CryptoTracker = () => {
         >
           <CancelIcon />
         </IconButton>
-      </span>
+      </div>
     );
   };
-
   return (
     <div className={classes.root}>
       <Typography variant="h4" className={classes.header}>
@@ -173,19 +162,6 @@ const CryptoTracker = () => {
           {calculateNetProfit()}%
         </span>
       </Typography>
-
-      {/* <Autocomplete
-        className={classes.combobox}
-        options={currencies}
-        defaultValue="SGD"
-        renderInput={(params) => (
-          <TextField {...params} variant="outlined" label="Select Currency" />
-        )}
-        onChange={(e, value) => {
-          setSelectCurrency(value);
-          setIsLoading(true);
-        }}
-      /> */}
 
       <TableContainer>
         <Table>
@@ -213,7 +189,7 @@ const CryptoTracker = () => {
           </TableHead>
           <TableBody>
             {!isLoading &&
-              cryptoData.map((crypto, index) => {
+              cryptoData.map((crypto: any, index: any) => {
                 return (
                   <TableRow>
                     <TableCell>
@@ -364,7 +340,7 @@ const CryptoTracker = () => {
                     value={formValue}
                     onValueChange={(values) => {
                       let { floatValue } = values;
-                      setFormValue(floatValue);
+                      setFormValue(floatValue || "");
                     }}
                   />
                 </TableCell>
@@ -423,5 +399,4 @@ const CryptoTracker = () => {
     </div>
   );
 };
-
 export default CryptoTracker;
