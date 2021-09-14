@@ -63,8 +63,8 @@ const Terminal = () => {
   const [state, setState] = React.useState({
     isDragging: false,
     origin: { x: 0, y: 0 },
-    translation: { x: window.innerWidth / 3, y: window.innerHeight / 2 },
-    lastTranslation: { x: window.innerWidth / 3, y: window.innerHeight / 2 },
+    translation: { x: window.innerWidth / 3, y: window.innerHeight / 2.5 },
+    lastTranslation: { x: window.innerWidth / 3, y: window.innerHeight / 2.5 },
   });
   const { isDragging } = state;
   const handleMouseDown = ({ clientX, clientY }: any) => {
@@ -159,58 +159,60 @@ const Terminal = () => {
           TERMINAL
         </Paper>
       ) : (
-        <Paper
-          className={classes.main}
-          elevation={3}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          style={{
-            right: `${state.translation.x}px`,
-            bottom: `${state.translation.y}px`,
-          }}
-        >
-          <div className={classes.header}>
-            <button
-              className={classes.headerButtons}
-              style={{ backgroundColor: 'red' }}
-              onClick={() => {
-                alert('Now why would you want to close my lovely creation?');
-                setHistory(help.split('\n'));
-                setIsMinimised(true);
-              }}
-            ></button>
-            <button
-              className={classes.headerButtons}
-              style={{ backgroundColor: 'yellow' }}
-              onClick={() => setIsMinimised(true)}
-            ></button>
-            <button
-              className={classes.headerButtons}
-              style={{ backgroundColor: 'green' }}
-              onClick={() => alert('ARE YOU TRYING TO KILL ME WITH CSS?????????')}
-            ></button>
-          </div>
-          <div className={classes.text}>
-            {history.map((row: string) => {
-              return <Typography>{row}</Typography>;
-            })}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'row', padding: '0 0 0 10px' }}>
-            {'>'}
-            <input
-              className={classes.inputField}
-              onChange={(event) => {
-                setCommand(event.target.value);
-              }}
-              value={command}
-              onKeyDown={handleEnter}
-              autoCapitalize="none"
-              placeholder="type here"
-            ></input>
-          </div>
-        </Paper>
+        <Draggable>
+          <Paper
+            className={classes.main}
+            elevation={3}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            style={{
+              right: `${state.translation.x}px`,
+              bottom: `${state.translation.y}px`,
+            }}
+          >
+            <div className={classes.header}>
+              <button
+                className={classes.headerButtons}
+                style={{ backgroundColor: 'red' }}
+                onClick={() => {
+                  alert('Now why would you want to close my lovely creation?');
+                  setHistory(help.split('\n'));
+                  setIsMinimised(true);
+                }}
+              ></button>
+              <button
+                className={classes.headerButtons}
+                style={{ backgroundColor: 'yellow' }}
+                onClick={() => setIsMinimised(true)}
+              ></button>
+              <button
+                className={classes.headerButtons}
+                style={{ backgroundColor: 'green' }}
+                onClick={() => alert('ARE YOU TRYING TO KILL ME WITH CSS?????????')}
+              ></button>
+            </div>
+            <div className={classes.text}>
+              {history.map((row: string) => {
+                return <Typography>{row}</Typography>;
+              })}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'row', padding: '0 0 0 10px' }}>
+              {'>'}
+              <input
+                className={classes.inputField}
+                onChange={(event) => {
+                  setCommand(event.target.value);
+                }}
+                value={command}
+                onKeyDown={handleEnter}
+                autoCapitalize="none"
+                placeholder="type here"
+              ></input>
+            </div>
+          </Paper>
+        </Draggable>
       )}
     </div>
   );
