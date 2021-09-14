@@ -17,16 +17,20 @@ const useStyles = makeStyles((theme) => {
       marginTop: '10px',
     },
     image: {
-      width: window.innerWidth < 600 ? '90%' : '60%',
-      height: 'auto',
+      width: '300px',
     },
     imagecontainer: {
-      display: 'flex',
+      textAlign: 'center',
       justifyContent: 'center',
       marginBottom: theme.spacing(3),
     },
+    iconcontainer: {
+      display: 'flex',
+      marginBottom: theme.spacing(2),
+      justifyContent: 'center',
+    },
     icons: { transform: 'scale(2)' },
-    maintext: { width: '90%', margin: '5% auto 0 auto', textAlign: 'center' },
+    maintext: { width: '70%', margin: '5% auto 0 auto', textAlign: 'center' },
     root: { marginBottom: '20%', width: '100vw' },
   };
 });
@@ -41,7 +45,7 @@ const AboutMe = () => {
       <div className={classes.imagecontainer}>
         <img src={pp} className={classes.image} />
       </div>
-      <div className={classes.imagecontainer}>
+      <div className={classes.iconcontainer}>
         <Button href="https://github.com/shermanleejm" target="_blank" rel="noopener">
           <GitHubIcon className={classes.icons} />
         </Button>
@@ -57,6 +61,24 @@ const AboutMe = () => {
           I make stuff. I have an asset tracker that you can play with{' '}
           <Link to="/tracker" component={MUILink}>
             here
+          </Link>
+          .<br />I also made a built in terminal that you can play with{' '}
+          <Link to="/terminal" component={MUILink}>
+            here
+          </Link>
+          .
+        </Typography>
+        <br />
+        <Typography>
+          You can visit my github profile by clicking the icon above.{' '}
+        </Typography>
+        <br />
+        <Typography>
+          I am currently working on a blockchain network that focuses on tamper-proof
+          <br />
+          contracts and distributed programming, feel free to hit me up using the{' '}
+          <Link to="/contact-me" component={MUILink}>
+            contact me page
           </Link>
           .
         </Typography>

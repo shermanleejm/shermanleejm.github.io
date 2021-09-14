@@ -46,18 +46,20 @@ const SideBar = () => {
       >
         <List>
           {Pages.map((page) => {
-            return (
-              <ListItem
-                button
-                key={page.name}
-                component={Link}
-                to={page.link}
-                onClick={() => setIsOpen(false)}
-              >
-                <ListItemIcon children={page.icon} />
-                <ListItemText primary={page.name} />
-              </ListItem>
-            );
+            if (page.name !== undefined) {
+              return (
+                <ListItem
+                  button
+                  key={page.name}
+                  component={Link}
+                  to={page.link}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <ListItemIcon children={page.icon} />
+                  <ListItemText primary={page.name} />
+                </ListItem>
+              );
+            }
           })}
         </List>
       </SwipeableDrawer>

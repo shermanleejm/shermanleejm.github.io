@@ -12,6 +12,7 @@
     "axios": "^0.21.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-draggable": "^4.4.4",
     "react-number-format": "^4.5.5",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3"
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@material-ui/types": "^5.1.0",
+    "@types/body-scroll-lock": "^3.1.0",
     "@types/react": "^17.0.0",
     "@types/react-router-dom": "^5.1.7",
     "gh-pages": "^3.1.0"

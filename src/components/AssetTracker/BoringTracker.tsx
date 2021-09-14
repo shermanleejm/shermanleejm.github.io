@@ -92,23 +92,24 @@ const BoringTracker = () => {
             setErrorMessage('Alpha Vantage only allows 5 requests every minute.');
             setIsLoading(false);
             return;
-          }
-          line.high = parseFloat(tickerData['03. high']);
-          line.low = parseFloat(tickerData['04. low']);
-          line.open = parseFloat(tickerData['02. open']);
-          line.pl = parseFloat(
-            (((tickerData['02. open'] - line.price) / line.price) * 100).toFixed(2)
-          );
-        }
-        localStorage.setItem('boring', JSON.stringify(shuffle(item)));
-        setBoringData(item);
-      }
 
-      setErrorMessage(undefined);
-      setIsLoading(false);
+            line.high = parseFloat(tickerData['03. high']);
+            line.low = parseFloat(tickerData['04. low']);
+            line.open = parseFloat(tickerData['02. open']);
+            line.pl = parseFloat(
+              (((tickerData['02. open'] - line.price) / line.price) * 100).toFixed(2)
+            );
+          }
+          localStorage.setItem('boring', JSON.stringify(shuffle(item)));
+          setBoringData(item);
+        }
+
+        setErrorMessage(undefined);
+        setIsLoading(false);
+      }
+      console.log('calling useEffect on Boring Tracker');
+      fetchLocalData();
     }
-    console.log('calling useEffect on Boring Tracker');
-    fetchLocalData();
   }, [refresh]);
 
   async function queryTicker(kw: string) {
@@ -241,7 +242,6 @@ const BoringTracker = () => {
               <TextField
                 label="Quantity"
                 type="number"
-                // step={0.001}
                 value={formQuantity}
                 onChange={(e) => {
                   setFormQuantity(e.target.value);
@@ -252,7 +252,6 @@ const BoringTracker = () => {
               <TextField
                 label="Price"
                 type="number"
-                // step={0.001}
                 value={formPrice}
                 onChange={(e) => {
                   setFormPrice(e.target.value);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { HashRouter, Switch, Route, Redirect, BrowserRouter } from 'react-router-dom';
 import { SideBar, Pages } from './components';
 
 const App = () => {
@@ -21,7 +21,17 @@ const App = () => {
             }}
           />
           {Pages.map((page) => {
-            return <Route exact path={page.link} component={page.component} />;
+            if (page.component !== undefined) {
+              return <Route exact path={page.link} component={page.component} />;
+            } else {
+              return (
+                <Route
+                  exact
+                  path={page.href}
+                  render={() => (window.location = page.href)}
+                />
+              );
+            }
           })}
         </Switch>
       </HashRouter>
