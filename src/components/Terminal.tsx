@@ -60,6 +60,7 @@ const Terminal = () => {
   const [isMinimised, setIsMinimised] = React.useState(false);
   const [history, setHistory] = React.useState<string[]>(help.split('\n'));
   const [command, setCommand] = React.useState('');
+  const [pointer, setPointer] = React.useState(help.split('\n').length);
   const [state, setState] = React.useState({
     isDragging: false,
     origin: { x: 0, y: 0 },
@@ -138,17 +139,33 @@ const Terminal = () => {
       }
       if (command !== 'clear') {
         let tmp = history;
-        tmp.push('>  ' + command);
+        tmp.push('> ' + command);
         res.split('\n').map((row) => tmp.push(row));
         setHistory(tmp);
       }
       setCommand('');
+      setPointer(history.length);
+    } else if (event.key === 'ArrowUp' && pointer > help.split('\n').length) {
+      setPointer(pointer - 2);
+      setCommand(history[pointer].substring(2));
+    } else if (
+      event.key === 'ArrowDown' &&
+      history.length > help.split('\n').length &&
+      pointer <= history.length
+    ) {
+      setPointer(pointer + 2);
+      setCommand(history[pointer].substring(2));
     }
   };
 
   const classes = useStyles();
   return (
     <div className={classes.root} id="scrolling">
+      {pointer}
+      <br />
+      {history.length}
+      <br />
+      {history[pointer]}
       {isMinimised ? (
         <Paper
           className={classes.minimise}
