@@ -1,5 +1,4 @@
 import {
-  makeStyles,
   TextField,
   Typography,
   Button,
@@ -20,10 +19,10 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const CryptoTracker = () => {
-  const [currencies, setCurrencies] = useState([]) as any;
+  const [, setCurrencies] = useState([]) as any;
   const [cryptoCurrencies, setCryptoCurrencies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectCurrency, setSelectCurrency] = useState('SGD');
+  const [selectCurrency] = useState('SGD');
   const [cryptoData, setCryptoData] = useState([]) as any;
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [formCrypto, setFormCrypto] = useState() as any;
@@ -67,6 +66,7 @@ const CryptoTracker = () => {
             if (!fiatCurrencies.includes(item)) {
               result.push(item);
             }
+            return '';
           });
           setCryptoCurrencies(result);
         });
@@ -97,7 +97,7 @@ const CryptoTracker = () => {
       fetchStoredValues();
     }, 60000);
     fetchStoredValues();
-  }, [isLoading]);
+  }, [isLoading, selectCurrency]);
 
   function calculateNetProfit(): number {
     let total = 0;

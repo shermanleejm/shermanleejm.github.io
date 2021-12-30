@@ -2,7 +2,7 @@ import React from 'react';
 import AssetTracker from './AssetTracker';
 import ContactMe from './ContactMe';
 import Home from './Home';
-import MTGDB from './MTGDB';
+import MTGDB from './MTGDB/';
 import Terminal from './Terminal';
 import terminal from '../assets/terminal.png';
 import tracker from '../assets/tracker.jpg';
