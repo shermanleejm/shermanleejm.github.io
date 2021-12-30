@@ -1,9 +1,17 @@
-import { Button, CircularProgress, Grid, Slider, TextField } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  Slider,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useCallback, useState } from 'react';
 import { createWorker } from 'tesseract.js';
 import Cropper from 'react-easy-crop';
 import getCroppedImg from './helper';
 import NumberFormat from 'react-number-format';
+import axios from 'axios';
 
 const AddNewCard = () => {
   const [img, setImg] = useState('');
@@ -15,6 +23,8 @@ const AddNewCard = () => {
   const [text, setText] = useState('');
   const [rotation, setRotation] = useState(0);
   const [qty, setQty] = useState(1);
+  const [lastRequest, setLastRequest] = useState(Date.now());
+  const [price, setPrice] = useState(-1);
 
   const handleChange = (event: any) => {
     setImg(URL.createObjectURL(event.target.files[0]));
@@ -51,6 +61,26 @@ const AddNewCard = () => {
       setIsLoading(false);
     }
   }, [croppedAreaPixels, img, rotation]);
+
+  function getCardPrice(queryName: string) {
+    const coolingPeriod = 500;
+
+    if (Date.now() - lastRequest < coolingPeriod) {
+      return 0;
+    }
+
+    axios
+      .get('https://api.scryfall.com/cards/search?q=' + queryName)
+      .then((res) => {
+        const usd = res.data.data[0].prices.usd;
+        if (usd === null || usd === undefined) {
+          setPrice(-1);
+        }
+        setPrice(res.data.data[0].prices.usd);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLastRequest(Date.now()));
+  }
 
   return isLoading ? (
     <CircularProgress />
@@ -103,7 +133,8 @@ const AddNewCard = () => {
                 setQty(floatValue || 1);
               }}
             />
-            <Button>submit</Button>
+            <Button onClick={() => getCardPrice(text)}>submit</Button>
+            {price > -1 && <Typography>This card costs US${price}</Typography>}
           </div>
         )}
       </Grid>
