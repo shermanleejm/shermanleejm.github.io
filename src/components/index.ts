@@ -26,6 +26,21 @@ export const Pages: PageType[] = [
     description: 'This is just the home page. Nothing to see here',
   },
   {
+    name: 'MTG Database',
+    component: MTGDB,
+    link: '/mtgdb',
+    img: mtg,
+    description:
+      'Complete front-end application. OCR enabled collection tracker for Magic The Gathering Commander deck building. Using IndexedDB as a local storage.',
+  },
+  {
+    name: 'Asset Tracker',
+    component: AssetTracker,
+    link: '/assettracker',
+    img: tracker,
+    description: 'DOGE COIN TO THE MOOOOOOOOOON!¡!¡!¡!¡!',
+  },
+  {
     name: 'Terminal',
     component: Terminal,
     link: '/terminal',
@@ -38,20 +53,5 @@ export const Pages: PageType[] = [
     link: '/contactme',
     img: contactMe,
     description: "Hijacked google forms' exposed api for a contact me page.",
-  },
-  {
-    name: 'Asset Tracker',
-    component: AssetTracker,
-    link: '/assettracker',
-    img: tracker,
-    description: 'DOGE COIN TO THE MOOOOOOOOOON!¡!¡!¡!¡!',
-  },
-  {
-    name: 'MTG Database',
-    component: MTGDB,
-    link: '/mtgdb',
-    img: mtg,
-    description:
-      'OCR enabled collection tracker for Magic The Gathering Commander deck building.',
   },
 ];
