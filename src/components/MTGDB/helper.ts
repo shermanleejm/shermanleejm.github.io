@@ -88,3 +88,11 @@ export default async function getCroppedImg(
     }, 'image/jpeg');
   });
 }
+
+interface MtgDB {
+  id?: number;
+  name?: string;
+  price?: number;
+  quantity?: number;
+  date_added?: number;
+}

@@ -1,4 +1,8 @@
-import { BankingActionType, DarkModeActionType } from './action-types';
+import {
+  BankingActionType,
+  DarkModeActionType,
+  DatabaseActionType,
+} from './action-types';
 
 export * as actionTypes from './action-types';
 
@@ -22,3 +26,5 @@ export type DarkModeAction =
   | { type: DarkModeActionType.DARK }
   | { type: DarkModeActionType.LIGHT }
   | { type: DarkModeActionType.TOGGLE };
+
+export type DatabaseAction = { type: DatabaseActionType.GET };

@@ -9,3 +9,7 @@ export enum BankingActionType {
   WITHDRAW = 'withdraw',
   BANKRUPT = 'bankrupt',
 }
+
+export enum DatabaseActionType {
+  GET = 'get',
+}

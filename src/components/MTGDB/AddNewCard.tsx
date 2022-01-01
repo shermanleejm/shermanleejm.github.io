@@ -12,6 +12,8 @@ import Cropper from 'react-easy-crop';
 import getCroppedImg from './helper';
 import NumberFormat from 'react-number-format';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { State } from '../../state/reducers';
 
 const AddNewCard = () => {
   const [img, setImg] = useState('');
@@ -25,6 +27,8 @@ const AddNewCard = () => {
   const [qty, setQty] = useState(1);
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [price, setPrice] = useState(-1);
+
+  const db = useSelector((state: State) => state.database);
 
   const handleChange = (event: any) => {
     setImg(URL.createObjectURL(event.target.files[0]));
@@ -79,7 +83,10 @@ const AddNewCard = () => {
         setPrice(res.data.data[0].prices.usd);
       })
       .catch((err) => console.error(err))
-      .finally(() => setLastRequest(Date.now()));
+      .finally(() => {
+        let newTs = Date.now();
+        setLastRequest(newTs);
+      });
   }
 
   return isLoading ? (
@@ -108,34 +115,50 @@ const AddNewCard = () => {
       </Grid>
       <Grid item xs={12} md={12}>
         {text !== '' && (
-          <div
+          <Grid
+            container
+            direction="column"
+            spacing={2}
             style={{
               width: '80vw',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 16,
-              margin: 16,
+              margin: '16 0 16 0',
             }}
           >
-            <TextField
-              value={text}
-              onChange={(e: any) => setText(e.target.value)}
-              label="Card Name (remove uneccessary characters)"
-            />
-            <NumberFormat
-              customInput={TextField}
-              value={qty}
-              thousandSeparator
-              decimalScale={0}
-              label="Quantity"
-              onValueChange={(values) => {
-                let { floatValue } = values;
-                setQty(floatValue || 1);
-              }}
-            />
-            <Button onClick={() => getCardPrice(text)}>submit</Button>
-            {price > -1 && <Typography>This card costs US${price}</Typography>}
-          </div>
+            <Grid item>
+              <TextField
+                value={text}
+                onChange={(e: any) => setText(e.target.value)}
+                label="Card Name (remove uneccessary characters)"
+                fullWidth
+              />
+            </Grid>
+            <Grid item>
+              <NumberFormat
+                customInput={TextField}
+                value={qty}
+                thousandSeparator
+                decimalScale={0}
+                label="Quantity"
+                onValueChange={(values) => {
+                  let { floatValue } = values;
+                  setQty(floatValue || 1);
+                }}
+                inputProps={{ fullWidth: 'true' }}
+              />
+            </Grid>
+            <Grid item>
+              <Button fullWidth onClick={() => getCardPrice(text)}>
+                get card price and store
+              </Button>
+            </Grid>
+            <Grid item>
+              {price > -1 && (
+                <div>
+                  <Typography>This card costs US${price}</Typography>
+                </div>
+              )}
+            </Grid>
+          </Grid>
         )}
       </Grid>
       <Grid item>
