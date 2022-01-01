@@ -1,9 +1,8 @@
-import Dexie from 'dexie';
+import { MTGDatabase } from '../../database';
 import { DatabaseAction } from '../actions';
 import { DatabaseActionType } from '../actions/action-types';
 
-const databaseDefault = new Dexie('mtgdb');
-databaseDefault.version(1).stores({ cards: '++id,name,price,quantity,date_added' });
+const databaseDefault = new MTGDatabase();
 
 const DatabaseReducer = (state = databaseDefault, action: DatabaseAction) => {
   switch (action.type) {
