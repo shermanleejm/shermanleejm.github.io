@@ -85,7 +85,20 @@ const AddNewCard = () => {
       .catch((err) => console.error(err))
       .finally(() => {
         let newTs = Date.now();
+
         setLastRequest(newTs);
+
+        db.transaction('rw', db.cards, async () => {
+          const id = await db.cards.add({
+            name: text,
+            price: price,
+            quantity: qty,
+            date_added: newTs,
+          });
+
+          const proof = await db.cards.get(id);
+          alert(JSON.stringify(proof));
+        });
       });
   }
 
