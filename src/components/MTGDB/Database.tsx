@@ -6,7 +6,7 @@ const Database = () => {
 
   useEffect(() => {
     const db = new Dexie('mtgdb');
-    db.version(1).stores({ cards: '++id,name,price,quantity,date_added' });
+    db.version(1).stores({ cards: '[name],price,quantity,date_added' });
     setDb(db);
   }, [db]);
 

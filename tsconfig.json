@@ -20,7 +20,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "typeRoots": [
-      "./src/types"
+      "./src/types",
+      "./src/interfaces"
     ]
   },
   "include": [
