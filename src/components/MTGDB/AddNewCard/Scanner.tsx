@@ -21,7 +21,7 @@ import { createWorker } from 'tesseract.js';
 import getCroppedImg from '../helper';
 import { ScryfallDataType } from '../../../interfaces';
 import { State } from '../../../state/reducers';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { CardsTableType } from '../../../database';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -44,7 +44,7 @@ const Scanner = () => {
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showToaster, setShowToaster] = useState(false);
-  const [allCards, setAllCards] = useState<CardsTableType[]>([]);
+  const [allCards, setAllCards] = useState<{ [key: string]: boolean }>();
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
@@ -55,7 +55,11 @@ const Scanner = () => {
   useEffect(() => {
     async function getAllCards() {
       const res = await db.cards.toArray();
-      setAllCards(res);
+      let tmp: { [key: string]: boolean } = {};
+      for (let i = 0; i < res.length; i++) {
+        tmp[res[i].name] = true;
+      }
+      setAllCards(tmp);
       setIsLoading(false);
     }
 
@@ -151,14 +155,6 @@ const Scanner = () => {
     openToaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
     setSearchResults([]);
     setIsLoading(true);
-  }
-
-  function checkDisabled(cardName: string) {
-    for (let i = 0; i < allCards.length; i++) {
-      if (allCards[i].name === cardName) return true;
-    }
-
-    return false;
   }
 
   const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
@@ -324,7 +320,7 @@ const Scanner = () => {
                       </CardContent>
                       <CardActions>
                         <Button
-                          disabled={checkDisabled(sr.name)}
+                          disabled={allCards ? allCards[sr.name] : false}
                           onClick={() => storeCard(sr)}
                         >
                           add card
