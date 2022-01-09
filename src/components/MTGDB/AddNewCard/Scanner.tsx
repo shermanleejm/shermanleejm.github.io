@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Cropper from 'react-easy-crop';
 import NumberFormat from 'react-number-format';
 import { createWorker } from 'tesseract.js';
@@ -28,6 +28,7 @@ import CloseIcon from '@mui/icons-material/Close';
 const Scanner = () => {
   const [img, setImg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(true);
   const [imgUploaded, setImgUploaded] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -88,6 +89,13 @@ const Scanner = () => {
     axios
       .get('https://api.scryfall.com/cards/search?q=' + queryName)
       .then((res) => {
+        let tmp = {} as any;
+        res.data.data.forEach(async (sr: ScryfallDataType) => {
+          let ce = await cardExists(sr.name);
+          tmp[sr.name] = ce;
+        });
+        console.log(tmp);
+        setCardExistence(tmp);
         setSearchResults(res.data.data);
       })
       .catch((err) => console.error(err))
@@ -146,8 +154,15 @@ const Scanner = () => {
   );
 
   function cardExists(cardName: string) {
-    let collision = db.cards.where('name').equalsIgnoreCase(cardName).first();
-    return collision !== undefined;
+    db.transaction('r', db.cards, () => {
+      db.cards
+        .where('name')
+        .equalsIgnoreCase(cardName)
+        .first()
+        .then(function (card) {
+          return card !== undefined;
+        });
+    });
   }
 
   return isLoading ? (
@@ -271,11 +286,12 @@ const Scanner = () => {
             spacing={3}
             justifyContent={'space-between'}
             alignItems={'center'}
+            style={{ width: '80vw' }}
           >
-            {searchResults.length > 0 &&
+            {!isSearching &&
               searchResults.map((sr: ScryfallDataType) => {
                 return (
-                  <Grid item xs={6}>
+                  <Grid item xs={6} md={2}>
                     <Card>
                       <CardMedia component="img" image={sr.image_uris.small} />
                       <CardContent>
@@ -283,7 +299,7 @@ const Scanner = () => {
                       </CardContent>
                       <CardActions>
                         <Button
-                          disabled={cardExists(sr.name)}
+                          disabled={cardExistence[sr.name]}
                           onClick={() => storeCard(sr)}
                         >
                           add card
