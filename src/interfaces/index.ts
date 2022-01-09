@@ -15,7 +15,7 @@ export interface ScryfallDataType {
   layout: string;
   highres_image: boolean;
   image_status: string;
-  image_uris: ImageUris;
+  image_uris: ImageUris | undefined;
   mana_cost: string;
   cmc: number;
   type_line: string;

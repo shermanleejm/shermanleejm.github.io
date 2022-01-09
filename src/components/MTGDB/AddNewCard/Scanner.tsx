@@ -21,9 +21,14 @@ import { createWorker } from 'tesseract.js';
 import getCroppedImg from '../helper';
 import { ScryfallDataType } from '../../../interfaces';
 import { State } from '../../../state/reducers';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CardsTableType } from '../../../database';
 import CloseIcon from '@mui/icons-material/Close';
+
+enum ToasterSeverityEnum {
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
 
 const Scanner = () => {
   const [img, setImg] = useState('');
@@ -37,11 +42,25 @@ const Scanner = () => {
   const [rotation, setRotation] = useState(0);
   const [qty, setQty] = useState(1);
   const [lastRequest, setLastRequest] = useState(Date.now());
-  const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showToaster, setShowToaster] = useState(false);
-  const [cardExistence, setCardExistence] = useState({}) as any;
+  const [allCards, setAllCards] = useState<CardsTableType[]>([]);
+  const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
+    ToasterSeverityEnum.SUCCESS
+  );
+  const [toasterMessage, setToasterMessage] = useState('');
 
   const db = useSelector((state: State) => state.database);
+
+  useEffect(() => {
+    async function getAllCards() {
+      const res = await db.cards.toArray();
+      setAllCards(res);
+      setIsLoading(false);
+    }
+
+    getAllCards();
+  }, [db.cards, isLoading]);
 
   const handleChange = (event: any) => {
     setImg(URL.createObjectURL(event.target.files[0]));
@@ -56,7 +75,6 @@ const Scanner = () => {
     setIsLoading(true);
     try {
       const croppedImage: any = await getCroppedImg(img, croppedAreaPixels, rotation);
-      console.log('donee', { croppedImage });
       try {
         let worker = createWorker({
           logger: (m) => console.log(m),
@@ -80,6 +98,8 @@ const Scanner = () => {
   }, [croppedAreaPixels, img, rotation]);
 
   function searchCard(queryName: string) {
+    setIsSearching(true);
+    setSearchResults([]);
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
@@ -89,18 +109,17 @@ const Scanner = () => {
     axios
       .get('https://api.scryfall.com/cards/search?q=' + queryName)
       .then((res) => {
-        let tmp = {} as any;
-        res.data.data.forEach(async (sr: ScryfallDataType) => {
-          let ce = await cardExists(sr.name);
-          tmp[sr.name] = ce;
-        });
-        console.log(tmp);
-        setCardExistence(tmp);
         setSearchResults(res.data.data);
       })
-      .catch((err) => console.error(err))
+      .catch((err) => {
+        console.error(err);
+        if (err.response.status === 404 || err.response.status === 400) {
+          openToaster('No card found', ToasterSeverityEnum.ERROR);
+        }
+      })
       .finally(() => {
         setLastRequest(Date.now());
+        setIsSearching(false);
       });
   }
 
@@ -129,8 +148,17 @@ const Scanner = () => {
       });
     }
 
-    setShowToaster(true);
+    openToaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
     setSearchResults([]);
+    setIsLoading(true);
+  }
+
+  function checkDisabled(cardName: string) {
+    for (let i = 0; i < allCards.length; i++) {
+      if (allCards[i].name === cardName) return true;
+    }
+
+    return false;
   }
 
   const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
@@ -139,6 +167,12 @@ const Scanner = () => {
     }
     setShowToaster(false);
   };
+
+  function openToaster(message: string, severity: ToasterSeverityEnum) {
+    setToasterMessage(message);
+    setToasterSeverity(severity);
+    setShowToaster(true);
+  }
 
   const toaster = (
     <React.Fragment>
@@ -152,18 +186,6 @@ const Scanner = () => {
       </IconButton>
     </React.Fragment>
   );
-
-  function cardExists(cardName: string) {
-    db.transaction('r', db.cards, () => {
-      db.cards
-        .where('name')
-        .equalsIgnoreCase(cardName)
-        .first()
-        .then(function (card) {
-          return card !== undefined;
-        });
-    });
-  }
 
   return isLoading ? (
     <div
@@ -284,7 +306,7 @@ const Scanner = () => {
             container
             direction="row"
             spacing={3}
-            justifyContent={'space-between'}
+            justifyContent={'start'}
             alignItems={'center'}
             style={{ width: '80vw' }}
           >
@@ -293,13 +315,16 @@ const Scanner = () => {
                 return (
                   <Grid item xs={6} md={2}>
                     <Card>
-                      <CardMedia component="img" image={sr.image_uris.small} />
+                      <CardMedia
+                        component="img"
+                        image={sr.image_uris === undefined ? '' : sr.image_uris.small}
+                      />
                       <CardContent>
                         <Typography>{sr.name}</Typography>
                       </CardContent>
                       <CardActions>
                         <Button
-                          disabled={cardExistence[sr.name]}
+                          disabled={checkDisabled(sr.name)}
                           onClick={() => storeCard(sr)}
                         >
                           add card
@@ -317,9 +342,8 @@ const Scanner = () => {
         autoHideDuration={3000}
         onClose={handleCloseToaster}
         action={toaster}
-        message="Card added"
       >
-        <Alert severity="success">Card Added!</Alert>
+        <Alert severity={toasterSeverity}>{toasterMessage}</Alert>
       </Snackbar>
     </div>
   );
