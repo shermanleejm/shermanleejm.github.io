@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { State } from '../../../state/reducers';
+import { State } from '../../state/reducers';
 import {
   DataGrid,
   GridRowsProp,
@@ -8,7 +8,7 @@ import {
 } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import { CircularProgress, Grid } from '@mui/material';
-import { CardsTableType } from '../../../database';
+import { CardsTableType } from '../../database';
 
 const Display = () => {
   const [isLoading, setIsLoading] = useState(true);

@@ -12,33 +12,37 @@ import {
   Snackbar,
   TextField,
   Typography,
-} from '@mui/material';
-import axios from 'axios';
-import React, { useCallback, useEffect, useState } from 'react';
-import Cropper from 'react-easy-crop';
-import NumberFormat from 'react-number-format';
-import { createWorker } from 'tesseract.js';
-import getCroppedImg from '../helper';
-import { ScryfallDataType } from '../../../interfaces';
-import { State } from '../../../state/reducers';
-import { useSelector } from 'react-redux';
-import { CardsTableType } from '../../../database';
-import CloseIcon from '@mui/icons-material/Close';
+} from "@mui/material";
+import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
+import Cropper from "react-easy-crop";
+import NumberFormat from "react-number-format";
+import { createWorker } from "tesseract.js";
+import getCroppedImg from "./helper";
+import { ScryfallDataType } from "../../interfaces";
+import { State } from "../../state/reducers";
+import { useSelector } from "react-redux";
+import { CardsTableType } from "../../database";
+import CloseIcon from "@mui/icons-material/Close";
 
 enum ToasterSeverityEnum {
-  SUCCESS = 'success',
-  ERROR = 'error',
+  SUCCESS = "success",
+  ERROR = "error",
 }
 
-const Scanner = () => {
-  const [img, setImg] = useState('');
+type AddNewCardProps = {
+  refresh: (e: boolean) => void;
+};
+
+const AddNewCard = (props: AddNewCardProps) => {
+  const [img, setImg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(true);
   const [imgUploaded, setImgUploaded] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [text, setText] = useState(' ');
+  const [text, setText] = useState(" ");
   const [rotation, setRotation] = useState(0);
   const [qty, setQty] = useState(1);
   const [lastRequest, setLastRequest] = useState(Date.now());
@@ -48,7 +52,7 @@ const Scanner = () => {
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
-  const [toasterMessage, setToasterMessage] = useState('');
+  const [toasterMessage, setToasterMessage] = useState("");
 
   const db = useSelector((state: State) => state.database);
 
@@ -78,14 +82,18 @@ const Scanner = () => {
   const showCroppedImage = useCallback(async () => {
     setIsLoading(true);
     try {
-      const croppedImage: any = await getCroppedImg(img, croppedAreaPixels, rotation);
+      const croppedImage: any = await getCroppedImg(
+        img,
+        croppedAreaPixels,
+        rotation
+      );
       try {
         let worker = createWorker({
           logger: (m) => console.log(m),
         });
         await worker.load();
-        await worker.loadLanguage('eng');
-        await worker.initialize('eng');
+        await worker.loadLanguage("eng");
+        await worker.initialize("eng");
         const {
           data: { text },
         } = await worker.recognize(croppedImage);
@@ -111,7 +119,7 @@ const Scanner = () => {
     }
 
     axios
-      .get('https://api.scryfall.com/cards/search?q=' + queryName)
+      .get("https://api.scryfall.com/cards/search?q=" + queryName)
       .then((res) => {
         setSearchResults(res.data.data);
         console.log(res.data.data);
@@ -119,7 +127,7 @@ const Scanner = () => {
       .catch((err) => {
         console.error(err);
         if (err.response.status === 404 || err.response.status === 400) {
-          openToaster('No card found', ToasterSeverityEnum.ERROR);
+          openToaster("No card found", ToasterSeverityEnum.ERROR);
         }
       })
       .finally(() => {
@@ -131,7 +139,7 @@ const Scanner = () => {
   async function storeCard(card: ScryfallDataType) {
     const newEntry: CardsTableType = {
       name: card.name,
-      price: card.prices.usd || '0',
+      price: card.prices.usd || "0",
       quantity: qty,
       date_added: Date.now(),
       set_name: card.set_name,
@@ -139,27 +147,31 @@ const Scanner = () => {
     };
 
     const collision: CardsTableType | undefined = await db.cards
-      .where('name')
+      .where("name")
       .equalsIgnoreCase(card.name)
       .first();
 
     if (collision === undefined) {
-      db.transaction('rw', db.cards, async () => {
+      db.transaction("rw", db.cards, async () => {
         await db.cards.add(newEntry);
       });
     } else {
-      db.transaction('rw', db.cards, async () => {
+      db.transaction("rw", db.cards, async () => {
         await db.cards.update(collision.id || 0, newEntry);
       });
     }
 
-    openToaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
+    openToaster("Recorded card!", ToasterSeverityEnum.SUCCESS);
     setSearchResults([]);
     setIsLoading(true);
+    props.refresh(true);
   }
 
-  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+  const handleCloseToaster = (
+    _event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
       return;
     }
     setShowToaster(false);
@@ -187,26 +199,36 @@ const Scanner = () => {
   return isLoading ? (
     <div
       style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '36 0 36 0',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "36 0 36 0",
       }}
     >
       <CircularProgress />
     </div>
   ) : (
     <div>
-      <Grid container direction="column" justifyContent="center" alignItems="center">
-        <Grid item style={{ width: '80vw' }}>
-          <Grid container direction="row" justifyContent="space-around" spacing={3}>
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item style={{ width: "80vw" }}>
+          <Grid
+            container
+            direction="row"
+            justifyContent="space-around"
+            spacing={3}
+          >
             <Grid item>
               <input
                 type="file"
                 accept="image/*"
                 capture="environment"
                 onChange={handleChange}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 id="upload-image"
               />
               <label htmlFor="upload-image">
@@ -221,8 +243,8 @@ const Scanner = () => {
 
         <Grid item>
           {imgUploaded && (
-            <div style={{ width: '80vw' }}>
-              <div style={{ position: 'relative', height: 300, width: '100%' }}>
+            <div style={{ width: "80vw" }}>
+              <div style={{ position: "relative", height: 300, width: "100%" }}>
                 <Cropper
                   image={img}
                   crop={crop}
@@ -246,10 +268,10 @@ const Scanner = () => {
           )}
         </Grid>
         <Grid item>
-          {img !== '' && imgUploaded && (
+          {img !== "" && imgUploaded && (
             <Button
               onClick={() => {
-                setImg('');
+                setImg("");
                 setImgUploaded(false);
               }}
             >
@@ -264,8 +286,8 @@ const Scanner = () => {
             direction="column"
             spacing={2}
             style={{
-              width: '80vw',
-              margin: '16 0 16 0',
+              width: "80vw",
+              margin: "16 0 16 0",
             }}
           >
             <Grid item>
@@ -287,7 +309,7 @@ const Scanner = () => {
                   let { floatValue } = values;
                   setQty(floatValue || 1);
                 }}
-                inputProps={{ fullWidth: 'true' }}
+                inputProps={{ fullWidth: "true" }}
               />
             </Grid>
             <Grid item>
@@ -303,9 +325,9 @@ const Scanner = () => {
             container
             direction="row"
             spacing={3}
-            justifyContent={'start'}
-            alignItems={'center'}
-            style={{ width: '80vw' }}
+            justifyContent={"start"}
+            alignItems={"center"}
+            style={{ width: "80vw" }}
           >
             {!isSearching &&
               searchResults.map((sr: ScryfallDataType) => {
@@ -314,7 +336,9 @@ const Scanner = () => {
                     <Card>
                       <CardMedia
                         component="img"
-                        image={sr.image_uris === undefined ? '' : sr.image_uris.small}
+                        image={
+                          sr.image_uris === undefined ? "" : sr.image_uris.small
+                        }
                       />
                       <CardContent>
                         <Typography>{sr.name}</Typography>
@@ -346,4 +370,4 @@ const Scanner = () => {
   );
 };
 
-export default Scanner;
+export default AddNewCard;

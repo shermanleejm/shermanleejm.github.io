@@ -1,10 +1,15 @@
-import AddNewCard from './AddNewCard';
-import Display from './Display';
+import { useEffect, useState } from "react";
+import AddNewCard from "./AddNewCard";
+import Display from "./Display";
 
 const MTGDB = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {}, [isLoading]);
+
   return (
     <div>
-      <AddNewCard />
+      <AddNewCard refresh={(e: boolean) => setIsLoading(e)} />
 
       <Display />
     </div>
