@@ -49,7 +49,6 @@ const Terminal = () => {
         lastTranslation: { x: translation.x, y: translation.y },
       });
     }
-    console.log(state);
   };
 
   const handleEnter = (event: any) => {

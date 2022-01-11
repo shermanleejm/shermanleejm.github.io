@@ -5,9 +5,14 @@ export interface CardsTableType {
   name: string;
   price: string;
   quantity: number;
-  date_added: number;
   rarity: string;
   set_name: string;
+  mana_cost: string;
+  cmc: number;
+  image_uri: string;
+  colors: string[];
+  color_identity: string[];
+  date_added: number;
 }
 
 export class MTGDatabase extends Dexie {
@@ -16,7 +21,8 @@ export class MTGDatabase extends Dexie {
   public constructor() {
     super('mtgdb');
     this.version(1).stores({
-      cards: '++id,name,price,quantity,rarity,set_name,date_added',
+      cards:
+        '++id,name,price,quantity,rarity,set_name,mana_cost,cmc,image_uri,colors,color_identity,date_added',
     });
   }
 }

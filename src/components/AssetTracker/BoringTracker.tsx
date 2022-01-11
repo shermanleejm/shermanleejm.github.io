@@ -66,7 +66,6 @@ const BoringTracker = () => {
 
     async function fetchLocalData() {
       let item = JSON.parse(localStorage.getItem('apikey') || '[]');
-      console.log(item);
       if (item.length > 0) {
         setAPIKey(item);
       }
@@ -94,7 +93,6 @@ const BoringTracker = () => {
         setIsLoading(false);
       }
     }
-    console.log('calling useEffect on Boring Tracker');
     fetchLocalData();
   }, [refresh, apiKey]);
 
