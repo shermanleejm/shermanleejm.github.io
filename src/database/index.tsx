@@ -3,7 +3,7 @@ import Dexie, { Table } from 'dexie';
 export interface CardsTableType {
   id?: number;
   name: string;
-  price: number;
+  price: string;
   quantity: number;
   date_added: number;
   rarity: string;

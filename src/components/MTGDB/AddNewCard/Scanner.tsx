@@ -114,6 +114,7 @@ const Scanner = () => {
       .get('https://api.scryfall.com/cards/search?q=' + queryName)
       .then((res) => {
         setSearchResults(res.data.data);
+        console.log(res.data.data);
       })
       .catch((err) => {
         console.error(err);
@@ -130,7 +131,7 @@ const Scanner = () => {
   async function storeCard(card: ScryfallDataType) {
     const newEntry: CardsTableType = {
       name: card.name,
-      price: parseInt(card.prices.usd || '0'),
+      price: card.prices.usd || '0',
       quantity: qty,
       date_added: Date.now(),
       set_name: card.set_name,
