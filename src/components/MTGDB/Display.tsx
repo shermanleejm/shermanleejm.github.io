@@ -3,8 +3,8 @@ import {
   GridCellParams,
   GridColDef,
   GridValueFormatterParams,
-} from '@mui/x-data-grid';
-import { useEffect, useState } from 'react';
+} from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -18,9 +18,9 @@ import {
   List,
   ListItem,
   ListItemText,
-} from '@mui/material';
-import { MTGDBProps } from '.';
-import { CardsTableType } from '../../database';
+} from "@mui/material";
+import { MTGDBProps } from ".";
+import { CardsTableType } from "../../database";
 
 const Display = (props: MTGDBProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
@@ -28,7 +28,7 @@ const Display = (props: MTGDBProps) => {
   const [toDelete, setToDelete] = useState<CardsTableType[]>([]);
   const [dialogState, setDialogState] = useState(false);
 
-  const colWidth = (window.innerWidth * 0.8) / 3;
+  const colWidth = (window.innerWidth * 0.8) / 4;
 
   useEffect(() => {
     function updateCards() {
@@ -40,17 +40,24 @@ const Display = (props: MTGDBProps) => {
   }, [isLoading, props.cardArr]);
 
   const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Name', width: colWidth },
-    { field: 'cmc', headerName: 'Converted Mana Cost', width: colWidth },
+    { field: "name", headerName: "Name", width: colWidth },
+    { field: "cmc", headerName: "Converted Mana Cost", width: colWidth },
     {
-      field: 'price',
-      headerName: 'Price',
+      field: "price",
+      headerName: "Price",
       width: colWidth,
       valueFormatter: (params: GridValueFormatterParams) => {
         return `$${params.value}`;
       },
     },
-    { field: 'color', headerName: 'Colours', width: colWidth },
+    {
+      field: "color",
+      headerName: "Colours",
+      width: colWidth,
+      valueGetter: (params) => {
+        return params.row.colors.join(", ") ?? "";
+      },
+    },
   ];
 
   type SortType = {
@@ -59,12 +66,14 @@ const Display = (props: MTGDBProps) => {
     checked: boolean;
   };
 
-  const [checkboxValues, setCheckboxValues] = useState<{ [key: string]: SortType }>({
-    name: { key: 'name', order: false, checked: false },
-    price: { key: 'price', order: false, checked: false },
-    cmc: { key: 'cmc', order: false, checked: false },
+  const [checkboxValues, setCheckboxValues] = useState<{
+    [key: string]: SortType;
+  }>({
+    name: { key: "name", order: false, checked: false },
+    price: { key: "price", order: false, checked: false },
+    cmc: { key: "cmc", order: false, checked: false },
   });
-  const sortNames = ['name', 'price', 'cmc'];
+  const sortNames = ["name", "price", "cmc"];
 
   function dynamicSort(property: SortType) {
     let first = property.order ? 1 : -1;
@@ -113,9 +122,9 @@ const Display = (props: MTGDBProps) => {
     <Box>
       <Grid
         container
-        direction={'column'}
-        justifyContent={'center'}
-        alignItems={'center'}
+        direction={"column"}
+        justifyContent={"center"}
+        alignItems={"center"}
       >
         {/* Filter Section */}
         {/* <Grid item>Advanced Sort</Grid>
@@ -140,21 +149,21 @@ const Display = (props: MTGDBProps) => {
         </Grid> */}
 
         {/* Data Grid */}
-        <Grid item style={{ width: '80vw' }}>
+        <Grid item style={{ width: "80vw" }}>
           <div
             style={{
-              height: '100%',
-              width: '100%',
+              height: "100%",
+              width: "100%",
             }}
           >
             <div style={{ flexGrow: 1 }}>
               <DataGrid
                 sx={{
-                  '& .u-text': { backgroundColor: '#2C458B', color: 'white' },
-                  '& .b-text': { backgroundColor: '#3C0C5D', color: 'white' },
-                  '& .r-text': { backgroundColor: '#731421', color: 'white' },
-                  '& .w-text': { backgroundColor: '#D99836', color: 'black' },
-                  '& .g-text': { backgroundColor: '#2A6438', color: 'white' },
+                  "& .u-text": { backgroundColor: "#2C458B", color: "white" },
+                  "& .b-text": { backgroundColor: "#3C0C5D", color: "white" },
+                  "& .r-text": { backgroundColor: "#731421", color: "white" },
+                  "& .w-text": { backgroundColor: "#D99836", color: "black" },
+                  "& .g-text": { backgroundColor: "#2A6438", color: "white" },
                 }}
                 rows={cards}
                 columns={columns}
@@ -168,10 +177,10 @@ const Display = (props: MTGDBProps) => {
                   setToDelete(selectedRows);
                 }}
                 getCellClassName={(params: GridCellParams<number>) => {
-                  if (params.field === 'name' && params.row.colors.length > 0) {
-                    return params.row.colors[0].toLowerCase() + '-text';
+                  if (params.field === "name" && params.row.colors.length > 0) {
+                    return params.row.colors[0].toLowerCase() + "-text";
                   }
-                  return '';
+                  return "";
                 }}
               />
             </div>
