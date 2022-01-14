@@ -102,7 +102,7 @@ const AddNewCard = (props: MTGDBProps) => {
   async function storeCard(card: ScryfallDataType) {
     const newEntry: CardsTableType = {
       name: card.name,
-      price: card.prices.usd ?? "0",
+      price: parseFloat(card.prices.usd || "0"),
       quantity: qty,
       set_name: card.set_name,
       rarity: card.rarity,

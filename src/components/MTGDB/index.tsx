@@ -1,24 +1,27 @@
-import { Alert, IconButton, Snackbar } from '@mui/material';
-import React from 'react';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { CardsTableType, MTGDatabase } from '../../database';
-import { State } from '../../state/reducers';
-import AddNewCard from './AddNewCard';
-import CloseIcon from '@mui/icons-material/Close';
-import Display from './Display';
+import { Alert, IconButton, Snackbar } from "@mui/material";
+import React from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { CardsTableType, MTGDatabase } from "../../database";
+import { State } from "../../state/reducers";
+import AddNewCard from "./AddNewCard";
+import CloseIcon from "@mui/icons-material/Close";
+import Display from "./Display";
 
 export enum ToasterSeverityEnum {
-  SUCCESS = 'success',
-  ERROR = 'error',
+  SUCCESS = "success",
+  ERROR = "error",
 }
 
 export type MTGDBProps = {
   refresh: (e: boolean) => void;
   toaster: (m: string, e: ToasterSeverityEnum) => void;
   db: MTGDatabase;
-  cardDict: { [key: string]: boolean };
+  cardDict?: { [key: string]: boolean };
   cardArr: CardsTableType[];
+  uniqueSets?: string[];
+  uniqueTags?: string[];
+  filterCard?: (k: string, val: string) => void;
 };
 
 const MTGDB = () => {
@@ -29,16 +32,36 @@ const MTGDB = () => {
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
-  const [toasterMessage, setToasterMessage] = useState('');
+  const [toasterMessage, setToasterMessage] = useState("");
+  const [uniqueTags, setUniqueTags] = useState<string[]>();
+  const [uniqueSets, setUniqueSets] = useState<string[]>();
 
   const db = useSelector((state: State) => state.database);
 
-  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+  const handleCloseToaster = (
+    _event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
       return;
     }
     setShowToaster(false);
   };
+
+  function filterCardArr(k: string, val: string) {
+    switch (k) {
+      case "tags":
+        setCardArr(cardArr.filter((c) => new Set(c[k]).has(val)));
+        console.log(cardArr.filter((c) => new Set(c[k]).has(val)));
+        break;
+      case "set_name":
+        setCardArr(cardArr.filter((c) => c[k] === val));
+        break;
+      default:
+        setIsLoading(true);
+        break;
+    }
+  }
 
   function openToaster(message: string, severity: ToasterSeverityEnum) {
     setToasterMessage(message);
@@ -48,13 +71,20 @@ const MTGDB = () => {
 
   useEffect(() => {
     async function getAllCards() {
-      const array = await db.cards.toArray();
+      const arr = await db.cards.toArray();
+      let uTags = new Set<string>();
+      let uSets = new Set<string>();
       let dict: { [key: string]: boolean } = {};
-      for (let i = 0; i < array.length; i++) {
-        dict[array[i].name] = true;
+      for (let i = 0; i < arr.length; i++) {
+        let curr = arr[i];
+        dict[curr.name] = true;
+        uSets.add(curr.set_name);
+        uTags = new Set([...new Set(curr.tags), ...new Set(Array.from(uTags))]);
       }
+      setUniqueSets(Array.from(uSets));
+      setUniqueTags(Array.from(uTags));
       setCardDict(dict);
-      setCardArr(array);
+      setCardArr(arr);
       setIsLoading(false);
     }
 
@@ -89,10 +119,14 @@ const MTGDB = () => {
       <Display
         refresh={(e: boolean) => setIsLoading(e)}
         db={db}
-        cardDict={cardDict}
         cardArr={cardArr}
         toaster={function (m: string, e: ToasterSeverityEnum): void {
           openToaster(m, e);
+        }}
+        uniqueSets={uniqueSets}
+        uniqueTags={uniqueTags}
+        filterCard={function (k: string, v: string): void {
+          filterCardArr(k, v);
         }}
       />
 

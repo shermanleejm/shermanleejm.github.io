@@ -10,17 +10,17 @@ import {
   Autocomplete,
   Box,
   Button,
-  Checkbox,
   Chip,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogTitle,
-  FormControlLabel,
   Grid,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
+  Select,
   styled,
   TextField,
   Tooltip,
@@ -37,12 +37,15 @@ const Display = (props: MTGDBProps) => {
   const [totalPrice, setTotalPrice] = useState(-1);
   const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [calculateDialogState, setCalculateDialogState] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<string>("tags");
+  const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
 
   useEffect(() => {
     function updateCards() {
       setCards(props.cardArr);
+      setMemoCards(props.cardArr);
       setIsLoading(false);
     }
 
@@ -63,6 +66,7 @@ const Display = (props: MTGDBProps) => {
       field: "name",
       headerName: "Name",
       width: colWidth,
+      flex: 1,
       renderCell: (params: GridRenderCellParams) => {
         let data: CardsTableType = params.row;
         return (
@@ -84,6 +88,7 @@ const Display = (props: MTGDBProps) => {
       field: "price",
       headerName: "Price",
       width: colWidth / 2,
+      flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         return `$${params.value}`;
       },
@@ -108,22 +113,20 @@ const Display = (props: MTGDBProps) => {
             multiple
             id="tags-standard"
             options={data.tags || []}
+            defaultValue={data.tags || []}
             freeSolo
             onChange={(_, values) => {
               updateTags(data.id || 0, values);
             }}
-            renderTags={(value: readonly string[], getTagProps) => {
-              return value.map((option: string, index: number) => {
-                console.log(option);
-                return (
-                  <Chip
-                    variant="outlined"
-                    label={option}
-                    {...getTagProps({ index })}
-                  />
-                );
-              });
-            }}
+            renderTags={(value: readonly string[], getTagProps) =>
+              value.map((option: string, index: number) => (
+                <Chip
+                  variant="outlined"
+                  label={option}
+                  {...getTagProps({ index })}
+                />
+              ))
+            }
             renderInput={(params) => (
               <TextField {...params} variant="standard" />
             )}
@@ -133,44 +136,30 @@ const Display = (props: MTGDBProps) => {
     },
   ];
 
-  type SortType = {
-    key: string;
-    order: boolean;
-    checked: boolean;
-  };
-
-  const [checkboxValues, setCheckboxValues] = useState<{
-    [key: string]: SortType;
-  }>({
-    name: { key: "name", order: false, checked: false },
-    price: { key: "price", order: false, checked: false },
-    cmc: { key: "cmc", order: false, checked: false },
-  });
-  const sortNames = ["name", "price", "cmc"];
-
-  function dynamicSort(property: SortType) {
-    let first = property.order ? 1 : -1;
-    let second = property.order ? -1 : 1;
-    return function (obj1: any, obj2: any) {
-      return obj1[property.key] > obj2[property.key]
-        ? first
-        : obj1[property.key] < obj2[property.key]
-        ? second
-        : 0;
-    };
+  function filterOptions(k: string) {
+    switch (k) {
+      case "tags":
+        return props.uniqueTags;
+      case "set_name":
+        return props.uniqueSets;
+      default:
+        return [];
+    }
   }
 
-  function dynamicSortMultiple(props: SortType[]) {
-    return function (obj1: any, obj2: any) {
-      var i = 0,
-        result = 0,
-        numberOfProperties = props.length;
-      while (result === 0 && i < numberOfProperties) {
-        result = dynamicSort(props[i])(obj1, obj2);
-        i++;
-      }
-      return result;
-    };
+  function filterCardArr(k: string, val: string | null) {
+    if (val === null) {
+      setCards(memoCards);
+      return "";
+    }
+    switch (k) {
+      case "tags":
+        setCards(cards.filter((c) => new Set(c[k]).has(val || "")));
+        break;
+      case "set_name":
+        setCards(cards.filter((c) => c[k] === val));
+        break;
+    }
   }
 
   async function deleteCards() {
@@ -185,7 +174,7 @@ const Display = (props: MTGDBProps) => {
   function calculateSelected() {
     let res = 0;
     for (let i = 0; i < selectedCards.length; i++) {
-      res += parseFloat(selectedCards[i]["price"]);
+      res += selectedCards[i]["price"];
     }
     setTotalPrice(parseFloat(res.toFixed(2)));
   }
@@ -200,34 +189,63 @@ const Display = (props: MTGDBProps) => {
   return isLoading ? (
     <CircularProgress />
   ) : (
-    <Box>
+    <Box
+      sx={{
+        ".u-text": { backgroundColor: "#2C458B", color: "white" },
+        ".b-text": { backgroundColor: "#3C0C5D", color: "white" },
+        ".r-text": { backgroundColor: "#731421", color: "white" },
+        ".w-text": { backgroundColor: "#ffffff", color: "black" },
+        ".g-text": { backgroundColor: "#2A6438", color: "white" },
+        ".m-text": { backgroundColor: "#FFD700", color: "black" },
+        ".c-text": { backgroundColor: "#808080", color: "white" },
+        ".tags": { borderRadius: "50%", border: "1" },
+      }}
+    >
       <Grid
         container
         direction={"column"}
         justifyContent={"center"}
         alignItems={"center"}
       >
-        {/* Filter Section */}
-        {/* <Grid item>Advanced Sort</Grid>
-        <Grid item style={{ textAlign: 'center', width: '80vw' }}>
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            {sortNames.map((k) => {
-              return (
-                <Grid item xs={4}>
-                  <FormControlLabel
-                    label={k}
-                    control={<Checkbox checked={checkboxState(k)} onChange={() => {}} />}
-                  />
-                </Grid>
-              );
-            })}
+        {/* Filter */}
+        <Grid item>
+          <Grid container direction={"row"}>
+            <Grid item style={{ width: "20vw" }}>
+              <Select
+                fullWidth
+                defaultValue={"tags"}
+                onChange={(e) => setSelectedFilter(e.target.value as string)}
+              >
+                <MenuItem value={"tags"}>Tags</MenuItem>
+                <MenuItem value={"set_name"}>Set Name</MenuItem>
+              </Select>
+            </Grid>
+            <Grid item style={{ width: "60vw" }}>
+              <Autocomplete
+                fullWidth
+                id="tags-standard"
+                options={filterOptions(selectedFilter) || []}
+                // defaultValue={data.tags || []}
+                freeSolo
+                onChange={(_, v) => {
+                  filterCardArr(selectedFilter, v);
+                }}
+                renderTags={(value: readonly string[], getTagProps) =>
+                  value.map((option: string, index: number) => (
+                    <Chip
+                      variant="outlined"
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" />
+                )}
+              />
+            </Grid>
           </Grid>
-        </Grid> */}
+        </Grid>
 
         {/* Data Grid */}
         <Grid item style={{ width: "80vw" }}>
@@ -239,16 +257,6 @@ const Display = (props: MTGDBProps) => {
           >
             <div style={{ flexGrow: 1 }}>
               <DataGrid
-                sx={{
-                  ".u-text": { backgroundColor: "#2C458B", color: "white" },
-                  ".b-text": { backgroundColor: "#3C0C5D", color: "white" },
-                  ".r-text": { backgroundColor: "#731421", color: "white" },
-                  ".w-text": { backgroundColor: "#ffffff", color: "black" },
-                  ".g-text": { backgroundColor: "#2A6438", color: "white" },
-                  ".m-text": { backgroundColor: "#FFD700", color: "black" },
-                  ".c-text": { backgroundColor: "#808080", color: "white" },
-                  ".tags": { borderRadius: "50%", border: "1" },
-                }}
                 rows={cards}
                 columns={columns}
                 autoHeight
