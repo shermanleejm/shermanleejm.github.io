@@ -9,26 +9,26 @@ import {
   Slider,
   TextField,
   Typography,
-} from '@mui/material';
-import axios from 'axios';
-import React, { useCallback, useState } from 'react';
-import Cropper from 'react-easy-crop';
-import NumberFormat from 'react-number-format';
-import { createWorker } from 'tesseract.js';
-import getCroppedImg from './helper';
-import { ScryfallDataType } from '../../interfaces';
-import { CardsTableType } from '../../database';
-import { MTGDBProps, ToasterSeverityEnum } from '.';
+} from "@mui/material";
+import axios from "axios";
+import React, { useCallback, useState } from "react";
+import Cropper from "react-easy-crop";
+import NumberFormat from "react-number-format";
+import { createWorker } from "tesseract.js";
+import getCroppedImg from "./helper";
+import { ScryfallDataType } from "../../interfaces";
+import { CardsTableType } from "../../database";
+import { MTGDBProps, ToasterSeverityEnum } from ".";
 
 const AddNewCard = (props: MTGDBProps) => {
-  const [img, setImg] = useState('');
+  const [img, setImg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(true);
   const [imgUploaded, setImgUploaded] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [text, setText] = useState(' ');
+  const [text, setText] = useState(" ");
   const [rotation, setRotation] = useState(0);
   const [qty, setQty] = useState(1);
   const [lastRequest, setLastRequest] = useState(Date.now());
@@ -46,14 +46,18 @@ const AddNewCard = (props: MTGDBProps) => {
   const showCroppedImage = useCallback(async () => {
     setIsLoading(true);
     try {
-      const croppedImage: any = await getCroppedImg(img, croppedAreaPixels, rotation);
+      const croppedImage: any = await getCroppedImg(
+        img,
+        croppedAreaPixels,
+        rotation
+      );
       try {
         let worker = createWorker({
           logger: (m) => console.log(m),
         });
         await worker.load();
-        await worker.loadLanguage('eng');
-        await worker.initialize('eng');
+        await worker.loadLanguage("eng");
+        await worker.initialize("eng");
         const {
           data: { text },
         } = await worker.recognize(croppedImage);
@@ -79,14 +83,14 @@ const AddNewCard = (props: MTGDBProps) => {
     }
 
     axios
-      .get('https://api.scryfall.com/cards/search?q=' + queryName)
+      .get("https://api.scryfall.com/cards/search?q=" + queryName)
       .then((res) => {
         setSearchResults(res.data.data);
       })
       .catch((err) => {
         console.error(err);
         if (err.response.status === 404 || err.response.status === 400) {
-          props.toaster('No card found', ToasterSeverityEnum.ERROR);
+          props.toaster("No card found", ToasterSeverityEnum.ERROR);
         }
       })
       .finally(() => {
@@ -98,60 +102,71 @@ const AddNewCard = (props: MTGDBProps) => {
   async function storeCard(card: ScryfallDataType) {
     const newEntry: CardsTableType = {
       name: card.name,
-      price: card.prices.usd ?? '0',
+      price: card.prices.usd ?? "0",
       quantity: qty,
       set_name: card.set_name,
       rarity: card.rarity,
       mana_cost: card.mana_cost,
       cmc: card.cmc,
-      image_uri: card.image_uris?.small ?? '',
+      image_uri: card.image_uris?.small ?? "",
       colors: card.colors,
       color_identity: card.color_identity,
+      tags: [],
       date_added: Date.now(),
     };
 
     const collision: CardsTableType | undefined = await props.db.cards
-      .where('name')
+      .where("name")
       .equalsIgnoreCase(card.name)
       .first();
 
     if (collision === undefined) {
-      props.db.transaction('rw', props.db.cards, async () => {
+      props.db.transaction("rw", props.db.cards, async () => {
         await props.db.cards.add(newEntry);
       });
     } else {
-      props.db.transaction('rw', props.db.cards, async () => {
+      props.db.transaction("rw", props.db.cards, async () => {
         await props.db.cards.update(collision.id || 0, newEntry);
       });
     }
 
-    props.toaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
+    props.toaster("Recorded card!", ToasterSeverityEnum.SUCCESS);
     props.refresh(true);
   }
 
   return isLoading ? (
     <div
       style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '36 0 36 0',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "36 0 36 0",
       }}
     >
       <CircularProgress />
     </div>
   ) : (
     <div>
-      <Grid container direction="column" justifyContent="center" alignItems="center">
-        <Grid item style={{ width: '80vw' }}>
-          <Grid container direction="row" justifyContent="space-around" spacing={3}>
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item style={{ width: "80vw" }}>
+          <Grid
+            container
+            direction="row"
+            justifyContent="space-around"
+            spacing={3}
+          >
             <Grid item>
               <input
                 type="file"
                 accept="image/*"
                 capture="environment"
                 onChange={handleChange}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 id="upload-image"
               />
               <label htmlFor="upload-image">
@@ -166,8 +181,8 @@ const AddNewCard = (props: MTGDBProps) => {
 
         <Grid item>
           {imgUploaded && (
-            <div style={{ width: '80vw' }}>
-              <div style={{ position: 'relative', height: 300, width: '100%' }}>
+            <div style={{ width: "80vw" }}>
+              <div style={{ position: "relative", height: 300, width: "100%" }}>
                 <Cropper
                   image={img}
                   crop={crop}
@@ -191,10 +206,10 @@ const AddNewCard = (props: MTGDBProps) => {
           )}
         </Grid>
         <Grid item>
-          {img !== '' && imgUploaded && (
+          {img !== "" && imgUploaded && (
             <Button
               onClick={() => {
-                setImg('');
+                setImg("");
                 setImgUploaded(false);
               }}
             >
@@ -209,8 +224,8 @@ const AddNewCard = (props: MTGDBProps) => {
             direction="column"
             spacing={2}
             style={{
-              width: '80vw',
-              margin: '16 0 16 0',
+              width: "80vw",
+              margin: "16 0 16 0",
             }}
           >
             <Grid item>
@@ -232,7 +247,7 @@ const AddNewCard = (props: MTGDBProps) => {
                   let { floatValue } = values;
                   setQty(floatValue || 1);
                 }}
-                inputProps={{ fullWidth: 'true' }}
+                inputProps={{ fullWidth: "true" }}
               />
             </Grid>
             <Grid item>
@@ -246,7 +261,7 @@ const AddNewCard = (props: MTGDBProps) => {
                   fullWidth
                   onClick={() => {
                     setSearchResults([]);
-                    setText('');
+                    setText("");
                   }}
                 >
                   clear
@@ -261,9 +276,9 @@ const AddNewCard = (props: MTGDBProps) => {
             container
             direction="row"
             spacing={3}
-            justifyContent={'start'}
-            alignItems={'center'}
-            style={{ width: '80vw' }}
+            justifyContent={"start"}
+            alignItems={"center"}
+            style={{ width: "80vw" }}
           >
             {!isSearching &&
               searchResults.map((sr: ScryfallDataType) => {
@@ -272,14 +287,18 @@ const AddNewCard = (props: MTGDBProps) => {
                     <Card>
                       <CardMedia
                         component="img"
-                        image={sr.image_uris === undefined ? '' : sr.image_uris.small}
+                        image={
+                          sr.image_uris === undefined ? "" : sr.image_uris.small
+                        }
                       />
                       <CardContent>
                         <Typography>{sr.name}</Typography>
                       </CardContent>
                       <CardActions>
                         <Button
-                          disabled={props.cardDict ? props.cardDict[sr.name] : false}
+                          disabled={
+                            props.cardDict ? props.cardDict[sr.name] : false
+                          }
                           onClick={() => storeCard(sr)}
                         >
                           add card

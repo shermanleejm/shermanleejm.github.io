@@ -2,13 +2,16 @@ import {
   DataGrid,
   GridCellParams,
   GridColDef,
+  GridRenderCellParams,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Autocomplete,
   Box,
   Button,
   Checkbox,
+  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -18,6 +21,11 @@ import {
   List,
   ListItem,
   ListItemText,
+  styled,
+  TextField,
+  Tooltip,
+  TooltipProps,
+  Typography,
 } from "@mui/material";
 import { MTGDBProps } from ".";
 import { CardsTableType } from "../../database";
@@ -25,8 +33,10 @@ import { CardsTableType } from "../../database";
 const Display = (props: MTGDBProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [toDelete, setToDelete] = useState<CardsTableType[]>([]);
-  const [dialogState, setDialogState] = useState(false);
+  const [selectedCards, setSelectedCards] = useState<CardsTableType[]>([]);
+  const [totalPrice, setTotalPrice] = useState(-1);
+  const [deleteDialogState, setDeleteDialogState] = useState(false);
+  const [calculateDialogState, setCalculateDialogState] = useState(false);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
 
@@ -39,23 +49,86 @@ const Display = (props: MTGDBProps) => {
     updateCards();
   }, [isLoading, props.cardArr]);
 
+  async function updateTags(id: number, tags: string[]) {
+    await props.db.cards.update(id, { tags: tags });
+    props.refresh(true);
+  }
+
+  const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({}));
+
   const columns: GridColDef[] = [
-    { field: "name", headerName: "Name", width: colWidth },
-    { field: "cmc", headerName: "Converted Mana Cost", width: colWidth },
+    {
+      field: "name",
+      headerName: "Name",
+      width: colWidth,
+      renderCell: (params: GridRenderCellParams) => {
+        let data: CardsTableType = params.row;
+        return (
+          <HtmlTooltip
+            title={
+              <React.Fragment>
+                <img src={data.image_uri}></img>
+              </React.Fragment>
+            }
+            followCursor
+          >
+            <Typography>{data.name}</Typography>
+          </HtmlTooltip>
+        );
+      },
+    },
+    { field: "cmc", headerName: "CMC", width: 65 },
     {
       field: "price",
       headerName: "Price",
-      width: colWidth,
+      width: colWidth / 2,
       valueFormatter: (params: GridValueFormatterParams) => {
         return `$${params.value}`;
       },
     },
+    // {
+    //   field: "color",
+    //   headerName: "Colours",
+    //   width: colWidth / 1.5,
+    //   valueGetter: (params) => {
+    //     return params.row.colors.join(", ") ?? "";
+    //   },
+    // },
     {
-      field: "color",
-      headerName: "Colours",
-      width: colWidth,
-      valueGetter: (params) => {
-        return params.row.colors.join(", ") ?? "";
+      field: "tags",
+      headerName: "tags",
+      width: colWidth * 2,
+      renderCell: (params: GridRenderCellParams) => {
+        let data: CardsTableType = params.row;
+        return (
+          <Autocomplete
+            fullWidth
+            multiple
+            id="tags-standard"
+            options={data.tags || []}
+            freeSolo
+            onChange={(_, values) => {
+              updateTags(data.id || 0, values);
+            }}
+            renderTags={(value: readonly string[], getTagProps) => {
+              return value.map((option: string, index: number) => {
+                console.log(option);
+                return (
+                  <Chip
+                    variant="outlined"
+                    label={option}
+                    {...getTagProps({ index })}
+                  />
+                );
+              });
+            }}
+            renderInput={(params) => (
+              <TextField {...params} variant="standard" />
+            )}
+          />
+        );
       },
     },
   ];
@@ -102,16 +175,24 @@ const Display = (props: MTGDBProps) => {
 
   async function deleteCards() {
     setIsLoading(true);
-    for (let i = 0; i < toDelete.length; i++) {
-      await props.db.cards.delete(toDelete[i].id ?? -1);
+    for (let i = 0; i < selectedCards.length; i++) {
+      await props.db.cards.delete(selectedCards[i].id ?? -1);
     }
     props.refresh(true);
     setIsLoading(false);
   }
 
-  function closeDialog() {
-    setDialogState(false);
-    setToDelete([]);
+  function calculateSelected() {
+    let res = 0;
+    for (let i = 0; i < selectedCards.length; i++) {
+      res += parseFloat(selectedCards[i]["price"]);
+    }
+    setTotalPrice(parseFloat(res.toFixed(2)));
+  }
+
+  function closeDeleteDialog() {
+    setDeleteDialogState(false);
+    setSelectedCards([]);
     setIsLoading(true);
     props.refresh(true);
   }
@@ -159,11 +240,14 @@ const Display = (props: MTGDBProps) => {
             <div style={{ flexGrow: 1 }}>
               <DataGrid
                 sx={{
-                  "& .u-text": { backgroundColor: "#2C458B", color: "white" },
-                  "& .b-text": { backgroundColor: "#3C0C5D", color: "white" },
-                  "& .r-text": { backgroundColor: "#731421", color: "white" },
-                  "& .w-text": { backgroundColor: "#D99836", color: "black" },
-                  "& .g-text": { backgroundColor: "#2A6438", color: "white" },
+                  ".u-text": { backgroundColor: "#2C458B", color: "white" },
+                  ".b-text": { backgroundColor: "#3C0C5D", color: "white" },
+                  ".r-text": { backgroundColor: "#731421", color: "white" },
+                  ".w-text": { backgroundColor: "#ffffff", color: "black" },
+                  ".g-text": { backgroundColor: "#2A6438", color: "white" },
+                  ".m-text": { backgroundColor: "#FFD700", color: "black" },
+                  ".c-text": { backgroundColor: "#808080", color: "white" },
+                  ".tags": { borderRadius: "50%", border: "1" },
                 }}
                 rows={cards}
                 columns={columns}
@@ -174,28 +258,51 @@ const Display = (props: MTGDBProps) => {
                   let selectedRows = cards.filter((card) =>
                     selectedIds.has(card.id ?? -1)
                   );
-                  setToDelete(selectedRows);
+                  setSelectedCards(selectedRows);
                 }}
                 getCellClassName={(params: GridCellParams<number>) => {
-                  if (params.field === "name" && params.row.colors.length > 0) {
-                    return params.row.colors[0].toLowerCase() + "-text";
+                  let res = "";
+                  if (params.field === "name") {
+                    if (params.row.colors.length < 1) {
+                      res += "c-text";
+                    } else if (params.row.colors.length > 1) {
+                      res += "m-text";
+                    } else {
+                      res += params.row.colors[0].toLowerCase() + "-text";
+                    }
                   }
-                  return "";
+
+                  if (params.field === "cmc") {
+                    res += "pill";
+                  }
+                  return res;
                 }}
               />
             </div>
           </div>
         </Grid>
         <Grid item>
-          <Button onClick={() => setDialogState(true)}>delete selected</Button>
+          <Button onClick={() => setDeleteDialogState(true)}>
+            delete selected
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            onClick={() => {
+              calculateSelected();
+              setCalculateDialogState(true);
+            }}
+          >
+            calculate selected
+          </Button>
         </Grid>
       </Grid>
 
-      {/* Dialog */}
-      <Dialog onClose={deleteCards} open={dialogState}>
+      {/* Delete Dialog */}
+      <Dialog onClose={deleteCards} open={deleteDialogState}>
         <DialogTitle>Confirm delete?</DialogTitle>
         <List>
-          {toDelete.map((card) => (
+          {selectedCards.map((card) => (
             <ListItem>
               <ListItemText primary={card.name} />
             </ListItem>
@@ -205,12 +312,23 @@ const Display = (props: MTGDBProps) => {
           <Button
             onClick={() => {
               deleteCards();
-              closeDialog();
+              closeDeleteDialog();
             }}
           >
             Confirm
           </Button>
-          <Button onClick={() => closeDialog()}>Cancel</Button>
+          <Button onClick={() => closeDeleteDialog()}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Calculate Dialog */}
+      <Dialog
+        onClose={() => setCalculateDialogState(false)}
+        open={calculateDialogState}
+      >
+        <DialogTitle>US${totalPrice}</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setCalculateDialogState(false)}>close</Button>
         </DialogActions>
       </Dialog>
     </Box>
