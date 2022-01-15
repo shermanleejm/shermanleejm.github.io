@@ -1,17 +1,17 @@
-import { Alert, IconButton, Snackbar } from "@mui/material";
-import React from "react";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { CardsTableType, MTGDatabase } from "../../database";
-import { State } from "../../state/reducers";
-import AddNewCard from "./AddNewCard";
-import CloseIcon from "@mui/icons-material/Close";
-import Display from "./Display";
-import NetExports from "./NetExports";
+import { Alert, Button, IconButton, Snackbar } from '@mui/material';
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { CardsTableType, MTGDatabase } from '../../database';
+import { State } from '../../state/reducers';
+import AddNewCard from './AddNewCard';
+import CloseIcon from '@mui/icons-material/Close';
+import Display from './Display';
+import NetExports from './NetExports';
 
 export enum ToasterSeverityEnum {
-  SUCCESS = "success",
-  ERROR = "error",
+  SUCCESS = 'success',
+  ERROR = 'error',
 }
 
 export type MTGDBProps = {
@@ -33,17 +33,15 @@ const MTGDB = () => {
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
-  const [toasterMessage, setToasterMessage] = useState("");
+  const [toasterMessage, setToasterMessage] = useState('');
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
+  const [showImportExport, setShowImportExport] = useState(false);
 
   const db = useSelector((state: State) => state.database);
 
-  const handleCloseToaster = (
-    _event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
+  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
       return;
     }
     setShowToaster(false);
@@ -51,11 +49,11 @@ const MTGDB = () => {
 
   function filterCardArr(k: string, val: string) {
     switch (k) {
-      case "tags":
+      case 'tags':
         setCardArr(cardArr.filter((c) => new Set(c[k]).has(val)));
         console.log(cardArr.filter((c) => new Set(c[k]).has(val)));
         break;
-      case "set_name":
+      case 'set_name':
         setCardArr(cardArr.filter((c) => c[k] === val));
         break;
       default:
@@ -131,14 +129,23 @@ const MTGDB = () => {
         }}
       />
 
-      <NetExports
-        db={db}
-        refresh={(e: boolean) => setIsLoading(e)}
-        cardArr={cardArr}
-        toaster={function (m: string, e: ToasterSeverityEnum): void {
-          openToaster(m, e);
-        }}
-      />
+      {showImportExport ? (
+        <div style={{ textAlign: 'center' }}>
+          <NetExports
+            db={db}
+            refresh={(e: boolean) => setIsLoading(e)}
+            cardArr={cardArr}
+            toaster={function (m: string, e: ToasterSeverityEnum): void {
+              openToaster(m, e);
+            }}
+          />
+          <Button onClick={() => setShowImportExport(false)}>hide import export</Button>
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center' }}>
+          <Button onClick={() => setShowImportExport(true)}>show import export</Button>
+        </div>
+      )}
 
       <Snackbar
         open={showToaster}
