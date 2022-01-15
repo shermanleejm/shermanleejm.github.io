@@ -147,6 +147,7 @@ const Display = (props: MTGDBProps) => {
     { slug: 'name', name: 'Card Name' },
     { slug: 'price', name: 'Price' },
     { slug: 'colors', name: 'Colours' },
+    { slug: 'type_line', name: 'Card Type' },
   ];
 
   function filterCardArr(k: string, val: string | null) {
@@ -170,6 +171,10 @@ const Display = (props: MTGDBProps) => {
       case 'colors':
         setCards(cards.filter((c) => new Set(c.colors).has(val.toUpperCase())));
         break;
+      case 'type_line':
+        setCards(
+          cards.filter((c) => c.type_line.toLowerCase().includes(val.toLowerCase()))
+        );
     }
   }
 
