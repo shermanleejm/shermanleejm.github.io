@@ -6,6 +6,8 @@ import {
   CardMedia,
   CircularProgress,
   Grid,
+  IconButton,
+  InputAdornment,
   Slider,
   TextField,
   Typography,
@@ -20,11 +22,12 @@ import { ScryfallDataType } from '../../interfaces';
 import { CardsTableType } from '../../database';
 import { MTGDBProps, ToasterSeverityEnum } from '.';
 import SearchResultCard from './SearchResultCard';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const AddNewCard = (props: MTGDBProps) => {
   const [img, setImg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const [imgUploaded, setImgUploaded] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -33,7 +36,7 @@ const AddNewCard = (props: MTGDBProps) => {
   const [rotation, setRotation] = useState(0);
   const [qty, setQty] = useState(1);
   const [lastRequest, setLastRequest] = useState(Date.now());
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
 
   const handleChange = (event: any) => {
     setImg(URL.createObjectURL(event.target.files[0]));
@@ -58,7 +61,7 @@ const AddNewCard = (props: MTGDBProps) => {
         const {
           data: { text },
         } = await worker.recognize(croppedImage);
-        setText(text);
+        setText(text.replace(/[^a-zA-Z0-9\s]/g, ''));
         await worker.terminate();
       } catch (err) {
         console.error(err);
@@ -76,6 +79,8 @@ const AddNewCard = (props: MTGDBProps) => {
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
+      props.toaster('Too many requests', ToasterSeverityEnum.ERROR);
+      setIsSearching(false);
       return 0;
     }
 
@@ -97,7 +102,6 @@ const AddNewCard = (props: MTGDBProps) => {
   }
 
   async function storeCard(card: ScryfallDataType, tag?: string) {
-    console.log(card);
     const newEntry: CardsTableType = {
       name: card.name,
       price: parseFloat(card.prices.usd || '0'),
@@ -130,7 +134,6 @@ const AddNewCard = (props: MTGDBProps) => {
     }
 
     props.toaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
-    props.refresh(true);
   }
 
   return isLoading ? (
@@ -222,9 +225,23 @@ const AddNewCard = (props: MTGDBProps) => {
             <Grid item>
               <TextField
                 value={text}
-                onChange={(e: any) => setText(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ''))
+                }
                 label="Card Name (remove uneccessary characters)"
                 fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton edge="end" onClick={() => setText('')}>
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                  if (e.key === 'Enter') searchCard(text);
+                }}
               />
             </Grid>
             <Grid item>
@@ -242,9 +259,13 @@ const AddNewCard = (props: MTGDBProps) => {
               />
             </Grid>
             <Grid item>
-              <Button fullWidth onClick={() => searchCard(text)}>
-                search
-              </Button>
+              {isSearching ? (
+                <CircularProgress />
+              ) : (
+                <Button fullWidth onClick={() => searchCard(text)}>
+                  search
+                </Button>
+              )}
             </Grid>
             <Grid item>
               {searchResults.length > 0 && (
@@ -271,14 +292,13 @@ const AddNewCard = (props: MTGDBProps) => {
             alignItems={'center'}
             style={{ width: '80vw' }}
           >
-            {!isSearching &&
-              searchResults.map((sr: ScryfallDataType) => (
-                <SearchResultCard
-                  sr={sr}
-                  storeCard={(sr: ScryfallDataType, tag?: string) => storeCard(sr, tag)}
-                  cardDict={props.cardDict || {}}
-                />
-              ))}
+            {searchResults.map((sr: ScryfallDataType) => (
+              <SearchResultCard
+                sr={sr}
+                storeCard={(sr: ScryfallDataType, tag?: string) => storeCard(sr, tag)}
+                cardDict={props.cardDict || {}}
+              />
+            ))}
           </Grid>
         </Grid>
       </Grid>

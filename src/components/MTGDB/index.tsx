@@ -1,4 +1,13 @@
-import { Alert, Button, IconButton, Snackbar } from '@mui/material';
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Snackbar,
+  Tab,
+  Tabs,
+} from '@mui/material';
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -37,6 +46,7 @@ const MTGDB = () => {
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
   const [showImportExport, setShowImportExport] = useState(false);
+  const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
 
@@ -105,47 +115,84 @@ const MTGDB = () => {
 
   return (
     <div>
-      <AddNewCard
-        refresh={(e: boolean) => setIsLoading(e)}
-        db={db}
-        cardDict={cardDict}
-        cardArr={cardArr}
-        toaster={function (m: string, e: ToasterSeverityEnum): void {
-          openToaster(m, e);
-        }}
-      />
-
-      <Display
-        refresh={(e: boolean) => setIsLoading(e)}
-        db={db}
-        cardArr={cardArr}
-        toaster={function (m: string, e: ToasterSeverityEnum): void {
-          openToaster(m, e);
-        }}
-        uniqueSets={uniqueSets}
-        uniqueTags={uniqueTags}
-        filterCard={function (k: string, v: string): void {
-          filterCardArr(k, v);
-        }}
-      />
-
-      {showImportExport ? (
-        <div style={{ textAlign: 'center' }}>
-          <NetExports
-            db={db}
-            refresh={(e: boolean) => setIsLoading(e)}
-            cardArr={cardArr}
-            toaster={function (m: string, e: ToasterSeverityEnum): void {
-              openToaster(m, e);
+      <Grid
+        container
+        direction={'column'}
+        spacing={4}
+        justifyContent={'center'}
+        alignItems={'center'}
+      >
+        <Grid item>
+          <Tabs
+            value={chosenTab}
+            onChange={(e: React.SyntheticEvent, newValue: number) => {
+              setChosenTab(newValue);
+              setIsLoading(true);
             }}
-          />
-          <Button onClick={() => setShowImportExport(false)}>hide import export</Button>
-        </div>
-      ) : (
-        <div style={{ textAlign: 'center' }}>
-          <Button onClick={() => setShowImportExport(true)}>show import export</Button>
-        </div>
-      )}
+          >
+            <Tab label="Add Card" />
+            <Tab label="Cards Table" />
+            <Tab label="Import/Export" />
+          </Tabs>
+        </Grid>
+
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
+          <span>
+            {' '}
+            <Grid item hidden={chosenTab !== 0}>
+              <AddNewCard
+                refresh={(e: boolean) => setIsLoading(e)}
+                db={db}
+                cardDict={cardDict}
+                cardArr={cardArr}
+                toaster={function (m: string, e: ToasterSeverityEnum): void {
+                  openToaster(m, e);
+                }}
+              />
+            </Grid>
+            <Grid item hidden={chosenTab !== 1}>
+              <Display
+                refresh={(e: boolean) => setIsLoading(e)}
+                db={db}
+                cardArr={cardArr}
+                toaster={function (m: string, e: ToasterSeverityEnum): void {
+                  openToaster(m, e);
+                }}
+                uniqueSets={uniqueSets}
+                uniqueTags={uniqueTags}
+                filterCard={function (k: string, v: string): void {
+                  filterCardArr(k, v);
+                }}
+              />
+            </Grid>
+            <Grid item hidden={chosenTab !== 2}>
+              {showImportExport ? (
+                <div style={{ textAlign: 'center' }}>
+                  <NetExports
+                    db={db}
+                    refresh={(e: boolean) => setIsLoading(e)}
+                    cardArr={cardArr}
+                    toaster={function (m: string, e: ToasterSeverityEnum): void {
+                      openToaster(m, e);
+                    }}
+                  />
+                  <Button onClick={() => setShowImportExport(false)}>
+                    hide import export
+                  </Button>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center' }}>
+                  <Button onClick={() => setShowImportExport(true)}>
+                    show import export
+                  </Button>
+                </div>
+              )}
+            </Grid>
+          </span>
+        )}
+      </Grid>
 
       <Snackbar
         open={showToaster}
