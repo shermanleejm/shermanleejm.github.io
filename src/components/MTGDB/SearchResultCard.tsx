@@ -29,7 +29,13 @@ const SearchResultCard = (props: SearchResultCardType) => {
       <Card>
         <CardMedia
           component="img"
-          image={props.sr.image_uris === undefined ? '' : props.sr.image_uris.small}
+          image={
+            props.sr.image_uris === undefined
+              ? props.sr.card_faces !== undefined
+                ? props.sr.card_faces[0].image_uris.small
+                : ''
+              : props.sr.image_uris.small
+          }
         />
         <CardContent>
           <Typography>{props.sr.name}</Typography>

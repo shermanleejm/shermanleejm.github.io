@@ -146,6 +146,7 @@ const Display = (props: MTGDBProps) => {
     { slug: 'set_name', name: 'Set Name' },
     { slug: 'name', name: 'Card Name' },
     { slug: 'price', name: 'Price' },
+    { slug: 'colors', name: 'Colours' },
   ];
 
   function filterCardArr(k: string, val: string | null) {
@@ -165,6 +166,9 @@ const Display = (props: MTGDBProps) => {
         break;
       case 'price':
         setCards(cards.filter((c) => c.price > parseFloat(val)));
+        break;
+      case 'colors':
+        setCards(cards.filter((c) => new Set(c.colors).has(val.toUpperCase())));
         break;
     }
   }

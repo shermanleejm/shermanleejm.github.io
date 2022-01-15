@@ -1,16 +1,11 @@
 import {
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
   CircularProgress,
   Grid,
   IconButton,
   InputAdornment,
   Slider,
   TextField,
-  Typography,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useCallback, useState } from 'react';
@@ -88,6 +83,7 @@ const AddNewCard = (props: MTGDBProps) => {
       .get('https://api.scryfall.com/cards/search?q=' + queryName)
       .then((res) => {
         setSearchResults(res.data.data);
+        console.log(res.data.data);
       })
       .catch((err) => {
         console.error(err);
@@ -102,6 +98,13 @@ const AddNewCard = (props: MTGDBProps) => {
   }
 
   async function storeCard(card: ScryfallDataType, tag?: string) {
+    let colors = [];
+    if (card.card_faces) {
+      colors = card.card_faces[0].colors;
+    } else {
+      colors = card.colors || [];
+    }
+
     const newEntry: CardsTableType = {
       name: card.name,
       price: parseFloat(card.prices.usd || '0'),
@@ -111,7 +114,7 @@ const AddNewCard = (props: MTGDBProps) => {
       mana_cost: card.mana_cost,
       cmc: card.cmc,
       image_uri: card.image_uris?.small ?? '',
-      colors: card.colors,
+      colors: colors,
       color_identity: card.color_identity,
       tags: tag === undefined ? [] : [tag],
       type_line: card.type_line,

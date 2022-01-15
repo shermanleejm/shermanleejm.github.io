@@ -22,7 +22,7 @@ export interface ScryfallDataType {
   oracle_text: string;
   power: string;
   toughness: string;
-  colors: string[];
+  colors?: string[];
   color_identity: string[];
   keywords: string[];
   legalities: { [key: string]: Legality };
@@ -65,6 +65,20 @@ export interface ScryfallDataType {
   prices: { [key: string]: null | string };
   related_uris: RelatedUris;
   purchase_uris: PurchaseUris;
+  card_faces?: CardFaces[];
+}
+
+export interface CardFaces {
+  artist: string;
+  artist_id: string;
+  colors: string[];
+  illustration_id: string;
+  image_uris: ImageUris;
+  mana_cost: string;
+  name: string;
+  object: string;
+  oracle_text: string;
+  type_line: string;
 }
 
 export interface ImageUris {
