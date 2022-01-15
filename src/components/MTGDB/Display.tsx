@@ -4,8 +4,8 @@ import {
   GridColDef,
   GridRenderCellParams,
   GridValueFormatterParams,
-} from "@mui/x-data-grid";
-import React, { useEffect, useState } from "react";
+} from '@mui/x-data-grid';
+import React, { useEffect, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -26,9 +26,9 @@ import {
   Tooltip,
   TooltipProps,
   Typography,
-} from "@mui/material";
-import { MTGDBProps } from ".";
-import { CardsTableType } from "../../database";
+} from '@mui/material';
+import { MTGDBProps } from '.';
+import { CardsTableType } from '../../database';
 
 const Display = (props: MTGDBProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
@@ -37,7 +37,7 @@ const Display = (props: MTGDBProps) => {
   const [totalPrice, setTotalPrice] = useState(-1);
   const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [calculateDialogState, setCalculateDialogState] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<string>("tags");
+  const [selectedFilter, setSelectedFilter] = useState<string>('tags');
   const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
@@ -63,8 +63,8 @@ const Display = (props: MTGDBProps) => {
 
   const columns: GridColDef[] = [
     {
-      field: "name",
-      headerName: "Name",
+      field: 'name',
+      headerName: 'Name',
       width: colWidth,
       flex: 1,
       renderCell: (params: GridRenderCellParams) => {
@@ -83,10 +83,10 @@ const Display = (props: MTGDBProps) => {
         );
       },
     },
-    { field: "cmc", headerName: "CMC", width: 65 },
+    { field: 'cmc', headerName: 'CMC', width: 65 },
     {
-      field: "price",
-      headerName: "Price",
+      field: 'price',
+      headerName: 'Price',
       width: colWidth / 2,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
@@ -102,8 +102,8 @@ const Display = (props: MTGDBProps) => {
     //   },
     // },
     {
-      field: "tags",
-      headerName: "tags",
+      field: 'tags',
+      headerName: 'tags',
       width: colWidth * 2,
       renderCell: (params: GridRenderCellParams) => {
         let data: CardsTableType = params.row;
@@ -120,16 +120,10 @@ const Display = (props: MTGDBProps) => {
             }}
             renderTags={(value: readonly string[], getTagProps) =>
               value.map((option: string, index: number) => (
-                <Chip
-                  variant="outlined"
-                  label={option}
-                  {...getTagProps({ index })}
-                />
+                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
               ))
             }
-            renderInput={(params) => (
-              <TextField {...params} variant="standard" />
-            )}
+            renderInput={(params) => <TextField {...params} variant="standard" />}
           />
         );
       },
@@ -138,27 +132,35 @@ const Display = (props: MTGDBProps) => {
 
   function filterOptions(k: string) {
     switch (k) {
-      case "tags":
+      case 'tags':
         return props.uniqueTags;
-      case "set_name":
+      case 'set_name':
         return props.uniqueSets;
       default:
         return [];
     }
   }
 
+  const filters = [
+    { slug: 'tags', name: 'Tags' },
+    { slug: 'set_name', name: 'Set Name' },
+    { slug: 'name', name: 'Card Name' },
+  ];
+
   function filterCardArr(k: string, val: string | null) {
     if (val === null) {
       setCards(memoCards);
-      return "";
+      return '';
     }
     switch (k) {
-      case "tags":
-        setCards(cards.filter((c) => new Set(c[k]).has(val || "")));
+      case 'tags':
+        setCards(cards.filter((c) => new Set(c[k]).has(val || '')));
         break;
-      case "set_name":
+      case 'set_name':
         setCards(cards.filter((c) => c[k] === val));
         break;
+      case 'name':
+        setCards(cards.filter((c) => c.name.toLowerCase().includes(val.toLowerCase())));
     }
   }
 
@@ -174,7 +176,7 @@ const Display = (props: MTGDBProps) => {
   function calculateSelected() {
     let res = 0;
     for (let i = 0; i < selectedCards.length; i++) {
-      res += selectedCards[i]["price"];
+      res += selectedCards[i]['price'];
     }
     setTotalPrice(parseFloat(res.toFixed(2)));
   }
@@ -191,36 +193,37 @@ const Display = (props: MTGDBProps) => {
   ) : (
     <Box
       sx={{
-        ".u-text": { backgroundColor: "#2C458B", color: "white" },
-        ".b-text": { backgroundColor: "#3C0C5D", color: "white" },
-        ".r-text": { backgroundColor: "#731421", color: "white" },
-        ".w-text": { backgroundColor: "#ffffff", color: "black" },
-        ".g-text": { backgroundColor: "#2A6438", color: "white" },
-        ".m-text": { backgroundColor: "#FFD700", color: "black" },
-        ".c-text": { backgroundColor: "#808080", color: "white" },
-        ".tags": { borderRadius: "50%", border: "1" },
+        '.u-text': { backgroundColor: '#2C458B', color: 'white' },
+        '.b-text': { backgroundColor: '#3C0C5D', color: 'white' },
+        '.r-text': { backgroundColor: '#731421', color: 'white' },
+        '.w-text': { backgroundColor: '#ffffff', color: 'black' },
+        '.g-text': { backgroundColor: '#2A6438', color: 'white' },
+        '.m-text': { backgroundColor: '#FFD700', color: 'black' },
+        '.c-text': { backgroundColor: '#808080', color: 'white' },
+        '.tags': { borderRadius: '50%', border: '1' },
       }}
     >
       <Grid
         container
-        direction={"column"}
-        justifyContent={"center"}
-        alignItems={"center"}
+        direction={'column'}
+        justifyContent={'center'}
+        alignItems={'center'}
       >
         {/* Filter */}
         <Grid item>
-          <Grid container direction={"row"}>
-            <Grid item style={{ width: "20vw" }}>
+          <Grid container direction={'row'}>
+            <Grid item style={{ width: '20vw' }}>
               <Select
                 fullWidth
-                defaultValue={"tags"}
+                defaultValue={filters[0].slug}
                 onChange={(e) => setSelectedFilter(e.target.value as string)}
               >
-                <MenuItem value={"tags"}>Tags</MenuItem>
-                <MenuItem value={"set_name"}>Set Name</MenuItem>
+                {filters.map((f) => (
+                  <MenuItem value={f.slug}>{f.name}</MenuItem>
+                ))}
               </Select>
             </Grid>
-            <Grid item style={{ width: "60vw" }}>
+            <Grid item style={{ width: '60vw' }}>
               <Autocomplete
                 fullWidth
                 id="tags-standard"
@@ -232,27 +235,21 @@ const Display = (props: MTGDBProps) => {
                 }}
                 renderTags={(value: readonly string[], getTagProps) =>
                   value.map((option: string, index: number) => (
-                    <Chip
-                      variant="outlined"
-                      label={option}
-                      {...getTagProps({ index })}
-                    />
+                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
                   ))
                 }
-                renderInput={(params) => (
-                  <TextField {...params} variant="outlined" />
-                )}
+                renderInput={(params) => <TextField {...params} variant="outlined" />}
               />
             </Grid>
           </Grid>
         </Grid>
 
         {/* Data Grid */}
-        <Grid item style={{ width: "80vw" }}>
+        <Grid item style={{ width: '80vw' }}>
           <div
             style={{
-              height: "100%",
-              width: "100%",
+              height: '100%',
+              width: '100%',
             }}
           >
             <div style={{ flexGrow: 1 }}>
@@ -269,19 +266,19 @@ const Display = (props: MTGDBProps) => {
                   setSelectedCards(selectedRows);
                 }}
                 getCellClassName={(params: GridCellParams<number>) => {
-                  let res = "";
-                  if (params.field === "name") {
+                  let res = '';
+                  if (params.field === 'name') {
                     if (params.row.colors.length < 1) {
-                      res += "c-text";
+                      res += 'c-text';
                     } else if (params.row.colors.length > 1) {
-                      res += "m-text";
+                      res += 'm-text';
                     } else {
-                      res += params.row.colors[0].toLowerCase() + "-text";
+                      res += params.row.colors[0].toLowerCase() + '-text';
                     }
                   }
 
-                  if (params.field === "cmc") {
-                    res += "pill";
+                  if (params.field === 'cmc') {
+                    res += 'pill';
                   }
                   return res;
                 }}
@@ -290,9 +287,7 @@ const Display = (props: MTGDBProps) => {
           </div>
         </Grid>
         <Grid item>
-          <Button onClick={() => setDeleteDialogState(true)}>
-            delete selected
-          </Button>
+          <Button onClick={() => setDeleteDialogState(true)}>delete selected</Button>
         </Grid>
         <Grid item>
           <Button
@@ -330,10 +325,7 @@ const Display = (props: MTGDBProps) => {
       </Dialog>
 
       {/* Calculate Dialog */}
-      <Dialog
-        onClose={() => setCalculateDialogState(false)}
-        open={calculateDialogState}
-      >
+      <Dialog onClose={() => setCalculateDialogState(false)} open={calculateDialogState}>
         <DialogTitle>US${totalPrice}</DialogTitle>
         <DialogActions>
           <Button onClick={() => setCalculateDialogState(false)}>close</Button>
