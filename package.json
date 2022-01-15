@@ -22,9 +22,12 @@
     "@types/redux-thunk": "^2.1.0",
     "axios": "^0.24.0",
     "dexie": "^3.2.0",
+    "dexie-export-import": "^1.0.3",
     "dexie-react-hooks": "^1.1.1",
+    "downloadjs": "^1.4.7",
     "gh-pages": "^3.2.3",
     "react": "^17.0.2",
+    "react-csv": "^2.2.1",
     "react-dom": "^17.0.2",
     "react-draggable": "^4.4.4",
     "react-easy-crop": "^4.0.1",
@@ -60,5 +63,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-csv": "^1.1.2"
   }
 }

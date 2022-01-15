@@ -73,7 +73,7 @@ const Display = (props: MTGDBProps) => {
           <HtmlTooltip
             title={
               <React.Fragment>
-                <img src={data.image_uri}></img>
+                <img src={data.image_uri} alt=""></img>
               </React.Fragment>
             }
             followCursor

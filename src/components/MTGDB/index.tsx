@@ -7,6 +7,7 @@ import { State } from "../../state/reducers";
 import AddNewCard from "./AddNewCard";
 import CloseIcon from "@mui/icons-material/Close";
 import Display from "./Display";
+import NetExports from "./NetExports";
 
 export enum ToasterSeverityEnum {
   SUCCESS = "success",
@@ -127,6 +128,15 @@ const MTGDB = () => {
         uniqueTags={uniqueTags}
         filterCard={function (k: string, v: string): void {
           filterCardArr(k, v);
+        }}
+      />
+
+      <NetExports
+        db={db}
+        refresh={(e: boolean) => setIsLoading(e)}
+        cardArr={cardArr}
+        toaster={function (m: string, e: ToasterSeverityEnum): void {
+          openToaster(m, e);
         }}
       />
 
