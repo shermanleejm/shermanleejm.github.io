@@ -332,14 +332,16 @@ const Display = (props: MTGDBProps) => {
           </Button>
         </Grid>
         <Grid item>
-          <Button
-            href={`data:text/json;charset=utf-8,${encodeURIComponent(
-              JSON.stringify(selectedCards)
-            )}`}
-            download={`MTGDB_dump_${Date.now()}.json`}
-          >
-            export json
-          </Button>
+          {selectedCards.length > 0 && (
+            <Button
+              href={`data:text/json;charset=utf-8,${encodeURIComponent(
+                JSON.stringify(selectedCards)
+              )}`}
+              download={`MTGDB_dump_${Date.now()}.json`}
+            >
+              export json
+            </Button>
+          )}
         </Grid>
       </Grid>
 
