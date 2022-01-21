@@ -76,7 +76,7 @@ const NetExports = (props: MTGDBProps) => {
     </div>
   ) : (
     <div style={{ width: "80vw", margin: "auto" }}>
-      <Button fullWidth>
+      <Button fullWidth disabled>
         <CSVDownload></CSVDownload>
       </Button>
       <input
@@ -91,6 +91,14 @@ const NetExports = (props: MTGDBProps) => {
           upload csv
         </Button>
       </label>
+      <Button
+        href={`data:text/json;charset=utf-8,${encodeURIComponent(
+          JSON.stringify(props.cardArr)
+        )}`}
+        download={`MTGDB_dump_${Date.now()}.json`}
+      >
+        export json
+      </Button>
       <input
         type="file"
         accept="application/json"
