@@ -60,16 +60,9 @@ const SearchResultCard = (props: SearchResultCardType) => {
       }
       setIsLoading(false);
     }
-    console.log(props.sr.name);
+
     preCheck();
-  }, [
-    props.cardDict,
-    props.sr.name,
-    props.sr.prices.usd,
-    props.sr.prices.usd_etched,
-    props.sr.prices.usd_foil,
-    isLoading,
-  ]);
+  }, []);
 
   const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTag(e.target.value);
