@@ -29,7 +29,6 @@ const AddNewCard = (props: MTGDBProps) => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [text, setText] = useState(' ');
   const [rotation, setRotation] = useState(0);
-  const [qty, setQty] = useState(1);
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
 
@@ -96,7 +95,12 @@ const AddNewCard = (props: MTGDBProps) => {
       });
   }
 
-  async function storeCard(card: ScryfallDataType, tag?: string, price?: string) {
+  async function storeCard(
+    card: ScryfallDataType,
+    tag?: string,
+    price?: string,
+    qty?: number
+  ) {
     let colors = [];
     if (card.card_faces) {
       colors = card.card_faces[0].colors;
@@ -107,7 +111,7 @@ const AddNewCard = (props: MTGDBProps) => {
     const newEntry: CardsTableType = {
       name: card.name,
       price: price ? parseFloat(price) : parseFloat(card.prices.usd || '0'),
-      quantity: qty,
+      quantity: qty || 1,
       set_name: card.set_name,
       rarity: card.rarity,
       mana_cost: card.mana_cost,
@@ -252,20 +256,6 @@ const AddNewCard = (props: MTGDBProps) => {
               />
             </Grid>
             <Grid item>
-              <NumberFormat
-                customInput={TextField}
-                value={qty}
-                thousandSeparator
-                decimalScale={0}
-                label="Quantity"
-                onValueChange={(values) => {
-                  let { floatValue } = values;
-                  setQty(floatValue || 1);
-                }}
-                inputProps={{ fullWidth: 'true' }}
-              />
-            </Grid>
-            <Grid item>
               {isSearching ? (
                 <CircularProgress />
               ) : (
@@ -302,7 +292,12 @@ const AddNewCard = (props: MTGDBProps) => {
             {searchResults.map((sr: ScryfallDataType) => (
               <SearchResultCard
                 sr={sr}
-                storeCard={(sr: ScryfallDataType, tag?: string, price?: string) => storeCard(sr, tag)}
+                storeCard={(
+                  sr: ScryfallDataType,
+                  tag?: string,
+                  price?: string,
+                  qty?: number
+                ) => storeCard(sr, tag, price, qty)}
                 cardDict={props.cardDict || {}}
               />
             ))}

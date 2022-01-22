@@ -10,12 +10,13 @@ import {
   Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import NumberFormat from 'react-number-format';
 import { ScryfallDataType } from '../../interfaces';
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;
   cardDict: { [key: string]: boolean };
-  storeCard: (sr: ScryfallDataType, tag?: string, price?: string) => void;
+  storeCard: (sr: ScryfallDataType, tag?: string, price?: string, qty?: number) => void;
 };
 
 const SearchResultCard = (props: SearchResultCardType) => {
@@ -26,6 +27,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
     { type: string; money: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     function preCheck() {
@@ -108,6 +110,20 @@ const SearchResultCard = (props: SearchResultCardType) => {
               </MenuItem>
             ))}
           </TextField>
+          <br />
+          <br />
+          <NumberFormat
+            customInput={TextField}
+            value={qty}
+            thousandSeparator
+            decimalScale={0}
+            label="Quantity"
+            onValueChange={(values) => {
+              let { floatValue } = values;
+              setQty(floatValue || 1);
+            }}
+            inputProps={{ fullWidth: 'true' }}
+          />
         </CardContent>
         <CardActions>
           <Grid container direction={'column'}>
@@ -119,7 +135,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
                 disabled={isClicked}
                 onClick={() => {
                   setIsClicked(true);
-                  props.storeCard(props.sr, tag, price);
+                  props.storeCard(props.sr, tag, price, qty);
                 }}
               >
                 add card
