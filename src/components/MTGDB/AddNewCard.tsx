@@ -284,7 +284,7 @@ const AddNewCard = (props: MTGDBProps) => {
           <Grid
             container
             direction="row"
-            spacing={3}
+            spacing={1}
             justifyContent={'start'}
             alignItems={'stretch'}
             style={{ width: '80vw' }}

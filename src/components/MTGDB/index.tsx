@@ -140,7 +140,6 @@ const MTGDB = () => {
           <CircularProgress />
         ) : (
           <span>
-            {' '}
             <Grid item hidden={chosenTab !== 0}>
               <AddNewCard
                 refresh={(e: boolean) => setIsLoading(e)}
