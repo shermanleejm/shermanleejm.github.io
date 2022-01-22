@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Input, Typography } from "@mui/material";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import "dexie-export-import";
 import { useState } from "react";
 import { MTGDBProps, ToasterSeverityEnum } from ".";

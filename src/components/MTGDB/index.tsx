@@ -114,7 +114,7 @@ const MTGDB = () => {
   );
 
   return (
-    <div>
+    <div style={{ margin: '0 0 50px 0 ' }}>
       <Grid
         container
         direction={'column'}
