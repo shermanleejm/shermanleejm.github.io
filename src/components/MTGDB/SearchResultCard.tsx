@@ -105,9 +105,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
             }}
           >
             {priceSelectOptions.map((pso) => (
-              <MenuItem value={pso.money}>
-                {pso.type} - USD {pso.money}
-              </MenuItem>
+              <MenuItem value={pso.money}>{`US$${pso.money} - ${pso.type}`}</MenuItem>
             ))}
           </TextField>
           <br />
