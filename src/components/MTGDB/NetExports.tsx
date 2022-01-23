@@ -76,7 +76,7 @@ const NetExports = (props: MTGDBProps) => {
       <Typography>Processing...</Typography>
     </div>
   ) : (
-    <div style={{ width: '80vw', margin: 'auto' }}>
+    <div style={{ width: '80vw', margin: 'auto', textAlign: 'center' }}>
       <Button fullWidth disabled>
         <CSVDownload></CSVDownload>
       </Button>

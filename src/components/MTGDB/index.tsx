@@ -17,6 +17,7 @@ import AddNewCard from './AddNewCard';
 import CloseIcon from '@mui/icons-material/Close';
 import Display from './Display';
 import NetExports from './NetExports';
+import DeckBuilder from './DeckBuilder';
 
 export enum ToasterSeverityEnum {
   SUCCESS = 'success',
@@ -113,6 +114,59 @@ const MTGDB = () => {
     </React.Fragment>
   );
 
+  type CustomTabsType = {
+    label: string;
+    component: JSX.Element;
+  };
+  const CustomTabs: CustomTabsType[] = [
+    {
+      label: 'Add Card',
+      component: (
+        <AddNewCard
+          refresh={(e: boolean) => setIsLoading(e)}
+          db={db}
+          cardDict={cardDict}
+          cardArr={cardArr}
+          toaster={function (m: string, e: ToasterSeverityEnum): void {
+            openToaster(m, e);
+          }}
+        />
+      ),
+    },
+    {
+      label: 'Cards Table',
+      component: (
+        <Display
+          refresh={(e: boolean) => setIsLoading(e)}
+          db={db}
+          cardArr={cardArr}
+          toaster={function (m: string, e: ToasterSeverityEnum): void {
+            openToaster(m, e);
+          }}
+          uniqueSets={uniqueSets}
+          uniqueTags={uniqueTags}
+          filterCard={function (k: string, v: string): void {
+            filterCardArr(k, v);
+          }}
+        />
+      ),
+    },
+    { label: 'Deck Builder', component: <DeckBuilder /> },
+    {
+      label: 'Import/Export',
+      component: (
+        <NetExports
+          db={db}
+          refresh={(e: boolean) => setIsLoading(e)}
+          cardArr={cardArr}
+          toaster={function (m: string, e: ToasterSeverityEnum): void {
+            openToaster(m, e);
+          }}
+        />
+      ),
+    },
+  ];
+
   return (
     <div style={{ margin: '0 0 50px 0 ' }}>
       <Grid
@@ -130,9 +184,9 @@ const MTGDB = () => {
               setIsLoading(true);
             }}
           >
-            <Tab label="Add Card" />
-            <Tab label="Cards Table" />
-            <Tab label="Import/Export" />
+            {CustomTabs.map((e: CustomTabsType) => (
+              <Tab label={e.label} />
+            ))}
           </Tabs>
         </Grid>
 
@@ -140,55 +194,13 @@ const MTGDB = () => {
           <CircularProgress />
         ) : (
           <span>
-            <Grid item hidden={chosenTab !== 0}>
-              <AddNewCard
-                refresh={(e: boolean) => setIsLoading(e)}
-                db={db}
-                cardDict={cardDict}
-                cardArr={cardArr}
-                toaster={function (m: string, e: ToasterSeverityEnum): void {
-                  openToaster(m, e);
-                }}
-              />
-            </Grid>
-            <Grid item hidden={chosenTab !== 1}>
-              <Display
-                refresh={(e: boolean) => setIsLoading(e)}
-                db={db}
-                cardArr={cardArr}
-                toaster={function (m: string, e: ToasterSeverityEnum): void {
-                  openToaster(m, e);
-                }}
-                uniqueSets={uniqueSets}
-                uniqueTags={uniqueTags}
-                filterCard={function (k: string, v: string): void {
-                  filterCardArr(k, v);
-                }}
-              />
-            </Grid>
-            <Grid item hidden={chosenTab !== 2}>
-              {showImportExport ? (
-                <div style={{ textAlign: 'center' }}>
-                  <NetExports
-                    db={db}
-                    refresh={(e: boolean) => setIsLoading(e)}
-                    cardArr={cardArr}
-                    toaster={function (m: string, e: ToasterSeverityEnum): void {
-                      openToaster(m, e);
-                    }}
-                  />
-                  <Button onClick={() => setShowImportExport(false)}>
-                    hide import export
-                  </Button>
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center' }}>
-                  <Button onClick={() => setShowImportExport(true)}>
-                    show import export
-                  </Button>
-                </div>
-              )}
-            </Grid>
+            {CustomTabs.map((e: CustomTabsType, i: number) => {
+              return (
+                <Grid item hidden={chosenTab !== i}>
+                  {e.component}
+                </Grid>
+              );
+            })}
           </span>
         )}
       </Grid>
