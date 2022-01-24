@@ -179,41 +179,33 @@ const MTGDB = () => {
 
   return (
     <div>
-      <Grid
-        container
-        direction={'column'}
-        spacing={4}
-        justifyContent={'center'}
-        alignItems={'center'}
+      <Tabs
+        centered
+        value={chosenTab}
+        onChange={(e: React.SyntheticEvent, newValue: number) => {
+          setChosenTab(newValue);
+          setIsLoading(true);
+        }}
+        style={{ marginBottom: 20 }}
       >
-        <Grid item>
-          <Tabs
-            value={chosenTab}
-            onChange={(e: React.SyntheticEvent, newValue: number) => {
-              setChosenTab(newValue);
-              setIsLoading(true);
-            }}
-          >
-            {CustomTabs.map((e: CustomTabsType) => (
-              <Tab label={e.label} />
-            ))}
-          </Tabs>
-        </Grid>
+        {CustomTabs.map((e: CustomTabsType) => (
+          <Tab label={e.label} />
+        ))}
+      </Tabs>
 
-        {isLoading ? (
-          <CircularProgress />
-        ) : (
-          <>
-            {CustomTabs.map((e: CustomTabsType, i: number) => {
-              return (
-                <Grid item hidden={chosenTab !== i}>
-                  {e.component}
-                </Grid>
-              );
-            })}
-          </>
-        )}
-      </Grid>
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <>
+          {CustomTabs.map((e: CustomTabsType, i: number) => {
+            return (
+              <div hidden={chosenTab !== i} key={i + 1}>
+                {e.component}
+              </div>
+            );
+          })}
+        </>
+      )}
 
       <Snackbar
         open={showToaster}

@@ -3,7 +3,7 @@ import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import InvertColorsIcon from '@mui/icons-material/InvertColors';
 import ParkIcon from '@mui/icons-material/Park';
-import { TextField, IconButton, Grid } from '@mui/material';
+import { TextField, IconButton, Grid, Typography } from '@mui/material';
 import { MTGDBProps } from '..';
 import Board from './Board';
 import { useEffect, useState } from 'react';
@@ -45,11 +45,14 @@ const DeckBuilder = (props: MTGDBProps) => {
 
   function filterCardArrByText(text: string) {
     setCardArr(
-      props.cardArr.filter(
-        (c) =>
-          c.name.toLowerCase().includes(text.toLowerCase()) ||
-          c.type_line.toLowerCase().includes(text.toLowerCase())
-      )
+      props.cardArr
+        .filter(
+          (c) =>
+            c.name.toLowerCase().includes(text.toLowerCase()) ||
+            c.type_line.toLowerCase().includes(text.toLowerCase())
+        )
+        .sort((a, b) => compare(a, b, 'cmc'))
+        .sort((a, b) => compare(a, b, 'colors'))
     );
   }
 
@@ -67,6 +70,7 @@ const DeckBuilder = (props: MTGDBProps) => {
         <Grid container direction={'row'}>
           <Grid item>
             <TextField
+              style={{ width: '50vw' }}
               label="general search"
               size="small"
               value={searchText}
@@ -88,7 +92,11 @@ const DeckBuilder = (props: MTGDBProps) => {
         </Grid>
       </Grid>
       <Grid item>
-        <Board cardArr={cardArr} />
+        {cardArr.length === 0 ? (
+          <Typography>Sorry, no cards meet this criteria</Typography>
+        ) : (
+          <Board cardArr={cardArr} />
+        )}
       </Grid>
     </Grid>
   );
