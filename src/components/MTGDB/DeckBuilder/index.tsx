@@ -67,9 +67,9 @@ const DeckBuilder = (props: MTGDBProps) => {
   ];
 
   return (
-    <Grid container direction={'column'} justifyContent={'center'} alignItems={'center'}>
+    <Grid container direction={'row'} justifyContent={'center'} alignItems={'center'}>
       <Grid item>
-        <Grid container direction={'row'}>
+        <Grid container direction={'row'} justifyContent={'center'}>
           <Grid item>
             <TextField
               style={{ width: '50vw' }}

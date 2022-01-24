@@ -37,7 +37,7 @@ const Board = (props: BoardProps) => {
 
       <Grid container spacing={1} justifyContent={'center'} alignItems={'center'}>
         {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType) => (
-          <Grid item xs={3} lg={3} justifyContent={'center'}>
+          <Grid item xs={6} md={3} justifyContent={'center'}>
             <DraggableCard data={c} />
           </Grid>
         ))}
