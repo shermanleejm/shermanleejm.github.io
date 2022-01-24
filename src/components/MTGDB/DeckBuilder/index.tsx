@@ -67,8 +67,8 @@ const DeckBuilder = (props: MTGDBProps) => {
   ];
 
   return (
-    <Grid container direction={'row'} justifyContent={'center'} alignItems={'center'}>
-      <Grid item>
+    <Grid container justifyContent={'center'} alignItems={'center'}>
+      <Grid item xs={12}>
         <Grid container direction={'row'} justifyContent={'center'}>
           <Grid item>
             <TextField
@@ -116,12 +116,15 @@ const DeckBuilder = (props: MTGDBProps) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid item sm={12} md={9}>
         {cardArr.length === 0 ? (
           <Typography>Sorry, no cards meet this criteria</Typography>
         ) : (
           <Board cardArr={cardArr} />
         )}
+      </Grid>
+      <Grid item sm={12} md={3}>
+        card list
       </Grid>
     </Grid>
   );
