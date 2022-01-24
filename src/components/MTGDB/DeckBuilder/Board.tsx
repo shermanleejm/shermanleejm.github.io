@@ -35,23 +35,13 @@ const Board = (props: BoardProps) => {
         <ArrowBackIosNewIcon />
       </IconButton>
 
-      <div
-        style={{
-          width: '80vw',
-          margin: 'auto',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Grid container spacing={1}>
-          {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType) => (
-            <Grid item xs={3} lg={3}>
-              <DraggableCard data={c} />
-            </Grid>
-          ))}
-        </Grid>
-      </div>
+      <Grid container spacing={1} justifyContent={'center'} alignItems={'center'}>
+        {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType) => (
+          <Grid item xs={3} lg={3} justifyContent={'center'}>
+            <DraggableCard data={c} />
+          </Grid>
+        ))}
+      </Grid>
 
       <IconButton
         disabled={startIndex > props.cardArr.length - perPage}

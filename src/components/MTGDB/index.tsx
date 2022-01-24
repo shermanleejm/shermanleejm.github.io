@@ -163,7 +163,7 @@ const MTGDB = () => {
       ),
     },
     {
-      label: 'Import/Export',
+      label: 'Import Export',
       component: (
         <NetExports
           db={db}
@@ -181,6 +181,8 @@ const MTGDB = () => {
     <div>
       <Tabs
         centered
+        variant="fullWidth"
+        scrollButtons={true}
         value={chosenTab}
         onChange={(e: React.SyntheticEvent, newValue: number) => {
           setChosenTab(newValue);
