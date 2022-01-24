@@ -13,7 +13,7 @@ const DraggableCard = (props: DraggableCardProps) => {
     <Card
       hidden={hidden}
       onClick={() => setHidden(true)}
-      sx={{ maxWidth: { xs: '50vh', md: '30vh' } }}
+      sx={{ maxWidth: { xs: '50vw', sm: "20vw", lg: '30vh' } }}
     >
       <CardMedia component={'img'} image={props.data.image_uri} />
     </Card>

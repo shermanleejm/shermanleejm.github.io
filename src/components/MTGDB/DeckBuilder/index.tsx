@@ -116,14 +116,14 @@ const DeckBuilder = (props: MTGDBProps) => {
           </Grid>
         </Grid>
       </Grid>
-      <Grid item sm={12} md={9}>
+      <Grid item xs={12} lg={9}>
         {cardArr.length === 0 ? (
           <Typography>Sorry, no cards meet this criteria</Typography>
         ) : (
           <Board cardArr={cardArr} />
         )}
       </Grid>
-      <Grid item sm={12} md={3}>
+      <Grid item xs={12} lg={3}>
         card list
       </Grid>
     </Grid>

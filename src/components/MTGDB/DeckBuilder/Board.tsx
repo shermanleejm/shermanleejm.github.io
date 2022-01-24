@@ -35,7 +35,7 @@ const Board = (props: BoardProps) => {
         <ArrowBackIosNewIcon />
       </IconButton>
 
-      <Grid container spacing={1} justifyContent={'center'} alignItems={'center'}>
+      <Grid container spacing={1} justifyContent={'flex-start'} alignItems={'center'}>
         {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType) => (
           <Grid item xs={6} md={3} justifyContent={'center'}>
             <DraggableCard data={c} />
