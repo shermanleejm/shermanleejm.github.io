@@ -12,7 +12,7 @@ export interface CardsTableType {
   image_uri: string;
   colors: string[];
   color_identity: string[];
-  tags?: string[];
+  tags: string[];
   type_line: string;
   date_added: number;
 }

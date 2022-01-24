@@ -1,6 +1,5 @@
 import {
   Alert,
-  Button,
   CircularProgress,
   Grid,
   IconButton,
@@ -28,11 +27,11 @@ export type MTGDBProps = {
   refresh: (e: boolean) => void;
   toaster: (m: string, e: ToasterSeverityEnum) => void;
   db: MTGDatabase;
-  cardDict?: { [key: string]: boolean };
   cardArr: CardsTableType[];
+  filterCard?: (k: string, val: string) => void;
+  cardDict?: { [key: string]: boolean };
   uniqueSets?: string[];
   uniqueTags?: string[];
-  filterCard?: (k: string, val: string) => void;
 };
 
 const MTGDB = () => {
@@ -46,8 +45,7 @@ const MTGDB = () => {
   const [toasterMessage, setToasterMessage] = useState('');
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
-  const [showImportExport, setShowImportExport] = useState(false);
-  const [chosenTab, setChosenTab] = useState(0);
+  const [chosenTab, setChosenTab] = useState(2);
 
   const db = useSelector((state: State) => state.database);
 
@@ -151,7 +149,19 @@ const MTGDB = () => {
         />
       ),
     },
-    { label: 'Deck Builder', component: <DeckBuilder /> },
+    {
+      label: 'Deck Builder',
+      component: (
+        <DeckBuilder
+          refresh={(e: boolean) => setIsLoading(e)}
+          db={db}
+          cardArr={cardArr}
+          toaster={function (m: string, e: ToasterSeverityEnum): void {
+            openToaster(m, e);
+          }}
+        />
+      ),
+    },
     {
       label: 'Import/Export',
       component: (
@@ -168,7 +178,7 @@ const MTGDB = () => {
   ];
 
   return (
-    <div style={{ margin: '0 0 50px 0 ' }}>
+    <div>
       <Grid
         container
         direction={'column'}
@@ -193,7 +203,7 @@ const MTGDB = () => {
         {isLoading ? (
           <CircularProgress />
         ) : (
-          <span>
+          <>
             {CustomTabs.map((e: CustomTabsType, i: number) => {
               return (
                 <Grid item hidden={chosenTab !== i}>
@@ -201,7 +211,7 @@ const MTGDB = () => {
                 </Grid>
               );
             })}
-          </span>
+          </>
         )}
       </Grid>
 

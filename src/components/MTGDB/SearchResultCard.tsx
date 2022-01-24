@@ -4,6 +4,7 @@ import {
   CardActions,
   CardContent,
   CardMedia,
+  CircularProgress,
   Grid,
   MenuItem,
   TextField,
@@ -16,7 +17,13 @@ import { ScryfallDataType } from '../../interfaces';
 export type SearchResultCardType = {
   sr: ScryfallDataType;
   cardDict: { [key: string]: boolean };
-  storeCard: (sr: ScryfallDataType, tag?: string, price?: string, qty?: number) => void;
+  storeCard: (
+    sr: ScryfallDataType,
+    tag?: string,
+    price?: string,
+    qty?: number,
+    imgUri?: string
+  ) => void;
 };
 
 const SearchResultCard = (props: SearchResultCardType) => {
@@ -28,6 +35,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [qty, setQty] = useState(1);
+  const [imgUri, setImgUri] = useState('');
 
   useEffect(() => {
     function preCheck() {
@@ -59,6 +67,13 @@ const SearchResultCard = (props: SearchResultCardType) => {
         setPrice(tmp[0].money);
       }
       setIsLoading(false);
+      setImgUri(
+        props.sr.image_uris === undefined
+          ? props.sr.card_faces !== undefined
+            ? props.sr.card_faces[0].image_uris.small
+            : ''
+          : props.sr.image_uris.small
+      );
     }
 
     preCheck();
@@ -69,20 +84,13 @@ const SearchResultCard = (props: SearchResultCardType) => {
   };
 
   return isLoading ? (
-    <div></div>
+    <div>
+      <CircularProgress />
+    </div>
   ) : (
     <Grid item xs={6} md={4} lg={3}>
       <Card raised sx={{ bgcolor: 'grey' }}>
-        <CardMedia
-          component="img"
-          image={
-            props.sr.image_uris === undefined
-              ? props.sr.card_faces !== undefined
-                ? props.sr.card_faces[0].image_uris.small
-                : ''
-              : props.sr.image_uris.small
-          }
-        />
+        <CardMedia component="img" image={imgUri} />
         <CardContent>
           <Typography>{props.sr.name}</Typography>
           <br />
@@ -126,7 +134,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
                 disabled={isClicked}
                 onClick={() => {
                   setIsClicked(true);
-                  props.storeCard(props.sr, tag, price, qty);
+                  props.storeCard(props.sr, tag, price, qty, imgUri);
                 }}
               >
                 add card

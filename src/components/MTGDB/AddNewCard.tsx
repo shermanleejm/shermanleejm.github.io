@@ -99,7 +99,8 @@ const AddNewCard = (props: MTGDBProps) => {
     card: ScryfallDataType,
     tag?: string,
     price?: string,
-    qty?: number
+    qty?: number,
+    imgUri?: string
   ) {
     let colors = [];
     if (card.card_faces) {
@@ -116,12 +117,7 @@ const AddNewCard = (props: MTGDBProps) => {
       rarity: card.rarity,
       mana_cost: card.mana_cost,
       cmc: card.cmc,
-      image_uri:
-        card.image_uris === undefined
-          ? card.card_faces !== undefined
-            ? card.card_faces[0].image_uris.small
-            : ''
-          : card.image_uris.small,
+      image_uri: imgUri || '',
       colors: colors,
       color_identity: card.color_identity,
       tags: tag === undefined ? [] : [tag],
@@ -296,8 +292,9 @@ const AddNewCard = (props: MTGDBProps) => {
                   sr: ScryfallDataType,
                   tag?: string,
                   price?: string,
-                  qty?: number
-                ) => storeCard(sr, tag, price, qty)}
+                  qty?: number,
+                  imgUri?: string
+                ) => storeCard(sr, tag, price, qty, imgUri)}
                 cardDict={props.cardDict || {}}
               />
             ))}
