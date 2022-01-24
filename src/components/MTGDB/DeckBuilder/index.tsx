@@ -3,6 +3,8 @@ import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 import InvertColorsIcon from '@mui/icons-material/InvertColors';
 import ParkIcon from '@mui/icons-material/Park';
+import LandscapeIcon from '@mui/icons-material/Landscape';
+import LooksIcon from '@mui/icons-material/Looks';
 import { TextField, IconButton, Grid, Typography } from '@mui/material';
 import { MTGDBProps } from '..';
 import Board from './Board';
@@ -22,7 +24,7 @@ const DeckBuilder = (props: MTGDBProps) => {
 
   useEffect(() => {
     function initialLoad() {
-      setCardArr(props.cardArr.sort((a, b) => compare(a, b, 'cmc')));
+      setCardArr(props.cardArr.sort((a, b) => compare(a, b, 'name')));
     }
 
     initialLoad();
@@ -88,6 +90,29 @@ const DeckBuilder = (props: MTGDBProps) => {
                 {cb.icon}
               </IconButton>
             ))}
+            <IconButton
+              onClick={() =>
+                setCardArr(
+                  props.cardArr.filter((c) => c.type_line.toLowerCase().includes('land'))
+                )
+              }
+            >
+              <LandscapeIcon />
+            </IconButton>
+            <IconButton
+              onClick={() =>
+                setCardArr(
+                  props.cardArr
+                    .filter(
+                      (c) =>
+                        c.colors.length > 1 && !c.type_line.toLowerCase().includes('land')
+                    )
+                    .sort((a, b) => compare(a, b, 'colors'))
+                )
+              }
+            >
+              <LooksIcon />
+            </IconButton>
           </Grid>
         </Grid>
       </Grid>
