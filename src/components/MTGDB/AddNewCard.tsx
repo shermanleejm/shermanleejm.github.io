@@ -12,7 +12,7 @@ import React, { useCallback, useState } from "react";
 import Cropper from "react-easy-crop";
 import { createWorker } from "tesseract.js";
 import getCroppedImg from "./helper";
-import { ScryfallDataType, ImageUris } from "../../interfaces";
+import { ScryfallDataType } from "../../interfaces";
 import { CardsTableType, CustomImageUris } from "../../database";
 import { MTGDBProps, ToasterSeverityEnum } from ".";
 import SearchResultCard from "./SearchResultCard";

@@ -1,21 +1,13 @@
 import {
   Backdrop,
-  Button,
   Card,
   CardActionArea,
-  CardActions,
   CardMedia,
   Grid,
   IconButton,
-  styled,
-  Tooltip,
-  TooltipProps,
-  Typography,
 } from "@mui/material";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import React from "react";
 import { useState } from "react";
 import { CardsTableType } from "../../../database";
 
