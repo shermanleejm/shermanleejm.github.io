@@ -26,7 +26,7 @@ const AddNewCard = (props: MTGDBProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [text, setText] = useState(" ");
+  const [text, setText] = useState("");
   const [rotation, setRotation] = useState(0);
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
