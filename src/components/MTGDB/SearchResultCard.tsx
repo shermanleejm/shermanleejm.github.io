@@ -1,4 +1,5 @@
 import {
+  Backdrop,
   Button,
   Card,
   CardActions,
@@ -12,6 +13,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import NumberFormat from "react-number-format";
+import { CustomImageUris } from "../../database";
 import { ScryfallDataType } from "../../interfaces";
 
 export type SearchResultCardType = {
@@ -36,7 +38,11 @@ const SearchResultCard = (props: SearchResultCardType) => {
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [qty, setQty] = useState(1);
-  const [imgUri, setImgUri] = useState("");
+  const [imgUri, setImgUri] = useState<CustomImageUris>({
+    small: [],
+    normal: [],
+  });
+  const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
     function preCheck() {
@@ -68,17 +74,24 @@ const SearchResultCard = (props: SearchResultCardType) => {
         setPrice(tmp[0].money);
       }
       setIsLoading(false);
-      setImgUri(
-        props.sr.image_uris === undefined
-          ? props.sr.card_faces !== undefined
-            ? props.sr.card_faces[0].image_uris.small
-            : ""
-          : props.sr.image_uris.small
-      );
 
       if (props.defaultTag) {
         setTag(props.defaultTag);
       }
+
+      let imageUris: CustomImageUris = { small: [], normal: [] };
+      if (props.sr.card_faces) {
+        for (let i = 0; i < props.sr.card_faces.length; i++) {
+          imageUris.small.push(props.sr.card_faces[i].image_uris.small);
+          imageUris.normal.push(props.sr.card_faces[i].image_uris.normal);
+        }
+      } else if (props.sr.image_uris) {
+        imageUris = {
+          small: [props.sr.image_uris?.small],
+          normal: [props.sr.image_uris?.normal],
+        };
+      }
+      setImgUri(imageUris);
     }
 
     preCheck();
@@ -93,62 +106,87 @@ const SearchResultCard = (props: SearchResultCardType) => {
       <CircularProgress />
     </div>
   ) : (
-    <Card raised sx={{ bgcolor: "grey" }}>
-      <CardMedia component="img" image={imgUri} />
-      <CardContent>
-        <Typography>{props.sr.name}</Typography>
-        <br />
-        <Typography>{props.sr.set_name}</Typography>
-        <br />
-        <TextField
-          select
-          fullWidth
-          value={price}
-          defaultChecked
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setPrice(e.target.value);
-          }}
-        >
-          {priceSelectOptions.map((pso) => (
-            <MenuItem
-              value={pso.money}
-            >{`US$${pso.money} - ${pso.type}`}</MenuItem>
+    <>
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={showOverlay}
+        onClick={() => setShowOverlay(false)}
+      >
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          {imgUri.normal.map((s: string, i: number) => (
+            <img
+              src={s}
+              alt=""
+              width={imgUri.normal.length === 1 ? "100%" : "50%"}
+            ></img>
           ))}
-        </TextField>
-        <br />
-        <br />
-        <NumberFormat
-          customInput={TextField}
-          value={qty}
-          thousandSeparator
-          decimalScale={0}
-          label="Quantity"
-          onValueChange={(values) => {
-            let { floatValue } = values;
-            setQty(floatValue || 1);
-          }}
-          inputProps={{ fullWidth: "true" }}
+        </div>
+      </Backdrop>
+
+      <Card raised sx={{ bgcolor: "grey" }}>
+        <CardMedia
+          component="img"
+          image={imgUri.small[0]}
+          onClick={() => setShowOverlay(true)}
         />
-      </CardContent>
-      <CardActions>
-        <Grid container direction={"column"}>
-          <Grid item>
-            <TextField onChange={handleTagChange} value={tag} label={"tag"} />
+        <CardContent>
+          <Typography>{props.sr.name}</Typography>
+          <br />
+          <Typography>{props.sr.set_name}</Typography>
+          <br />
+          <TextField
+            select
+            fullWidth
+            value={price}
+            defaultChecked
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setPrice(e.target.value);
+            }}
+          >
+            {priceSelectOptions.map((pso) => (
+              <MenuItem
+                value={pso.money}
+              >{`US$${pso.money} - ${pso.type}`}</MenuItem>
+            ))}
+          </TextField>
+          <br />
+          <br />
+          <NumberFormat
+            customInput={TextField}
+            value={qty}
+            thousandSeparator
+            decimalScale={0}
+            label="Quantity"
+            onValueChange={(values) => {
+              let { floatValue } = values;
+              setQty(floatValue || 1);
+            }}
+            inputProps={{ fullWidth: "true" }}
+          />
+        </CardContent>
+        <CardActions>
+          <Grid container direction={"column"}>
+            <Grid item>
+              <TextField onChange={handleTagChange} value={tag} label={"tag"} />
+            </Grid>
+            <Grid item>
+              <Button
+                disabled={isClicked}
+                onClick={() => {
+                  setIsClicked(true);
+                  props.storeCard(props.sr, tag, price, qty);
+                }}
+              >
+                add card
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Button
-              disabled={isClicked}
-              onClick={() => {
-                setIsClicked(true);
-                props.storeCard(props.sr, tag, price, qty);
-              }}
-            >
-              add card
-            </Button>
-          </Grid>
-        </Grid>
-      </CardActions>
-    </Card>
+        </CardActions>
+      </Card>
+    </>
   );
 };
 
