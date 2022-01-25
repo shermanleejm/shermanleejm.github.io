@@ -30,6 +30,7 @@ const AddNewCard = (props: MTGDBProps) => {
   const [rotation, setRotation] = useState(0);
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
+  const [defaultTag, setDefaultTag] = useState("");
 
   const handleChange = (event: any) => {
     setImg(URL.createObjectURL(event.target.files[0]));
@@ -246,6 +247,7 @@ const AddNewCard = (props: MTGDBProps) => {
           )}
         </Grid>
 
+        {/* Search and Tags */}
         <Grid item xs={12} md={12}>
           <Grid
             container
@@ -279,6 +281,15 @@ const AddNewCard = (props: MTGDBProps) => {
               />
             </Grid>
             <Grid item>
+              <TextField
+                label="Tag"
+                value={defaultTag}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setDefaultTag(e.target.value)
+                }
+              ></TextField>
+            </Grid>
+            <Grid item>
               {isSearching ? (
                 <CircularProgress />
               ) : (
@@ -303,6 +314,7 @@ const AddNewCard = (props: MTGDBProps) => {
           </Grid>
         </Grid>
 
+        {/* Search results */}
         <Grid item>
           <Grid
             container
@@ -313,16 +325,19 @@ const AddNewCard = (props: MTGDBProps) => {
             style={{ width: "80vw" }}
           >
             {searchResults.map((sr: ScryfallDataType) => (
-              <SearchResultCard
-                sr={sr}
-                storeCard={(
-                  sr: ScryfallDataType,
-                  tag?: string,
-                  price?: string,
-                  qty?: number
-                ) => storeCard(sr, tag, price, qty)}
-                cardDict={props.cardDict || {}}
-              />
+              <Grid item xs={6} md={4}>
+                <SearchResultCard
+                  sr={sr}
+                  storeCard={(
+                    sr: ScryfallDataType,
+                    tag?: string,
+                    price?: string,
+                    qty?: number
+                  ) => storeCard(sr, tag, price, qty)}
+                  cardDict={props.cardDict || {}}
+                  defaultTag={defaultTag}
+                />
+              </Grid>
             ))}
           </Grid>
         </Grid>
