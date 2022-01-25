@@ -39,7 +39,11 @@ const DraggableCard = (props: DraggableCardProps) => {
         >
           <div style={{ display: "flex", flexDirection: "row" }}>
             {props.data.image_uri.normal.map((s: string, i: number) => (
-              <img src={s} alt="" width={'50%'}></img>
+              <img
+                src={s}
+                alt=""
+                width={props.data.image_uri.normal.length === 1 ? "" : "50%"}
+              ></img>
             ))}
           </div>
         </Backdrop>
