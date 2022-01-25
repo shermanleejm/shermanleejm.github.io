@@ -198,7 +198,7 @@ const AddNewCard = (props: MTGDBProps) => {
                 id="upload-image"
               />
               <label htmlFor="upload-image">
-                <Button component="span">upload</Button>
+                <Button component="span">scanner</Button>
               </label>
             </Grid>
             <Grid item>
