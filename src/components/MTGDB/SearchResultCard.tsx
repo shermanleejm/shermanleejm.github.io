@@ -9,10 +9,10 @@ import {
   MenuItem,
   TextField,
   Typography,
-} from '@mui/material';
-import { useEffect, useState } from 'react';
-import NumberFormat from 'react-number-format';
-import { ScryfallDataType } from '../../interfaces';
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import NumberFormat from "react-number-format";
+import { ScryfallDataType } from "../../interfaces";
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;
@@ -35,7 +35,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [qty, setQty] = useState(1);
-  const [imgUri, setImgUri] = useState('');
+  const [imgUri, setImgUri] = useState("");
 
   useEffect(() => {
     function preCheck() {
@@ -46,19 +46,19 @@ const SearchResultCard = (props: SearchResultCardType) => {
       let tmp: { type: string; money: string }[] = [];
       if (props.sr.prices.usd !== null) {
         tmp.push({
-          type: 'Non-foil',
+          type: "Non-foil",
           money: props.sr.prices.usd,
         });
       }
       if (props.sr.prices.usd_foil !== null) {
         tmp.push({
-          type: 'Foil',
+          type: "Foil",
           money: props.sr.prices.usd_foil,
         });
       }
       if (props.sr.prices.usd_etched !== null) {
         tmp.push({
-          type: 'Etched',
+          type: "Etched",
           money: props.sr.prices.usd_etched,
         });
       }
@@ -71,7 +71,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
         props.sr.image_uris === undefined
           ? props.sr.card_faces !== undefined
             ? props.sr.card_faces[0].image_uris.small
-            : ''
+            : ""
           : props.sr.image_uris.small
       );
     }
@@ -89,7 +89,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
     </div>
   ) : (
     <Grid item xs={6} md={4} lg={3}>
-      <Card raised sx={{ bgcolor: 'grey' }}>
+      <Card raised sx={{ bgcolor: "grey" }}>
         <CardMedia component="img" image={imgUri} />
         <CardContent>
           <Typography>{props.sr.name}</Typography>
@@ -106,7 +106,9 @@ const SearchResultCard = (props: SearchResultCardType) => {
             }}
           >
             {priceSelectOptions.map((pso) => (
-              <MenuItem value={pso.money}>{`US$${pso.money} - ${pso.type}`}</MenuItem>
+              <MenuItem
+                value={pso.money}
+              >{`US$${pso.money} - ${pso.type}`}</MenuItem>
             ))}
           </TextField>
           <br />
@@ -121,20 +123,20 @@ const SearchResultCard = (props: SearchResultCardType) => {
               let { floatValue } = values;
               setQty(floatValue || 1);
             }}
-            inputProps={{ fullWidth: 'true' }}
+            inputProps={{ fullWidth: "true" }}
           />
         </CardContent>
         <CardActions>
-          <Grid container direction={'column'}>
+          <Grid container direction={"column"}>
             <Grid item>
-              <TextField onChange={handleTagChange} value={tag} label={'tag'} />
+              <TextField onChange={handleTagChange} value={tag} label={"tag"} />
             </Grid>
             <Grid item>
               <Button
                 disabled={isClicked}
                 onClick={() => {
                   setIsClicked(true);
-                  props.storeCard(props.sr, tag, price, qty, imgUri);
+                  props.storeCard(props.sr, tag, price, qty);
                 }}
               >
                 add card

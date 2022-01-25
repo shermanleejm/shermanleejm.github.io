@@ -30,7 +30,7 @@ import {
 import { MTGDBProps } from ".";
 import { CardsTableType } from "../../database";
 
-const Display = (props: MTGDBProps) => {
+const CardDataGrid = (props: MTGDBProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCards, setSelectedCards] = useState<CardsTableType[]>([]);
@@ -73,7 +73,11 @@ const Display = (props: MTGDBProps) => {
           <HtmlTooltip
             title={
               <React.Fragment>
-                <img src={data.image_uri} alt=""></img>
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                  {data.image_uri.small.map((s: string, i: number) => (
+                    <img src={data.image_uri.small[i]} alt=""></img>
+                  ))}
+                </div>
               </React.Fragment>
             }
             followCursor
@@ -382,4 +386,4 @@ const Display = (props: MTGDBProps) => {
   );
 };
 
-export default Display;
+export default CardDataGrid;

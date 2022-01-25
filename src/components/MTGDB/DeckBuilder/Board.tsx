@@ -1,30 +1,40 @@
-import { Grid, IconButton } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { CardsTableType } from '../../../database';
-import DraggableCard from './DraggableCard';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { CircularProgress, Grid, IconButton } from "@mui/material";
+import { useEffect, useState } from "react";
+import { CardsTableType } from "../../../database";
+import DraggableCard from "./DraggableCard";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 type BoardProps = {
   cardArr: CardsTableType[];
+  decklist: Set<CardsTableType>;
+  addToDeckList: (c: CardsTableType) => void;
 };
 
 const Board = (props: BoardProps) => {
   const perPage = 8;
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(perPage);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     function resetPages() {
       setStartIndex(0);
       setEndIndex(perPage);
+      setIsLoading(false);
     }
 
     resetPages();
-  }, [props.cardArr]);
+  }, []);
 
-  return (
-    <div style={{ display: 'flex' }}>
+  function addToDecklistCallback(c: CardsTableType) {
+    props.addToDeckList(c);
+  }
+
+  return isLoading ? (
+    <CircularProgress />
+  ) : (
+    <div style={{ display: "flex" }}>
       <IconButton
         disabled={startIndex - perPage < 0}
         onClick={() => {
@@ -35,10 +45,19 @@ const Board = (props: BoardProps) => {
         <ArrowBackIosNewIcon />
       </IconButton>
 
-      <Grid container spacing={1} justifyContent={'flex-start'} alignItems={'center'}>
+      <Grid
+        container
+        spacing={1}
+        justifyContent={"flex-start"}
+        alignItems={"center"}
+      >
         {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType) => (
-          <Grid item xs={6} md={3} justifyContent={'center'}>
-            <DraggableCard data={c} />
+          <Grid item xs={6} sm={3} justifyContent={"center"}>
+            <DraggableCard
+              data={c}
+              addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
+              disabled={props.decklist.has(c)}
+            />
           </Grid>
         ))}
       </Grid>

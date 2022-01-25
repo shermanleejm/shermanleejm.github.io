@@ -1,5 +1,10 @@
 import Dexie, { Table } from "dexie";
 
+export interface CustomImageUris {
+  small: string[];
+  normal: string[];
+}
+
 export interface CardsTableType {
   id?: number;
   name: string;
@@ -9,7 +14,7 @@ export interface CardsTableType {
   set_name: string;
   mana_cost: string;
   cmc: number;
-  image_uri: string;
+  image_uri: CustomImageUris;
   colors: string[];
   color_identity: string[];
   tags: string[];

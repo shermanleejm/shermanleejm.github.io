@@ -1,19 +1,21 @@
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import InvertColorsIcon from '@mui/icons-material/InvertColors';
-import ParkIcon from '@mui/icons-material/Park';
-import LandscapeIcon from '@mui/icons-material/Landscape';
-import LooksIcon from '@mui/icons-material/Looks';
-import { TextField, IconButton, Grid, Typography } from '@mui/material';
-import { MTGDBProps } from '..';
-import Board from './Board';
-import { useEffect, useState } from 'react';
-import { CardsTableType } from '../../../database';
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import SentimentNeutralIcon from "@mui/icons-material/SentimentNeutral";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
+import InvertColorsIcon from "@mui/icons-material/InvertColors";
+import ParkIcon from "@mui/icons-material/Park";
+import LandscapeIcon from "@mui/icons-material/Landscape";
+import LooksIcon from "@mui/icons-material/Looks";
+import { TextField, IconButton, Grid, Typography, Button } from "@mui/material";
+import { MTGDBProps } from "..";
+import Board from "./Board";
+import DeckList from "./DeckList";
+import { useEffect, useState } from "react";
+import { CardsTableType } from "../../../database";
 
 const DeckBuilder = (props: MTGDBProps) => {
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
-  const [searchText, setSearchText] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>("");
+  const [decklist, setDecklist] = useState<Set<CardsTableType>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
 
   function compare(a: any, b: any, type: keyof CardsTableType) {
@@ -24,24 +26,24 @@ const DeckBuilder = (props: MTGDBProps) => {
 
   useEffect(() => {
     function initialLoad() {
-      setCardArr(props.cardArr.sort((a, b) => compare(a, b, 'name')));
+      setCardArr(props.cardArr.sort((a, b) => compare(a, b, "name")));
     }
 
     initialLoad();
   }, []);
 
   enum colorSlug {
-    BLACK = 'B',
-    WHITE = 'W',
-    GREEN = 'G',
-    BLUE = 'U',
-    RED = 'R',
+    BLACK = "B",
+    WHITE = "W",
+    GREEN = "G",
+    BLUE = "U",
+    RED = "R",
   }
 
   function filterCardArrByColor(type: colorSlug) {
     let tmp = props.cardArr
       .filter((c) => c.colors.length === 1 && c.colors.includes(type))
-      .sort((a, b) => compare(a, b, 'cmc'));
+      .sort((a, b) => compare(a, b, "cmc"));
     setCardArr(tmp);
   }
 
@@ -53,8 +55,8 @@ const DeckBuilder = (props: MTGDBProps) => {
             c.name.toLowerCase().includes(text.toLowerCase()) ||
             c.type_line.toLowerCase().includes(text.toLowerCase())
         )
-        .sort((a, b) => compare(a, b, 'cmc'))
-        .sort((a, b) => compare(a, b, 'colors'))
+        .sort((a, b) => compare(a, b, "cmc"))
+        .sort((a, b) => compare(a, b, "colors"))
     );
   }
 
@@ -66,21 +68,46 @@ const DeckBuilder = (props: MTGDBProps) => {
     { icon: <ParkIcon />, name: colorSlug.GREEN },
   ];
 
+  function modifyDecklist(c: CardsTableType, type: "delete" | "add") {
+    switch (type) {
+      case "delete":
+        let tmp1 = decklist;
+        tmp1.delete(c);
+        setDecklist(tmp1);
+        break;
+      case "add":
+        let tmp2 = [...Array.from(decklist), c].sort((a, b) => {
+          if (a.cmc < b.cmc) return -1;
+          if (a.cmc > b.cmc) return 1;
+          return 0;
+        });
+        setDecklist(new Set(tmp2));
+        break;
+      default:
+        break;
+    }
+  }
+
   return (
-    <Grid container justifyContent={'center'} alignItems={'center'}>
+    <Grid
+      container
+      spacing={1}
+      justifyContent={"space-between"}
+      alignItems={"flex-start"}
+    >
       <Grid item xs={12}>
-        <Grid container direction={'row'} justifyContent={'center'}>
+        <Grid container direction={"row"} justifyContent={"center"}>
           <Grid item>
             <TextField
-              style={{ width: '50vw' }}
+              style={{ width: "50vw" }}
               label="general search"
               size="small"
               value={searchText}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ''))
+                setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ""))
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                if (e.key === 'Enter') filterCardArrByText(searchText);
+                if (e.key === "Enter") filterCardArrByText(searchText);
               }}
             ></TextField>
           </Grid>
@@ -93,7 +120,9 @@ const DeckBuilder = (props: MTGDBProps) => {
             <IconButton
               onClick={() =>
                 setCardArr(
-                  props.cardArr.filter((c) => c.type_line.toLowerCase().includes('land'))
+                  props.cardArr.filter((c) =>
+                    c.type_line.toLowerCase().includes("land")
+                  )
                 )
               }
             >
@@ -105,14 +134,22 @@ const DeckBuilder = (props: MTGDBProps) => {
                   props.cardArr
                     .filter(
                       (c) =>
-                        c.colors.length > 1 && !c.type_line.toLowerCase().includes('land')
+                        c.colors.length > 1 &&
+                        !c.type_line.toLowerCase().includes("land")
                     )
-                    .sort((a, b) => compare(a, b, 'colors'))
+                    .sort((a, b) => compare(a, b, "colors"))
                 )
               }
             >
               <LooksIcon />
             </IconButton>
+            <Button
+              size="small"
+              variant="text"
+              onClick={() => filterCardArrByText("")}
+            >
+              reset
+            </Button>
           </Grid>
         </Grid>
       </Grid>
@@ -120,11 +157,20 @@ const DeckBuilder = (props: MTGDBProps) => {
         {cardArr.length === 0 ? (
           <Typography>Sorry, no cards meet this criteria</Typography>
         ) : (
-          <Board cardArr={cardArr} />
+          <Board
+            cardArr={cardArr}
+            decklist={decklist}
+            addToDeckList={(c: CardsTableType) => modifyDecklist(c, "add")}
+          />
         )}
       </Grid>
       <Grid item xs={12} lg={3}>
-        card list
+        <DeckList
+          cards={decklist}
+          deleteFromDeckList={(c: CardsTableType) =>
+            modifyDecklist(c, "delete")
+          }
+        />
       </Grid>
     </Grid>
   );
