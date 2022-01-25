@@ -65,7 +65,7 @@ const CardDataGrid = (props: MTGDBProps) => {
     {
       field: "name",
       headerName: "Name",
-      width: colWidth,
+      minWidth: 200,
       flex: 1,
       renderCell: (params: GridRenderCellParams) => {
         let data: CardsTableType = params.row;
@@ -107,6 +107,7 @@ const CardDataGrid = (props: MTGDBProps) => {
     {
       field: "tags",
       headerName: "tags",
+      minWidth: 400,
       flex: 1,
       renderCell: (params: GridRenderCellParams) => {
         let data: CardsTableType = params.row;

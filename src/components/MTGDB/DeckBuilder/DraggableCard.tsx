@@ -10,9 +10,11 @@ import {
   styled,
   Tooltip,
   TooltipProps,
+  Typography,
 } from "@mui/material";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import React from "react";
 import { useState } from "react";
 import { CardsTableType } from "../../../database";
@@ -51,17 +53,24 @@ const DraggableCard = (props: DraggableCardProps) => {
 
       <Card sx={{ maxWidth: { xs: "50vh", sm: "24vh" } }}>
         <CardMedia
-          onClick={() => setShowOverlay(true)}
+          style={{ cursor: "pointer" }}
+          onClick={() => props.addToDecklist(props.data)}
           component={"img"}
           image={props.data.image_uri.small[0]}
         />
-        <CardActionArea
-          disabled={props.disabled}
-          onClick={() => props.addToDecklist(props.data)}
-        >
-          <IconButton disabled={props.disabled}>
-            <AddBoxIcon />
-          </IconButton>
+        <CardActionArea onClick={() => setShowOverlay(true)}>
+          <Grid container direction={"row"}>
+            <Grid item>
+              <IconButton>
+                <ZoomInIcon />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <IconButton disabled={props.disabled}>
+                {props.disabled ? <CheckCircleIcon /> : ""}
+              </IconButton>
+            </Grid>
+          </Grid>
         </CardActionArea>
       </Card>
     </>
