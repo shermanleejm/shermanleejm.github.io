@@ -325,7 +325,7 @@ const AddNewCard = (props: MTGDBProps) => {
             style={{ width: "80vw" }}
           >
             {searchResults.map((sr: ScryfallDataType) => (
-              <Grid item xs={6} md={4}>
+              <Grid item xs={6} md={3}>
                 <SearchResultCard
                   sr={sr}
                   storeCard={(
