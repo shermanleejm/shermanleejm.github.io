@@ -8,6 +8,8 @@ import terminal from '../assets/terminal.png';
 import tracker from '../assets/tracker.jpg';
 import contactMe from '../assets/contactMe.png';
 import mtg from '../assets/mtg.png';
+import wordle from '../assets/wordle.jpg';
+import WordleSolver from './WordleSolver';
 
 export type PageType = {
   name: string;
@@ -53,5 +55,13 @@ export const Pages: PageType[] = [
     link: '/contactme',
     img: contactMe,
     description: "Hijacked google forms' exposed api for a contact me page.",
+  },
+  {
+    name: 'Wordle Solver',
+    component: WordleSolver,
+    link: '/wordle-solver',
+    img: wordle,
+    description:
+      'Wordle solver. Just key in your guesses and it will search for you. Saves you some time lmao.',
   },
 ];
