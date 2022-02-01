@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from 'react';
 import NumberFormat from 'react-number-format';
 import { CustomImageUris } from '../../database';
-import { ScryfallDataType } from '../../interfaces';
+import { ScryfallDataType } from './interfaces';
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;

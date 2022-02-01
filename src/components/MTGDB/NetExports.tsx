@@ -2,11 +2,14 @@ import { Button, CircularProgress, Typography } from '@mui/material';
 import 'dexie-export-import';
 import { useState } from 'react';
 import { MTGDBProps, ToasterSeverityEnum } from '.';
-import { CardsTableColumns, CardsTableType } from '../../database';
+import { CardsTableColumns, CardsTableType, CustomImageUris } from '../../database';
 import { CSVLink } from 'react-csv';
+import axios from 'axios';
+import { ScryfallDataType } from './interfaces';
 
 const NetExports = (props: MTGDBProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [currentUpdateCard, setCurrentUpdateCard] = useState('');
 
   const handleCsv = (e: any) => {
     const fileReader = new FileReader();
@@ -19,6 +22,79 @@ const NetExports = (props: MTGDBProps) => {
         json = ee.target.result;
       }
       console.log(json);
+    };
+  };
+
+  const handleJsonAndUpdate = async (e: any) => {
+    setIsLoading(true);
+    const fileReader = new FileReader();
+    fileReader.readAsText(e.target.files[0], 'UTF-8');
+    fileReader.onload = async (ee: any) => {
+      let json: [CardsTableType];
+      try {
+        json = JSON.parse(ee.target.result);
+      } catch (err) {
+        props.toaster('Unable to process.', ToasterSeverityEnum.ERROR);
+        return '';
+      }
+
+      for (const card of json) {
+        let check = await props.db.cards.where(card).first();
+        console.log(check);
+        if (check === undefined) {
+          setCurrentUpdateCard(card.name);
+
+          let resp = await axios.get(
+            'https://api.scryfall.com/cards/search?q=' + card.name
+          );
+
+          let newCard: ScryfallDataType = resp.data.data[0];
+          console.log(newCard);
+          let colors = [];
+          if (newCard.card_faces) {
+            colors = newCard.card_faces[0].colors;
+          } else {
+            colors = newCard.colors || [];
+          }
+
+          let imgUris: CustomImageUris = { small: [], normal: [] };
+          if (newCard.card_faces) {
+            for (let i = 0; i < newCard.card_faces.length; i++) {
+              imgUris.small.push(newCard.card_faces[i].image_uris.small);
+              imgUris.normal.push(newCard.card_faces[i].image_uris.normal);
+            }
+          } else if (newCard.image_uris) {
+            imgUris = {
+              small: [newCard.image_uris?.small],
+              normal: [newCard.image_uris?.normal],
+            };
+          }
+
+          const newEntry: CardsTableType = {
+            name: newCard.name,
+            price: parseFloat(newCard.prices.usd || '0'),
+            quantity: card.quantity,
+            set_name: newCard.set_name,
+            rarity: newCard.rarity,
+            mana_cost: newCard.mana_cost,
+            cmc: newCard.cmc,
+            image_uri: imgUris,
+            colors: colors,
+            color_identity: newCard.color_identity,
+            tags: card.tags,
+            type_line: newCard.type_line,
+            oracle_text: newCard.oracle_text,
+            date_added: Date.now(),
+          };
+
+          await props.db.cards
+            .put(newEntry)
+            .then(() => {})
+            .catch((err) => console.error(err));
+        }
+      }
+
+      setIsLoading(false);
     };
   };
 
@@ -38,13 +114,13 @@ const NetExports = (props: MTGDBProps) => {
       for (const card of json) {
         let exists: boolean = true;
         await props.db.cards
-          .where(card)
+          .where({ name: card.name })
           .first()
           .then((res) => (exists = res !== undefined))
           .catch((err) => console.error(err));
 
         if (!exists) {
-          console.log(card);
+          setCurrentUpdateCard(card.name);
           await props.db.cards
             .put(card)
             .then(() => {})
@@ -73,13 +149,14 @@ const NetExports = (props: MTGDBProps) => {
   return isLoading ? (
     <div style={{ margin: 'auto' }}>
       <CircularProgress />
-      <Typography>Processing...</Typography>
+      <Typography>Processing {currentUpdateCard} ...</Typography>
     </div>
   ) : (
     <div style={{ width: '80vw', margin: 'auto', textAlign: 'center' }}>
       <Button fullWidth disabled>
         <CSVDownload></CSVDownload>
       </Button>
+
       <input
         type="file"
         accept=".csv"
@@ -92,6 +169,7 @@ const NetExports = (props: MTGDBProps) => {
           upload csv
         </Button>
       </label>
+
       <Button
         href={`data:text/json;charset=utf-8,${encodeURIComponent(
           JSON.stringify(props.cardArr)
@@ -100,6 +178,7 @@ const NetExports = (props: MTGDBProps) => {
       >
         export json
       </Button>
+
       <input
         type="file"
         accept="application/json"
@@ -110,6 +189,19 @@ const NetExports = (props: MTGDBProps) => {
       <label htmlFor="upload-db-json">
         <Button component="span" fullWidth>
           upload json
+        </Button>
+      </label>
+
+      <input
+        type="file"
+        accept="application/json"
+        onChange={handleJsonAndUpdate}
+        style={{ display: 'none' }}
+        id="upload-db-json-update"
+      />
+      <label htmlFor="upload-db-json-update">
+        <Button component="span" fullWidth>
+          upload json and update
         </Button>
       </label>
     </div>

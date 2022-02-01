@@ -6,31 +6,31 @@ import {
   InputAdornment,
   Slider,
   TextField,
-} from "@mui/material";
-import axios from "axios";
-import React, { useCallback, useState } from "react";
-import Cropper from "react-easy-crop";
-import { createWorker } from "tesseract.js";
-import getCroppedImg from "./helper";
-import { ScryfallDataType } from "../../interfaces";
-import { CardsTableType, CustomImageUris } from "../../database";
-import { MTGDBProps, ToasterSeverityEnum } from ".";
-import SearchResultCard from "./SearchResultCard";
-import ClearIcon from "@mui/icons-material/Clear";
+} from '@mui/material';
+import axios from 'axios';
+import React, { useCallback, useState } from 'react';
+import Cropper from 'react-easy-crop';
+import { createWorker } from 'tesseract.js';
+import getCroppedImg from './helper';
+import { ScryfallDataType } from './interfaces';
+import { CardsTableType, CustomImageUris } from '../../database';
+import { MTGDBProps, ToasterSeverityEnum } from '.';
+import SearchResultCard from './SearchResultCard';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const AddNewCard = (props: MTGDBProps) => {
-  const [img, setImg] = useState("");
+  const [img, setImg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [imgUploaded, setImgUploaded] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const [rotation, setRotation] = useState(0);
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
-  const [defaultTag, setDefaultTag] = useState("");
+  const [defaultTag, setDefaultTag] = useState('');
 
   const handleChange = (event: any) => {
     setImg(URL.createObjectURL(event.target.files[0]));
@@ -44,22 +44,18 @@ const AddNewCard = (props: MTGDBProps) => {
   const showCroppedImage = useCallback(async () => {
     setIsLoading(true);
     try {
-      const croppedImage: any = await getCroppedImg(
-        img,
-        croppedAreaPixels,
-        rotation
-      );
+      const croppedImage: any = await getCroppedImg(img, croppedAreaPixels, rotation);
       try {
         let worker = createWorker({
           logger: (m) => console.log(m),
         });
         await worker.load();
-        await worker.loadLanguage("eng");
-        await worker.initialize("eng");
+        await worker.loadLanguage('eng');
+        await worker.initialize('eng');
         const {
           data: { text },
         } = await worker.recognize(croppedImage);
-        setText(text.replace(/[^a-zA-Z0-9\s]/g, ""));
+        setText(text.replace(/[^a-zA-Z0-9\s]/g, ''));
         await worker.terminate();
       } catch (err) {
         console.error(err);
@@ -77,21 +73,21 @@ const AddNewCard = (props: MTGDBProps) => {
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
-      props.toaster("Too many requests", ToasterSeverityEnum.ERROR);
+      props.toaster('Too many requests', ToasterSeverityEnum.ERROR);
       setIsSearching(false);
       return 0;
     }
 
     axios
-      .get("https://api.scryfall.com/cards/search?q=" + queryName)
+      .get('https://api.scryfall.com/cards/search?q=' + queryName)
       .then((res) => {
-        console.log(res.data.data[0]);
+        console.log(res.data);
         setSearchResults(res.data.data);
       })
       .catch((err) => {
         console.error(err);
         if (err.response.status === 404 || err.response.status === 400) {
-          props.toaster("No card found", ToasterSeverityEnum.ERROR);
+          props.toaster('No card found', ToasterSeverityEnum.ERROR);
         }
       })
       .finally(() => {
@@ -129,7 +125,7 @@ const AddNewCard = (props: MTGDBProps) => {
 
     const newEntry: CardsTableType = {
       name: card.name,
-      price: price ? parseFloat(price) : parseFloat(card.prices.usd || "0"),
+      price: price ? parseFloat(price) : parseFloat(card.prices.usd || '0'),
       quantity: qty || 1,
       set_name: card.set_name,
       rarity: card.rarity,
@@ -140,61 +136,52 @@ const AddNewCard = (props: MTGDBProps) => {
       color_identity: card.color_identity,
       tags: tag === undefined ? [] : [tag],
       type_line: card.type_line,
+      oracle_text: card.oracle_text,
       date_added: Date.now(),
     };
 
     const collision: CardsTableType | undefined = await props.db.cards
-      .where("name")
+      .where('name')
       .equalsIgnoreCase(card.name)
       .first();
 
     if (collision === undefined) {
-      props.db.transaction("rw", props.db.cards, async () => {
+      props.db.transaction('rw', props.db.cards, async () => {
         await props.db.cards.add(newEntry);
       });
     } else {
-      props.db.transaction("rw", props.db.cards, async () => {
+      props.db.transaction('rw', props.db.cards, async () => {
         await props.db.cards.update(collision.id || 0, newEntry);
       });
     }
 
-    props.toaster("Recorded card!", ToasterSeverityEnum.SUCCESS);
+    props.toaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
   }
 
   return isLoading ? (
     <div
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "36 0 36 0",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '36 0 36 0',
       }}
     >
       <CircularProgress />
     </div>
   ) : (
     <div>
-      <Grid
-        container
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Grid container direction="column" justifyContent="center" alignItems="center">
         {/* Upload and Magic button  */}
-        <Grid item style={{ width: "80vw" }}>
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-around"
-            spacing={3}
-          >
+        <Grid item style={{ width: '80vw' }}>
+          <Grid container direction="row" justifyContent="space-around" spacing={3}>
             <Grid item>
               <input
                 type="file"
                 accept="image/*"
                 capture="environment"
                 onChange={handleChange}
-                style={{ display: "none" }}
+                style={{ display: 'none' }}
                 id="upload-image"
               />
               <label htmlFor="upload-image">
@@ -210,8 +197,8 @@ const AddNewCard = (props: MTGDBProps) => {
         {/* Cropper */}
         <Grid item>
           {imgUploaded && (
-            <div style={{ width: "80vw" }}>
-              <div style={{ position: "relative", height: 300, width: "100%" }}>
+            <div style={{ width: '80vw' }}>
+              <div style={{ position: 'relative', height: 300, width: '100%' }}>
                 <Cropper
                   image={img}
                   crop={crop}
@@ -235,10 +222,10 @@ const AddNewCard = (props: MTGDBProps) => {
           )}
         </Grid>
         <Grid item>
-          {img !== "" && imgUploaded && (
+          {img !== '' && imgUploaded && (
             <Button
               onClick={() => {
-                setImg("");
+                setImg('');
                 setImgUploaded(false);
               }}
             >
@@ -252,31 +239,31 @@ const AddNewCard = (props: MTGDBProps) => {
           <Grid
             container
             direction="column"
-            spacing={2}
+            spacing={1}
             style={{
-              width: "80vw",
-              margin: "16 0 16 0",
+              width: '80vw',
+              margin: '16 0 16 0',
             }}
           >
             <Grid item>
               <TextField
                 value={text}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ""))
+                  setText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ''))
                 }
                 label="Card Name (remove uneccessary characters)"
                 fullWidth
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton edge="end" onClick={() => setText("")}>
+                      <IconButton edge="end" onClick={() => setText('')}>
                         <ClearIcon />
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
                 onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                  if (e.key === "Enter") searchCard(text);
+                  if (e.key === 'Enter') searchCard(text);
                 }}
               />
             </Grid>
@@ -304,7 +291,7 @@ const AddNewCard = (props: MTGDBProps) => {
                   fullWidth
                   onClick={() => {
                     setSearchResults([]);
-                    setText("");
+                    setText('');
                   }}
                 >
                   clear
@@ -320,9 +307,9 @@ const AddNewCard = (props: MTGDBProps) => {
             container
             direction="row"
             spacing={1}
-            justifyContent={"start"}
-            alignItems={"stretch"}
-            style={{ width: "80vw" }}
+            justifyContent={'start'}
+            alignItems={'stretch'}
+            style={{ width: '80vw' }}
           >
             {searchResults.map((sr: ScryfallDataType) => (
               <Grid item xs={6} md={3}>

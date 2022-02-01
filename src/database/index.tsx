@@ -1,4 +1,4 @@
-import Dexie, { Table } from "dexie";
+import Dexie, { Table } from 'dexie';
 
 export interface CustomImageUris {
   small: string[];
@@ -19,33 +19,35 @@ export interface CardsTableType {
   color_identity: string[];
   tags: string[];
   type_line: string;
+  oracle_text?: string;
   date_added: number;
 }
 
 export const CardsTableColumns = [
-  "id",
-  "name",
-  "price",
-  "quantity",
-  "rarity",
-  "set_name",
-  "mana_cost",
-  "cmc",
-  "image_uri",
-  "colors",
-  "color_identity",
-  "tags",
-  "type_line",
-  "date_added",
+  'id',
+  'name',
+  'price',
+  'quantity',
+  'rarity',
+  'set_name',
+  'mana_cost',
+  'cmc',
+  'image_uri',
+  'colors',
+  'color_identity',
+  'tags',
+  'type_line',
+  'oracle_text',
+  'date_added',
 ];
 
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
 
   public constructor() {
-    super("mtgdb");
+    super('mtgdb');
     this.version(1).stores({
-      cards: `++${CardsTableColumns.join(",")}`,
+      cards: `++${CardsTableColumns.join(',')}`,
     });
   }
 }
