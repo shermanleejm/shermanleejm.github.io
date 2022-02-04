@@ -1,16 +1,17 @@
 # Portfoliio Source Code
-Primarily using React Typescript.
+Primarily using React Typescript.  
+Source code not available on `master` branch to enable free web hosting on Github Pages.  
 
 # Contents
-- MTG Database
+- [MTG Database](https://shermanleejm.github.io/#/mtgdb)
   - Store all your cards
   - Make as many commander decks as you need!
   - Using IndexedDB as local storage. Able to export and save it elsewhere.
-- Draggable terminal
-  - Now with jokes!
-- Assets tracker
+- [Assets tracker](https://shermanleejm.github.io/#/assettracker)
   - Keep track of all your traditional stocks using real time prices
   - Keep track of your various cryto currencies
   - Dogecoin to the moon!!!
-- Contact me page
+- [Draggable terminal](https://shermanleejm.github.io/#/terminal)
+  - Now with jokes!
+- [Contact me page](https://shermanleejm.github.io/#/contactme)
   - Hijacked google forms for a nicer UI
