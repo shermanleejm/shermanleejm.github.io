@@ -1,21 +1,26 @@
-import { Button, CircularProgress, Typography } from '@mui/material';
-import 'dexie-export-import';
-import { useState } from 'react';
-import { MTGDBProps, ToasterSeverityEnum } from '.';
-import { CardsTableColumns, CardsTableType, CustomImageUris } from '../../database';
-import { CSVLink } from 'react-csv';
-import axios from 'axios';
-import { ScryfallDataType } from './interfaces';
+import { Button, CircularProgress, Typography } from "@mui/material";
+import "dexie-export-import";
+import { useState } from "react";
+import { MTGDBProps, ToasterSeverityEnum } from ".";
+import {
+  CardsTableColumns,
+  CardsTableType,
+  CustomImageUris,
+} from "../../database";
+import { CSVLink } from "react-csv";
+import axios from "axios";
+import { ScryfallDataType } from "./interfaces";
+import sample from "../../assets/War_of_the_spark.json";
 
 const NetExports = (props: MTGDBProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [currentUpdateCard, setCurrentUpdateCard] = useState('');
+  const [currentUpdateCard, setCurrentUpdateCard] = useState("");
 
   const handleCsv = (e: any) => {
     const fileReader = new FileReader();
-    fileReader.readAsText(e.target.files[0], 'UTF-8');
+    fileReader.readAsText(e.target.files[0], "UTF-8");
     fileReader.onload = (ee: any) => {
-      let json = '';
+      let json = "";
       try {
         json = JSON.parse(ee.target.result);
       } catch (err) {
@@ -27,14 +32,14 @@ const NetExports = (props: MTGDBProps) => {
   const handleJsonAndUpdate = async (e: any) => {
     setIsLoading(true);
     const fileReader = new FileReader();
-    fileReader.readAsText(e.target.files[0], 'UTF-8');
+    fileReader.readAsText(e.target.files[0], "UTF-8");
     fileReader.onload = async (ee: any) => {
       let json: [CardsTableType];
       try {
         json = JSON.parse(ee.target.result);
       } catch (err) {
-        props.toaster('Unable to process.', ToasterSeverityEnum.ERROR);
-        return '';
+        props.toaster("Unable to process.", ToasterSeverityEnum.ERROR);
+        return "";
       }
 
       for (const card of json) {
@@ -43,7 +48,7 @@ const NetExports = (props: MTGDBProps) => {
           setCurrentUpdateCard(card.name);
 
           let resp = await axios.get(
-            'https://api.scryfall.com/cards/search?q=' + card.name
+            "https://api.scryfall.com/cards/search?q=" + card.name
           );
 
           let newCard: ScryfallDataType = resp.data.data[0];
@@ -69,7 +74,7 @@ const NetExports = (props: MTGDBProps) => {
 
           const newEntry: CardsTableType = {
             name: newCard.name,
-            price: parseFloat(newCard.prices.usd || '0'),
+            price: parseFloat(newCard.prices.usd || "0"),
             quantity: card.quantity,
             set_name: newCard.set_name,
             rarity: newCard.rarity,
@@ -98,14 +103,14 @@ const NetExports = (props: MTGDBProps) => {
   const handleJson = async (e: any) => {
     setIsLoading(true);
     const fileReader = new FileReader();
-    fileReader.readAsText(e.target.files[0], 'UTF-8');
+    fileReader.readAsText(e.target.files[0], "UTF-8");
     fileReader.onload = async (ee: any) => {
       let json: [CardsTableType];
       try {
         json = JSON.parse(ee.target.result);
       } catch (err) {
-        props.toaster('Unable to process.', ToasterSeverityEnum.ERROR);
-        return '';
+        props.toaster("Unable to process.", ToasterSeverityEnum.ERROR);
+        return "";
       }
 
       for (const card of json) {
@@ -134,35 +139,59 @@ const NetExports = (props: MTGDBProps) => {
       data: props.cardArr,
       headers: CardsTableColumns,
       filename: `MTGDB_dump_${Date.now()}.csv`,
-      target: '_blank',
+      target: "_blank",
     };
     return (
-      <CSVLink style={{ all: 'unset' }} {...options}>
+      <CSVLink style={{ all: "unset" }} {...options}>
         export to csv
       </CSVLink>
     );
   };
 
+  async function sampleJson() {
+    console.log(sample);
+    setIsLoading(true);
+
+    for (const card of sample) {
+      let exists: boolean = true;
+      await props.db.cards
+        .where({ name: card.name })
+        .first()
+        .then((res) => (exists = res !== undefined))
+        .catch((err) => console.error(err));
+
+      if (!exists) {
+        setCurrentUpdateCard(card.name);
+        await props.db.cards
+          .put(card)
+          .then(() => {})
+          .catch((err) => console.error(err));
+      }
+    }
+
+    setIsLoading(false);
+  }
+
   return isLoading ? (
-    <div style={{ margin: 'auto' }}>
+    <div style={{ margin: "auto" }}>
       <CircularProgress />
       <Typography>Processing {currentUpdateCard} ...</Typography>
     </div>
   ) : (
-    <div style={{ width: '80vw', margin: 'auto', textAlign: 'center' }}>
+    <div style={{ width: "80vw", margin: "auto", textAlign: "center" }}>
       <Button fullWidth disabled>
         <CSVDownload></CSVDownload>
       </Button>
 
       <input
-        type="file"
-        accept=".csv"
+        type='file'
+        accept='.csv'
         onChange={handleCsv}
-        style={{ display: 'none' }}
-        id="upload-db-csv"
+        style={{ display: "none" }}
+        id='upload-db-csv'
       />
-      <label htmlFor="upload-db-csv">
-        <Button component="span" fullWidth disabled>
+      <label htmlFor='upload-db-csv'>
+        <Button component='span' fullWidth disabled>
           upload csv
         </Button>
       </label>
@@ -177,30 +206,32 @@ const NetExports = (props: MTGDBProps) => {
       </Button>
 
       <input
-        type="file"
-        accept="application/json"
+        type='file'
+        accept='application/json'
         onChange={handleJson}
-        style={{ display: 'none' }}
-        id="upload-db-json"
+        style={{ display: "none" }}
+        id='upload-db-json'
       />
-      <label htmlFor="upload-db-json">
-        <Button component="span" fullWidth>
+      <label htmlFor='upload-db-json'>
+        <Button component='span' fullWidth>
           upload json
         </Button>
       </label>
 
       <input
-        type="file"
-        accept="application/json"
+        type='file'
+        accept='application/json'
         onChange={handleJsonAndUpdate}
-        style={{ display: 'none' }}
-        id="upload-db-json-update"
+        style={{ display: "none" }}
+        id='upload-db-json-update'
       />
-      <label htmlFor="upload-db-json-update">
-        <Button component="span" fullWidth>
+      <label htmlFor='upload-db-json-update'>
+        <Button component='span' fullWidth>
           upload json and update
         </Button>
       </label>
+
+      <Button onClick={() => sampleJson()}>load sample json (testing)</Button>
     </div>
   );
 };
