@@ -1,5 +1,6 @@
 import {
   Alert,
+  Button,
   CircularProgress,
   Grid,
   IconButton,
@@ -17,6 +18,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import CardDataGrid from "./CardDataGrid";
 import NetExports from "./NetExports";
 import DeckBuilder from "./DeckBuilder";
+import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 
 export enum ToasterSeverityEnum {
   SUCCESS = "success",
@@ -104,12 +106,12 @@ const MTGDB = () => {
   const toaster = (
     <React.Fragment>
       <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
+        size='small'
+        aria-label='close'
+        color='inherit'
         onClick={handleCloseToaster}
       >
-        <CloseIcon fontSize="small" />
+        <CloseIcon fontSize='small' />
       </IconButton>
     </React.Fragment>
   );
@@ -183,7 +185,7 @@ const MTGDB = () => {
     <div style={{ margin: "auto", width: "90vw" }}>
       <Tabs
         centered
-        variant="fullWidth"
+        variant='fullWidth'
         scrollButtons={true}
         value={chosenTab}
         onChange={(e: React.SyntheticEvent, newValue: number) => {
@@ -219,6 +221,16 @@ const MTGDB = () => {
       >
         <Alert severity={toasterSeverity}>{toasterMessage}</Alert>
       </Snackbar>
+
+      <IconButton
+        size='large'
+        style={{ position: "fixed", right: 20, bottom: 20 }}
+        onClick={() => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      >
+        <ArrowCircleUpIcon style={{ transform: "scale(1.8)" }} />
+      </IconButton>
     </div>
   );
 };
