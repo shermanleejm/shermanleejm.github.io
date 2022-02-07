@@ -21,7 +21,6 @@ const NetExports = (props: MTGDBProps) => {
       } catch (err) {
         json = ee.target.result;
       }
-      console.log(json);
     };
   };
 
@@ -40,7 +39,6 @@ const NetExports = (props: MTGDBProps) => {
 
       for (const card of json) {
         let check = await props.db.cards.where(card).first();
-        console.log(check);
         if (check === undefined) {
           setCurrentUpdateCard(card.name);
 
@@ -49,7 +47,6 @@ const NetExports = (props: MTGDBProps) => {
           );
 
           let newCard: ScryfallDataType = resp.data.data[0];
-          console.log(newCard);
           let colors = [];
           if (newCard.card_faces) {
             colors = newCard.card_faces[0].colors;

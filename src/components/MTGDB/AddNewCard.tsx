@@ -1,36 +1,85 @@
 import {
+  Autocomplete,
   Button,
   CircularProgress,
   Grid,
   IconButton,
   InputAdornment,
+  MenuItem,
+  Select,
   Slider,
   TextField,
-} from '@mui/material';
-import axios from 'axios';
-import React, { useCallback, useState } from 'react';
-import Cropper from 'react-easy-crop';
-import { createWorker } from 'tesseract.js';
-import getCroppedImg from './helper';
-import { ScryfallDataType } from './interfaces';
-import { CardsTableType, CustomImageUris } from '../../database';
-import { MTGDBProps, ToasterSeverityEnum } from '.';
-import SearchResultCard from './SearchResultCard';
-import ClearIcon from '@mui/icons-material/Clear';
+} from "@mui/material";
+import axios from "axios";
+import React, { useCallback, useState } from "react";
+import Cropper from "react-easy-crop";
+import { createWorker } from "tesseract.js";
+import getCroppedImg from "./helper";
+import { ScryfallDataType, ScryfallSetType } from "./interfaces";
+import { CardsTableType, CustomImageUris } from "../../database";
+import { MTGDBProps, ToasterSeverityEnum } from ".";
+import SearchResultCard from "./SearchResultCard";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useEffect } from "react";
+interface SetSearchType {
+  label: string;
+  code: string;
+  search_uri: string;
+  parent_set_code: string | undefined;
+}
+
+enum SearchCardFilter {
+  name = "name",
+  set_name = "set_name",
+}
 
 const AddNewCard = (props: MTGDBProps) => {
-  const [img, setImg] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [img, setImg] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [imgUploaded, setImgUploaded] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [rotation, setRotation] = useState(0);
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
-  const [defaultTag, setDefaultTag] = useState('');
+  const [defaultTag, setDefaultTag] = useState("");
+  const [setCodes, setSetCodes] = useState<SetSearchType[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string>(
+    SearchCardFilter.name
+  );
+  const [selectedSet, setSelectedSet] = useState<SetSearchType>();
+
+  useEffect(() => {
+    function getSets() {
+      axios
+        .get("https://api.scryfall.com/sets")
+        .then((res) => {
+          setSetCodes(
+            res.data.data
+              .map((val: ScryfallSetType): SetSearchType => {
+                return {
+                  code: val.code,
+                  parent_set_code: val.parent_set_code,
+                  label: val.name,
+                  search_uri: val.search_uri,
+                };
+              })
+              .filter(
+                (e: SetSearchType) =>
+                  e.parent_set_code === undefined &&
+                  !e.label.includes("Alchemy")
+              )
+          );
+        })
+        .catch((e) => console.error(e))
+        .finally(() => setIsLoading(false));
+    }
+
+    getSets();
+  }, []);
 
   const handleChange = (event: any) => {
     setImg(URL.createObjectURL(event.target.files[0]));
@@ -44,18 +93,22 @@ const AddNewCard = (props: MTGDBProps) => {
   const showCroppedImage = useCallback(async () => {
     setIsLoading(true);
     try {
-      const croppedImage: any = await getCroppedImg(img, croppedAreaPixels, rotation);
+      const croppedImage: any = await getCroppedImg(
+        img,
+        croppedAreaPixels,
+        rotation
+      );
       try {
         let worker = createWorker({
           logger: (m) => console.log(m),
         });
         await worker.load();
-        await worker.loadLanguage('eng');
-        await worker.initialize('eng');
+        await worker.loadLanguage("eng");
+        await worker.initialize("eng");
         const {
           data: { text },
         } = await worker.recognize(croppedImage);
-        setText(text.replace(/[^a-zA-Z0-9\s]/g, ''));
+        setText(text.replace(/[^a-zA-Z0-9\s]/g, ""));
         await worker.terminate();
       } catch (err) {
         console.error(err);
@@ -67,33 +120,55 @@ const AddNewCard = (props: MTGDBProps) => {
     }
   }, [croppedAreaPixels, img, rotation]);
 
-  function searchCard(queryName: string) {
+  async function searchCard(queryName: string) {
     setIsSearching(true);
     setSearchResults([]);
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
-      props.toaster('Too many requests', ToasterSeverityEnum.ERROR);
+      props.toaster("Too many requests", ToasterSeverityEnum.ERROR);
       setIsSearching(false);
       return 0;
     }
 
-    axios
-      .get('https://api.scryfall.com/cards/search?q=' + queryName)
-      .then((res) => {
-        console.log(res.data);
-        setSearchResults(res.data.data);
-      })
-      .catch((err) => {
-        console.error(err);
-        if (err.response.status === 404 || err.response.status === 400) {
-          props.toaster('No card found', ToasterSeverityEnum.ERROR);
+    switch (selectedFilter) {
+      case "name":
+        axios
+          .get("https://api.scryfall.com/cards/search?q=" + queryName)
+          .then((res) => {
+            setSearchResults(res.data.data);
+          })
+          .catch((err) => {
+            console.error(err);
+            if (err.response.status === 404 || err.response.status === 400) {
+              props.toaster("No card found", ToasterSeverityEnum.ERROR);
+            }
+          })
+          .finally(() => {
+            setLastRequest(Date.now());
+            setIsSearching(false);
+          });
+        break;
+      case "set_name":
+        if (selectedSet !== undefined) {
+          const resp = await axios.get(
+            "https://api.scryfall.com/sets/" + selectedSet.code
+          );
+          let uri = resp.data.search_uri;
+          let tmp: ScryfallDataType[] = [];
+          while (uri !== undefined) {
+            let r = await axios.get(uri);
+            console.log(r.data.data);
+            tmp = tmp.concat(r.data.data);
+            uri = r.data.next_page;
+          }
+          setSearchResults(tmp);
         }
-      })
-      .finally(() => {
-        setLastRequest(Date.now());
         setIsSearching(false);
-      });
+        break;
+      default:
+        break;
+    }
   }
 
   async function storeCard(
@@ -125,7 +200,7 @@ const AddNewCard = (props: MTGDBProps) => {
 
     const newEntry: CardsTableType = {
       name: card.name,
-      price: price ? parseFloat(price) : parseFloat(card.prices.usd || '0'),
+      price: price ? parseFloat(price) : parseFloat(card.prices.usd || "0"),
       quantity: qty || 1,
       set_name: card.set_name,
       rarity: card.rarity,
@@ -141,51 +216,66 @@ const AddNewCard = (props: MTGDBProps) => {
     };
 
     const collision: CardsTableType | undefined = await props.db.cards
-      .where('name')
+      .where("name")
       .equalsIgnoreCase(card.name)
       .first();
 
     if (collision === undefined) {
-      props.db.transaction('rw', props.db.cards, async () => {
+      props.db.transaction("rw", props.db.cards, async () => {
         await props.db.cards.add(newEntry);
       });
     } else {
-      props.db.transaction('rw', props.db.cards, async () => {
+      props.db.transaction("rw", props.db.cards, async () => {
         await props.db.cards.update(collision.id || 0, newEntry);
       });
     }
 
-    props.toaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
+    props.toaster("Recorded card!", ToasterSeverityEnum.SUCCESS);
   }
+
+  const filters = [
+    { slug: SearchCardFilter.name, name: "Card Name" },
+    { slug: SearchCardFilter.set_name, name: "Set Name" },
+  ];
 
   return isLoading ? (
     <div
       style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '36 0 36 0',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "36 0 36 0",
       }}
     >
       <CircularProgress />
     </div>
   ) : (
     <div>
-      <Grid container direction="column" justifyContent="center" alignItems="center">
+      <Grid
+        container
+        direction='column'
+        justifyContent='center'
+        alignItems='center'
+      >
         {/* Upload and Magic button  */}
-        <Grid item style={{ width: '80vw' }}>
-          <Grid container direction="row" justifyContent="space-around" spacing={3}>
+        <Grid item style={{ width: "80vw" }}>
+          <Grid
+            container
+            direction='row'
+            justifyContent='space-around'
+            spacing={3}
+          >
             <Grid item>
               <input
-                type="file"
-                accept="image/*"
-                capture="environment"
+                type='file'
+                accept='image/*'
+                capture='environment'
                 onChange={handleChange}
-                style={{ display: 'none' }}
-                id="upload-image"
+                style={{ display: "none" }}
+                id='upload-image'
               />
-              <label htmlFor="upload-image">
-                <Button component="span">scanner</Button>
+              <label htmlFor='upload-image'>
+                <Button component='span'>scanner</Button>
               </label>
             </Grid>
             <Grid item>
@@ -197,8 +287,8 @@ const AddNewCard = (props: MTGDBProps) => {
         {/* Cropper */}
         <Grid item>
           {imgUploaded && (
-            <div style={{ width: '80vw' }}>
-              <div style={{ position: 'relative', height: 300, width: '100%' }}>
+            <div style={{ width: "80vw" }}>
+              <div style={{ position: "relative", height: 300, width: "100%" }}>
                 <Cropper
                   image={img}
                   crop={crop}
@@ -222,10 +312,10 @@ const AddNewCard = (props: MTGDBProps) => {
           )}
         </Grid>
         <Grid item>
-          {img !== '' && imgUploaded && (
+          {img !== "" && imgUploaded && (
             <Button
               onClick={() => {
-                setImg('');
+                setImg("");
                 setImgUploaded(false);
               }}
             >
@@ -238,38 +328,68 @@ const AddNewCard = (props: MTGDBProps) => {
         <Grid item xs={12} md={12}>
           <Grid
             container
-            direction="column"
+            direction='column'
             spacing={1}
             style={{
-              width: '80vw',
-              margin: '16 0 16 0',
+              width: "80vw",
+              margin: "16 0 16 0",
             }}
           >
             <Grid item>
-              <TextField
-                value={text}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ''))
-                }
-                label="Card Name (remove uneccessary characters)"
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton edge="end" onClick={() => setText('')}>
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                  if (e.key === 'Enter') searchCard(text);
-                }}
-              />
+              <Grid container direction={"row"}>
+                <Grid item xs={3}>
+                  <Select
+                    fullWidth
+                    defaultValue={selectedFilter}
+                    onChange={(e) =>
+                      setSelectedFilter(e.target.value as string)
+                    }
+                  >
+                    {filters.map((f) => (
+                      <MenuItem value={f.slug}>{f.name}</MenuItem>
+                    ))}
+                  </Select>
+                </Grid>
+                <Grid item xs={9}>
+                  {selectedFilter === "name" && (
+                    <TextField
+                      value={text}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ""))
+                      }
+                      label='Card Name (remove uneccessary characters)'
+                      fullWidth
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position='end'>
+                            <IconButton edge='end' onClick={() => setText("")}>
+                              <ClearIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                        if (e.key === "Enter") searchCard(text);
+                      }}
+                    />
+                  )}
+                  {selectedFilter === "set_name" && (
+                    <Autocomplete
+                      options={setCodes}
+                      onChange={(e, val) =>
+                        setSelectedSet(val === null ? undefined : val)
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} label='Set Name' />
+                      )}
+                    />
+                  )}
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item>
               <TextField
-                label="Tag"
+                label='Tag'
                 value={defaultTag}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setDefaultTag(e.target.value)
@@ -291,7 +411,7 @@ const AddNewCard = (props: MTGDBProps) => {
                   fullWidth
                   onClick={() => {
                     setSearchResults([]);
-                    setText('');
+                    setText("");
                   }}
                 >
                   clear
@@ -305,14 +425,14 @@ const AddNewCard = (props: MTGDBProps) => {
         <Grid item>
           <Grid
             container
-            direction="row"
+            direction='row'
             spacing={1}
-            justifyContent={'start'}
-            alignItems={'stretch'}
-            style={{ width: '80vw' }}
+            justifyContent={"start"}
+            alignItems={"stretch"}
+            style={{ width: "80vw" }}
           >
             {searchResults.map((sr: ScryfallDataType) => (
-              <Grid item xs={6} md={3}>
+              <Grid item xs={6} sm={4} md={3}>
                 <SearchResultCard
                   sr={sr}
                   storeCard={(

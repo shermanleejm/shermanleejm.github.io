@@ -63,7 +63,6 @@ const MTGDB = () => {
     switch (k) {
       case "tags":
         setCardArr(cardArr.filter((c) => new Set(c[k]).has(val)));
-        console.log(cardArr.filter((c) => new Set(c[k]).has(val)));
         break;
       case "set_name":
         setCardArr(cardArr.filter((c) => c[k] === val));
