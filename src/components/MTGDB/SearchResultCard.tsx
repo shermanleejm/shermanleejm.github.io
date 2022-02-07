@@ -1,17 +1,19 @@
 import {
+  Autocomplete,
   Backdrop,
   Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
+  Chip,
   CircularProgress,
   Grid,
   MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import NumberFormat from "react-number-format";
 import { useSelector } from "react-redux";
 import { CustomImageUris } from "../../database";
@@ -23,7 +25,7 @@ export type SearchResultCardType = {
   cardDict: { [key: string]: boolean };
   storeCard: (
     sr: ScryfallDataType,
-    tag?: string,
+    tag?: string[],
     price?: string,
     qty?: number,
     imgUri?: string
@@ -32,7 +34,7 @@ export type SearchResultCardType = {
 };
 
 const SearchResultCard = (props: SearchResultCardType) => {
-  const [tag, setTag] = useState<string | undefined>();
+  const [tags, setTags] = useState<string[]>([]);
   const [isClicked, setIsClicked] = useState(false);
   const [price, setPrice] = useState<string>();
   const [priceSelectOptions, setPriceSelectOptions] = useState<
@@ -80,7 +82,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
       setIsLoading(false);
 
       if (props.defaultTag) {
-        setTag(props.defaultTag);
+        setTags([props.defaultTag]);
       }
 
       let imageUris: CustomImageUris = { small: [], normal: [] };
@@ -101,8 +103,19 @@ const SearchResultCard = (props: SearchResultCardType) => {
     preCheck();
   }, []);
 
-  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTag(e.target.value);
+  const handleTagChange = (
+    event: SyntheticEvent<Element, Event>,
+    value: (string | string[])[]
+  ) => {
+    let tmp: string[] = [];
+    if (Array.isArray(value)) {
+      for (let c of value) {
+        if (typeof c === "string") {
+          tmp.push(c);
+        }
+      }
+    }
+    setTags(tmp);
   };
 
   async function removeCard() {
@@ -185,7 +198,25 @@ const SearchResultCard = (props: SearchResultCardType) => {
         <CardActions>
           <Grid container direction={"column"}>
             <Grid item>
-              <TextField onChange={handleTagChange} value={tag} label={"tag"} />
+              <Autocomplete
+                freeSolo
+                multiple
+                options={[]}
+                onChange={handleTagChange}
+                value={tags}
+                renderTags={(value: readonly string[], getTagProps) =>
+                  value.map((option: string, index: number) => (
+                    <Chip
+                      variant='outlined'
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={"tags"} />
+                )}
+              />
             </Grid>
             <Grid item>
               <Grid container>
@@ -194,7 +225,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
                     disabled={isClicked}
                     onClick={() => {
                       setIsClicked(true);
-                      props.storeCard(props.sr, tag, price, qty);
+                      props.storeCard(props.sr, tags, price, qty);
                     }}
                   >
                     add card

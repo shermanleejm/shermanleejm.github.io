@@ -173,7 +173,7 @@ const AddNewCard = (props: MTGDBProps) => {
 
   async function storeCard(
     card: ScryfallDataType,
-    tag?: string,
+    tag?: string[],
     price?: string,
     qty?: number,
     imgUri?: string
@@ -209,7 +209,7 @@ const AddNewCard = (props: MTGDBProps) => {
       image_uri: imgUris,
       colors: colors,
       color_identity: card.color_identity,
-      tags: tag === undefined ? [] : [tag],
+      tags: tag === undefined ? [] : tag,
       type_line: card.type_line,
       oracle_text: card.oracle_text,
       date_added: Date.now(),
@@ -437,10 +437,10 @@ const AddNewCard = (props: MTGDBProps) => {
                   sr={sr}
                   storeCard={(
                     sr: ScryfallDataType,
-                    tag?: string,
+                    tags?: string[],
                     price?: string,
                     qty?: number
-                  ) => storeCard(sr, tag, price, qty)}
+                  ) => storeCard(sr, tags, price, qty)}
                   cardDict={props.cardDict || {}}
                   defaultTag={defaultTag}
                 />
