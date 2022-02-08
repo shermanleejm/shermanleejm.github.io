@@ -47,7 +47,7 @@ const MTGDB = () => {
   const [toasterMessage, setToasterMessage] = useState("");
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
-  const [chosenTab, setChosenTab] = useState(1);
+  const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
 
