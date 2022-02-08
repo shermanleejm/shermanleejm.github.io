@@ -223,79 +223,6 @@ const CardDataGrid = (props: MTGDBProps) => {
     props.refresh(true);
   }
 
-  function handlePageChange(pn: number, pp: number) {
-    // setCards(cards.slice(pn * pp, pp * (pn + 1) - 1));
-  }
-
-  const NavigationBar = () => {
-    return (
-      <Grid item style={{ width: "80vw" }}>
-        <Grid
-          style={{ width: "100%" }}
-          container
-          alignItems={"center"}
-          direction={"row"}
-          justifyContent={"space-between"}
-        >
-          <Grid item>
-            <IconButton
-              disabled={pageNumber <= 0}
-              onClick={() => {
-                setPageNumber(pageNumber - 1);
-                handlePageChange(pageNumber - 1, perPage);
-              }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-          </Grid>
-          <Grid item>{`Page ${pageNumber + 1} of ${
-            lastPage === perPage ? lastPage : lastPage + 1
-          }`}</Grid>
-          <Grid item>
-            <Select
-              defaultValue={perPage}
-              onChange={(e) => {
-                setIsProprietary(true);
-                let newPerPage: number = e.target.value as number;
-                if (newPerPage > 0) {
-                  let newPageNum =
-                    Math.floor((perPage * (pageNumber + 1)) / newPerPage) >=
-                    lastPage
-                      ? lastPage
-                      : Math.floor((perPage * (pageNumber + 1)) / newPerPage);
-                  newPageNum = 0;
-                  handlePageChange(newPageNum, newPerPage);
-                  setPerPage(newPerPage);
-                  setPageNumber(newPageNum);
-                } else {
-                  setIsProprietary(false);
-                  setPerPage(props.cardArr.length + 1);
-                  setPageNumber(0);
-                }
-              }}
-            >
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-              <MenuItem value={100}>100</MenuItem>
-              <MenuItem value={-1}>all</MenuItem>
-            </Select>
-          </Grid>
-          <Grid item>
-            <IconButton
-              disabled={pageNumber >= lastPage}
-              onClick={() => {
-                setPageNumber(pageNumber + 1);
-                handlePageChange(pageNumber + 1, perPage);
-              }}
-            >
-              <ArrowForwardIcon />
-            </IconButton>
-          </Grid>
-        </Grid>
-      </Grid>
-    );
-  };
-
   return isLoading ? (
     <CircularProgress />
   ) : (
@@ -358,8 +285,6 @@ const CardDataGrid = (props: MTGDBProps) => {
           </Grid>
         </Grid>
 
-        <NavigationBar />
-
         {/* Data Grid */}
         <Grid item style={{ width: "80vw" }}>
           <div
@@ -370,14 +295,10 @@ const CardDataGrid = (props: MTGDBProps) => {
           >
             <div style={{ flexGrow: 1 }}>
               <DataGrid
-                rows={cards.slice(
-                  pageNumber * perPage,
-                  perPage * (pageNumber + 1) - 1
-                )}
+                rows={cards}
                 columns={columns}
                 autoHeight
                 checkboxSelection
-                hideFooter={isProprietary}
                 onSelectionModelChange={(ids) => {
                   let selectedIds = new Set(ids);
                   let selectedRows = cards.filter((card) =>
