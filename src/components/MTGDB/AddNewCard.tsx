@@ -136,7 +136,11 @@ const AddNewCard = (props: MTGDBProps) => {
         axios
           .get("https://api.scryfall.com/cards/search?q=" + queryName)
           .then((res) => {
-            setSearchResults(res.data.data);
+            setSearchResults(
+              res.data.data.filter(
+                (c: ScryfallDataType) => c.name.substring(0, 2) != "A-"
+              )
+            );
           })
           .catch((err) => {
             console.error(err);
@@ -159,7 +163,11 @@ const AddNewCard = (props: MTGDBProps) => {
           while (uri !== undefined) {
             let r = await axios.get(uri);
             console.log(r.data.data);
-            tmp = tmp.concat(r.data.data);
+            tmp = tmp.concat(
+              r.data.data.filter(
+                (c: ScryfallDataType) => c.name.substring(0, 2) != "A-"
+              )
+            );
             uri = r.data.next_page;
           }
           setSearchResults(tmp);
