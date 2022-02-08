@@ -16,7 +16,6 @@ const DeckBuilder = (props: MTGDBProps) => {
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [decklist, setDecklist] = useState<Set<CardsTableType>>(new Set());
-  const [isLoading, setIsLoading] = useState(false);
 
   function compare(a: any, b: any, type: keyof CardsTableType) {
     if (a[type] < b[type]) return -1;
@@ -30,7 +29,7 @@ const DeckBuilder = (props: MTGDBProps) => {
     }
 
     initialLoad();
-  }, []);
+  }, [props.cardArr]);
 
   enum colorSlug {
     BLACK = "B",

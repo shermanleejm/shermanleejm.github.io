@@ -14,8 +14,6 @@ const WordleSolver = () => {
   const [incorrect_4, setIncorrect_4] = useState("");
   const [incorrect_5, setIncorrect_5] = useState("");
   const [wrongGuesses, setWrongGuesses] = useState("");
-  const [incorrect, setIncorrect] = useState("");
-  const [possible, setPossible] = useState<string[]>([]);
   const [words, setWords] = useState<string[]>([]);
   const [initial, setInitial] = useState<boolean>(true);
   const [test, setTest] = useState("");
@@ -224,7 +222,7 @@ const WordleSolver = () => {
               spacing={1}
             >
               {words.map((w) => (
-                <Grid item xs={1}>
+                <Grid item xs={3}>
                   <Typography>{w}</Typography>
                 </Grid>
               ))}

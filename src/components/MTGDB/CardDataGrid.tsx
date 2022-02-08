@@ -16,7 +16,6 @@ import {
   DialogActions,
   DialogTitle,
   Grid,
-  IconButton,
   List,
   ListItem,
   ListItemText,
@@ -30,8 +29,6 @@ import {
 } from "@mui/material";
 import { MTGDBProps } from ".";
 import { CardsTableType } from "../../database";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const CardDataGrid = (props: MTGDBProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
@@ -42,12 +39,8 @@ const CardDataGrid = (props: MTGDBProps) => {
   const [calculateDialogState, setCalculateDialogState] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("tags");
   const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
-  const [perPage, setPerPage] = useState<number>(10);
-  const [pageNumber, setPageNumber] = useState<number>(0);
-  const [isProprietary, setIsProprietary] = useState(true);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
-  const lastPage = Math.floor(cards.length / perPage);
 
   useEffect(() => {
     function updateCards() {

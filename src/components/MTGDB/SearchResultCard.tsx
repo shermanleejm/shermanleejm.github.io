@@ -101,7 +101,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
     }
 
     preCheck();
-  }, []);
+  }, [props]);
 
   const handleTagChange = (
     event: SyntheticEvent<Element, Event>,
