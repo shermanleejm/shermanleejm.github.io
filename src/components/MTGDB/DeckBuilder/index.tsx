@@ -104,7 +104,7 @@ const DeckBuilder = (props: MTGDBProps) => {
               size='small'
               value={searchText}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\\\-]/g, ""))
+                setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\/\-]/g, ""))
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
                 if (e.key === "Enter") filterCardArrByText(searchText);
