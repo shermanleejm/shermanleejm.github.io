@@ -53,6 +53,12 @@ const NetExports = (props: MTGDBProps) => {
           );
 
           let newCard: ScryfallDataType = resp.data.data[0];
+          for (let c of resp.data.data) {
+            if (c.name === card.name) {
+              newCard = c;
+            }
+          }
+
           let colors = [];
           if (newCard.card_faces) {
             colors = newCard.card_faces[0].colors;
