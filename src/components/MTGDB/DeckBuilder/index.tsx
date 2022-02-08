@@ -53,7 +53,8 @@ const DeckBuilder = (props: MTGDBProps) => {
         .filter(
           (c) =>
             c.name.toLowerCase().includes(text.toLowerCase()) ||
-            c.type_line.toLowerCase().includes(text.toLowerCase())
+            c.type_line.toLowerCase().includes(text.toLowerCase()) ||
+            c.set_name.toLowerCase().includes(text.toLowerCase())
         )
         .sort((a, b) => compare(a, b, "cmc"))
         .sort((a, b) => compare(a, b, "colors"))
@@ -100,8 +101,8 @@ const DeckBuilder = (props: MTGDBProps) => {
           <Grid item>
             <TextField
               style={{ width: "50vw" }}
-              label="general search"
-              size="small"
+              label='general search'
+              size='small'
               value={searchText}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ""))
@@ -144,9 +145,12 @@ const DeckBuilder = (props: MTGDBProps) => {
               <LooksIcon />
             </IconButton>
             <Button
-              size="small"
-              variant="text"
-              onClick={() => filterCardArrByText("")}
+              size='small'
+              variant='text'
+              onClick={() => {
+                setCardArr(props.cardArr);
+                setSearchText("");
+              }}
             >
               reset
             </Button>
