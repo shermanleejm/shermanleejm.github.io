@@ -74,6 +74,7 @@ const NetExports = (props: MTGDBProps) => {
           }
 
           const newEntry: CardsTableType = {
+            scryfall_id: newCard.id,
             name: newCard.name,
             price: parseFloat(newCard.prices.usd || "0"),
             quantity: card.quantity,
@@ -113,24 +114,21 @@ const NetExports = (props: MTGDBProps) => {
         props.toaster("Unable to process.", ToasterSeverityEnum.ERROR);
         return "";
       }
-
+      let added = 0;
       for (const card of json) {
-        let exists: boolean = true;
-        await props.db.cards
-          .where({ name: card.name })
-          .first()
-          .then((res) => (exists = res !== undefined))
-          .catch((err) => console.error(err));
+        delete card.id;
+        let exists =
+          (await props.db.cards.where({ name: card.name }).first()) !==
+          undefined;
 
         if (!exists) {
           setCurrentUpdateCard(card.name);
-          await props.db.cards
-            .put(card)
-            .then(() => {})
-            .catch((err) => console.error(err));
+          await props.db.cards.put(card);
+          added++;
         }
       }
-
+      console.log("Added: ", added);
+      console.log("Total: ", (await props.db.cards.toArray()).length);
       setIsLoading(false);
     };
   };

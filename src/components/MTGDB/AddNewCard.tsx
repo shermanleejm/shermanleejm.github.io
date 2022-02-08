@@ -175,8 +175,7 @@ const AddNewCard = (props: MTGDBProps) => {
     card: ScryfallDataType,
     tag?: string[],
     price?: string,
-    qty?: number,
-    imgUri?: string
+    qty?: number
   ) {
     let colors = [];
     if (card.card_faces) {
@@ -200,6 +199,7 @@ const AddNewCard = (props: MTGDBProps) => {
 
     const newEntry: CardsTableType = {
       name: card.name,
+      scryfall_id: card.id,
       price: price ? parseFloat(price) : parseFloat(card.prices.usd || "0"),
       quantity: qty || 1,
       set_name: card.set_name,
