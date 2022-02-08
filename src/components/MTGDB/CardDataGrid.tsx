@@ -44,13 +44,14 @@ const CardDataGrid = (props: MTGDBProps) => {
   const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
   const [perPage, setPerPage] = useState<number>(10);
   const [pageNumber, setPageNumber] = useState<number>(0);
+  const [isProprietary, setIsProprietary] = useState(true);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
-  const lastPage = Math.floor(props.cardArr.length / perPage);
+  const lastPage = Math.floor(cards.length / perPage);
 
   useEffect(() => {
     function updateCards() {
-      setCards(props.cardArr.slice(0, perPage));
+      setCards(props.cardArr);
       setMemoCards(props.cardArr);
       setIsLoading(false);
     }
@@ -223,7 +224,7 @@ const CardDataGrid = (props: MTGDBProps) => {
   }
 
   function handlePageChange(pn: number, pp: number) {
-    setCards(props.cardArr.slice(pn * pp, pp * (pn + 1) - 1));
+    // setCards(cards.slice(pn * pp, pp * (pn + 1) - 1));
   }
 
   const NavigationBar = () => {
@@ -254,21 +255,28 @@ const CardDataGrid = (props: MTGDBProps) => {
             <Select
               defaultValue={perPage}
               onChange={(e) => {
+                setIsProprietary(true);
                 let newPerPage: number = e.target.value as number;
-                let newPageNum =
-                  Math.floor((perPage * (pageNumber + 1)) / newPerPage) >=
-                  lastPage
-                    ? lastPage
-                    : Math.floor((perPage * (pageNumber + 1)) / newPerPage);
-                newPageNum = 0;
-                handlePageChange(newPageNum, newPerPage);
-                setPerPage(newPerPage);
-                setPageNumber(newPageNum);
+                if (newPerPage > 0) {
+                  let newPageNum =
+                    Math.floor((perPage * (pageNumber + 1)) / newPerPage) >=
+                    lastPage
+                      ? lastPage
+                      : Math.floor((perPage * (pageNumber + 1)) / newPerPage);
+                  newPageNum = 0;
+                  handlePageChange(newPageNum, newPerPage);
+                  setPerPage(newPerPage);
+                  setPageNumber(newPageNum);
+                } else {
+                  setIsProprietary(false);
+                  handlePageChange(0, props.cardArr.length);
+                }
               }}
             >
               <MenuItem value={10}>10</MenuItem>
               <MenuItem value={50}>50</MenuItem>
               <MenuItem value={100}>100</MenuItem>
+              <MenuItem value={-1}>all</MenuItem>
             </Select>
           </Grid>
           <Grid item>
@@ -361,11 +369,11 @@ const CardDataGrid = (props: MTGDBProps) => {
           >
             <div style={{ flexGrow: 1 }}>
               <DataGrid
-                rows={cards}
+                rows={cards.slice(pageNumber * perPage, perPage * (pageNumber + 1) - 1)}
                 columns={columns}
                 autoHeight
                 checkboxSelection
-                hideFooter
+                hideFooter={isProprietary}
                 onSelectionModelChange={(ids) => {
                   let selectedIds = new Set(ids);
                   let selectedRows = cards.filter((card) =>
@@ -394,8 +402,6 @@ const CardDataGrid = (props: MTGDBProps) => {
             </div>
           </div>
         </Grid>
-
-        <NavigationBar />
 
         <Grid item>
           <Button onClick={() => setDeleteDialogState(true)}>
