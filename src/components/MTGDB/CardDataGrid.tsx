@@ -269,7 +269,8 @@ const CardDataGrid = (props: MTGDBProps) => {
                   setPageNumber(newPageNum);
                 } else {
                   setIsProprietary(false);
-                  handlePageChange(0, props.cardArr.length);
+                  setPerPage(props.cardArr.length + 1);
+                  setPageNumber(0);
                 }
               }}
             >
@@ -369,7 +370,10 @@ const CardDataGrid = (props: MTGDBProps) => {
           >
             <div style={{ flexGrow: 1 }}>
               <DataGrid
-                rows={cards.slice(pageNumber * perPage, perPage * (pageNumber + 1) - 1)}
+                rows={cards.slice(
+                  pageNumber * perPage,
+                  perPage * (pageNumber + 1) - 1
+                )}
                 columns={columns}
                 autoHeight
                 checkboxSelection
