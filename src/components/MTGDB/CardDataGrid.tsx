@@ -16,6 +16,7 @@ import {
   DialogActions,
   DialogTitle,
   Grid,
+  IconButton,
   List,
   ListItem,
   ListItemText,
@@ -29,6 +30,8 @@ import {
 } from "@mui/material";
 import { MTGDBProps } from ".";
 import { CardsTableType } from "../../database";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const CardDataGrid = (props: MTGDBProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
@@ -39,12 +42,15 @@ const CardDataGrid = (props: MTGDBProps) => {
   const [calculateDialogState, setCalculateDialogState] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<string>("tags");
   const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
+  const [perPage, setPerPage] = useState<number>(10);
+  const [pageNumber, setPageNumber] = useState<number>(0);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
+  const lastPage = Math.floor(props.cardArr.length / perPage);
 
   useEffect(() => {
     function updateCards() {
-      setCards(props.cardArr);
+      setCards(props.cardArr.slice(0, perPage));
       setMemoCards(props.cardArr);
       setIsLoading(false);
     }
@@ -75,7 +81,7 @@ const CardDataGrid = (props: MTGDBProps) => {
               <React.Fragment>
                 <div style={{ display: "flex", flexDirection: "row" }}>
                   {data.image_uri.small.map((s: string, i: number) => (
-                    <img src={data.image_uri.small[i]} alt=""></img>
+                    <img src={data.image_uri.small[i]} alt=''></img>
                   ))}
                 </div>
               </React.Fragment>
@@ -91,7 +97,7 @@ const CardDataGrid = (props: MTGDBProps) => {
     {
       field: "price",
       headerName: "Price",
-      width: colWidth / 4,
+      width: colWidth / 1.8,
       valueFormatter: (params: GridValueFormatterParams) => {
         return `$${params.value}`;
       },
@@ -115,7 +121,7 @@ const CardDataGrid = (props: MTGDBProps) => {
           <Autocomplete
             fullWidth
             multiple
-            id="tags-standard"
+            id='tags-standard'
             options={data.tags || []}
             defaultValue={data.tags || []}
             freeSolo
@@ -125,14 +131,14 @@ const CardDataGrid = (props: MTGDBProps) => {
             renderTags={(value: readonly string[], getTagProps) =>
               value.map((option: string, index: number) => (
                 <Chip
-                  variant="outlined"
+                  variant='outlined'
                   label={option}
                   {...getTagProps({ index })}
                 />
               ))
             }
             renderInput={(params) => (
-              <TextField {...params} variant="standard" />
+              <TextField {...params} variant='standard' />
             )}
           />
         );
@@ -216,6 +222,71 @@ const CardDataGrid = (props: MTGDBProps) => {
     props.refresh(true);
   }
 
+  function handlePageChange(pn: number, pp: number) {
+    setCards(props.cardArr.slice(pn * pp, pp * (pn + 1) - 1));
+  }
+
+  const NavigationBar = () => {
+    return (
+      <Grid item style={{ width: "80vw" }}>
+        <Grid
+          style={{ width: "100%" }}
+          container
+          alignItems={"center"}
+          direction={"row"}
+          justifyContent={"space-between"}
+        >
+          <Grid item>
+            <IconButton
+              disabled={pageNumber <= 0}
+              onClick={() => {
+                setPageNumber(pageNumber - 1);
+                handlePageChange(pageNumber - 1, perPage);
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          </Grid>
+          <Grid item>{`Page ${pageNumber + 1} of ${
+            lastPage === perPage ? lastPage : lastPage + 1
+          }`}</Grid>
+          <Grid item>
+            <Select
+              defaultValue={perPage}
+              onChange={(e) => {
+                let newPerPage: number = e.target.value as number;
+                let newPageNum =
+                  Math.floor((perPage * (pageNumber + 1)) / newPerPage) >=
+                  lastPage
+                    ? lastPage
+                    : Math.floor((perPage * (pageNumber + 1)) / newPerPage);
+                newPageNum = 0;
+                handlePageChange(newPageNum, newPerPage);
+                setPerPage(newPerPage);
+                setPageNumber(newPageNum);
+              }}
+            >
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </Select>
+          </Grid>
+          <Grid item>
+            <IconButton
+              disabled={pageNumber >= lastPage}
+              onClick={() => {
+                setPageNumber(pageNumber + 1);
+                handlePageChange(pageNumber + 1, perPage);
+              }}
+            >
+              <ArrowForwardIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
+      </Grid>
+    );
+  };
+
   return isLoading ? (
     <CircularProgress />
   ) : (
@@ -254,7 +325,7 @@ const CardDataGrid = (props: MTGDBProps) => {
             <Grid item style={{ width: "60vw" }}>
               <Autocomplete
                 fullWidth
-                id="tags-standard"
+                id='tags-standard'
                 options={filterOptions(selectedFilter) || []}
                 // defaultValue={data.tags || []}
                 freeSolo
@@ -264,19 +335,21 @@ const CardDataGrid = (props: MTGDBProps) => {
                 renderTags={(value: readonly string[], getTagProps) =>
                   value.map((option: string, index: number) => (
                     <Chip
-                      variant="outlined"
+                      variant='outlined'
                       label={option}
                       {...getTagProps({ index })}
                     />
                   ))
                 }
                 renderInput={(params) => (
-                  <TextField {...params} variant="outlined" />
+                  <TextField {...params} variant='outlined' />
                 )}
               />
             </Grid>
           </Grid>
         </Grid>
+
+        <NavigationBar />
 
         {/* Data Grid */}
         <Grid item style={{ width: "80vw" }}>
@@ -292,6 +365,7 @@ const CardDataGrid = (props: MTGDBProps) => {
                 columns={columns}
                 autoHeight
                 checkboxSelection
+                hideFooter
                 onSelectionModelChange={(ids) => {
                   let selectedIds = new Set(ids);
                   let selectedRows = cards.filter((card) =>
@@ -320,6 +394,9 @@ const CardDataGrid = (props: MTGDBProps) => {
             </div>
           </div>
         </Grid>
+
+        <NavigationBar />
+
         <Grid item>
           <Button onClick={() => setDeleteDialogState(true)}>
             delete selected
