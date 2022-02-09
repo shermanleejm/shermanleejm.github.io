@@ -19,9 +19,14 @@ const WordleSolver = () => {
   const [test, setTest] = useState('');
   const [showTest, setShowTest] = useState(false);
 
+  const START_DATE = Date.parse('09 Feb 2022 00:00:00 GMT');
+
   useEffect(() => {
     setWords(WORDS);
-    setTest(WORDS[Math.floor(Math.random()) * WORDS.length]);
+    let current =
+      Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) +
+      (235 % WORDS.length);
+    setTest(WORDS[current]);
   }, []);
 
   function solve() {
