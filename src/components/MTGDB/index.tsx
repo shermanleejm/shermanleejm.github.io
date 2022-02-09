@@ -17,7 +17,6 @@ import CardDataGrid from "./CardDataGrid";
 import NetExports from "./NetExports";
 import DeckBuilder from "./DeckBuilder";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
-import ManaChart from "./DeckBuilder/ManaChart";
 
 export enum ToasterSeverityEnum {
   SUCCESS = "success",
@@ -46,7 +45,7 @@ const MTGDB = () => {
   const [toasterMessage, setToasterMessage] = useState("");
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
-  const [chosenTab, setChosenTab] = useState(0);
+  const [chosenTab, setChosenTab] = useState(2);
 
   const db = useSelector((state: State) => state.database);
 
