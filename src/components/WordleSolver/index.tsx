@@ -24,8 +24,8 @@ const WordleSolver = () => {
   useEffect(() => {
     setWords(WORDS);
     let current =
-      Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) +
-      (235 % WORDS.length);
+      (Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) + 235) %
+      WORDS.length;
     setTest(WORDS[current]);
   }, []);
 
