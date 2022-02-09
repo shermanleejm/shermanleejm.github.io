@@ -17,6 +17,7 @@ import CardDataGrid from "./CardDataGrid";
 import NetExports from "./NetExports";
 import DeckBuilder from "./DeckBuilder";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import ManaChart from "./DeckBuilder/ManaChart";
 
 export enum ToasterSeverityEnum {
   SUCCESS = "success",

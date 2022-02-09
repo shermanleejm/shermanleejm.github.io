@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { CardsTableType } from "../../../database";
+import ManaChart from "./ManaChart";
 
 type DeckListType = {
   cards: Set<CardsTableType>;
@@ -37,8 +38,11 @@ const DeckList = (props: DeckListType) => {
     <div>
       <Grid container justifyContent={"center"} alignItems={"flex-start"}>
         <Grid item xs={12}>
+          <ManaChart />
+        </Grid>
+        <Grid item xs={12}>
           <TextField
-            size="small"
+            size='small'
             fullWidth
             label={"Deck Name"}
             value={deckName}
