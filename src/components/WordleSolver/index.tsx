@@ -1,6 +1,6 @@
 import { Button, Grid, TextField, Typography } from '@mui/material';
 import React from 'react';
-import { FormEvent, useEffect, useState } from 'react';
+import { useState } from 'react';
 import WORDS from './words';
 
 const WordleSolver = () => {

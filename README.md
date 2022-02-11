@@ -1,6 +1,7 @@
 # Portfoliio Source Code
 Primarily using React Typescript.  
 Source code not available on `master` branch to enable free web hosting on Github Pages.  
+Change to `dev` branch to see source code.  
 
 # Contents
 - [MTG Database](https://shermanleejm.github.io/#/mtgdb)
