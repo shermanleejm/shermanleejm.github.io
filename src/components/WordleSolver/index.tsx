@@ -60,7 +60,6 @@ const WordleSolver = () => {
         guess_setters[i]('');
       }
     }
-    console.log(wrongs, incorrects, expression);
 
     const regex = new RegExp(expression);
     let tmp = WORDS.filter((w) => regex.test(w));
@@ -71,7 +70,7 @@ const WordleSolver = () => {
     for (let i = 0; i < incorrects.length; i++) {
       let inc = incorrects[i];
       for (let c of inc) {
-        tmp = tmp.filter((w) => w.includes(c) && w[0] !== c);
+        tmp = tmp.filter((w) => w.includes(c) && w[i] !== c);
       }
       incorrects_setters[i](inc);
     }
