@@ -40,7 +40,7 @@ const WordleSolver = () => {
       (_5 === '' ? '.' : _5);
 
     const regex = new RegExp(expression);
-    let tmp = words.filter((w) => regex.test(w));
+    let tmp = WORDS.filter((w) => regex.test(w));
     for (let c of wrongGuesses) {
       tmp = tmp.filter((w) => !w.includes(c));
     }
