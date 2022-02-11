@@ -43,11 +43,12 @@ export const Pages: PageType[] = [
     description: 'DOGE COIN TO THE MOOOOOOOOOON!¡!¡!¡!¡!',
   },
   {
-    name: 'Terminal',
-    component: Terminal,
-    link: '/terminal',
-    img: terminal,
-    description: 'This is a pseudo terminal that tells jokes.',
+    name: 'Wordle Solver',
+    component: WordleSolver,
+    link: '/wordle-solver',
+    img: wordle,
+    description:
+      'Wordle solver. Just key in your guesses and it will search for you. Saves you some time lmao.',
   },
   {
     name: 'Contact Me',
@@ -57,11 +58,10 @@ export const Pages: PageType[] = [
     description: "Hijacked google forms' exposed api for a contact me page.",
   },
   {
-    name: 'Wordle Solver',
-    component: WordleSolver,
-    link: '/wordle-solver',
-    img: wordle,
-    description:
-      'Wordle solver. Just key in your guesses and it will search for you. Saves you some time lmao.',
+    name: 'Terminal',
+    component: Terminal,
+    link: '/terminal',
+    img: terminal,
+    description: 'This is a pseudo terminal that tells jokes.',
   },
 ];
