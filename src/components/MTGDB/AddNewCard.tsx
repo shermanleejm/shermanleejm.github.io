@@ -262,7 +262,7 @@ const AddNewCard = (props: MTGDBProps) => {
       }
     }
     // setMissingJson(Array.from(missingCardsJson));
-    navigator.clipboard.writeText(
+    await navigator.clipboard.writeText(
       Array.from(missingCardsTxt).join("\n").substring(0, 99999)
     );
     setIsGeneratingMssing(false);
