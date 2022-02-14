@@ -29,14 +29,14 @@ export type MTGDBProps = {
   db: MTGDatabase;
   cardArr: CardsTableType[];
   filterCard?: (k: string, val: string) => void;
-  cardDict?: { [key: string]: boolean };
+  cardDict?: Set<string>;
   uniqueSets?: string[];
   uniqueTags?: string[];
 };
 
 const MTGDB = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [cardDict, setCardDict] = useState<{ [key: string]: boolean }>({});
+  const [cardDict, setCardDict] = useState<Set<string>>(new Set());
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
   const [showToaster, setShowToaster] = useState(false);
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
@@ -84,10 +84,10 @@ const MTGDB = () => {
       const arr = await db.cards.toArray();
       let uTags = new Set<string>();
       let uSets = new Set<string>();
-      let dict: { [key: string]: boolean } = {};
+      let dict: Set<string> = new Set();
       for (let i = 0; i < arr.length; i++) {
         let curr = arr[i];
-        dict[curr.name] = true;
+        dict.add(curr.name);
         uSets.add(curr.set_name);
         uTags = new Set([...new Set(curr.tags), ...new Set(Array.from(uTags))]);
       }

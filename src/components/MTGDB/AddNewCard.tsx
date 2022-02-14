@@ -51,6 +51,9 @@ const AddNewCard = (props: MTGDBProps) => {
     SearchCardFilter.name
   );
   const [selectedSet, setSelectedSet] = useState<SetSearchType>();
+  const [isGeneratingMissing, setIsGeneratingMssing] = useState(false);
+  // const [missingJson, setMissingJson] = useState<ScryfallDataType[]>([]);
+  // const [missingTxt, setMissingTxt] = useState<string[]>([]);
 
   useEffect(() => {
     function getSets() {
@@ -162,7 +165,6 @@ const AddNewCard = (props: MTGDBProps) => {
           let tmp: ScryfallDataType[] = [];
           while (uri !== undefined) {
             let r = await axios.get(uri);
-            console.log(r.data.data);
             tmp = tmp.concat(
               r.data.data.filter(
                 (c: ScryfallDataType) => c.name.substring(0, 2) != "A-"
@@ -245,6 +247,27 @@ const AddNewCard = (props: MTGDBProps) => {
     { slug: SearchCardFilter.name, name: "Card Name" },
     { slug: SearchCardFilter.set_name, name: "Set Name" },
   ];
+
+  async function generateMissingTxt() {
+    // let missingCardsJson: Set<ScryfallDataType> = new Set();
+    let missingCardsTxt: Set<string> = new Set();
+    for (let c of searchResults) {
+      let evidence = await props.db.cards
+        .where("name")
+        .equalsIgnoreCase(c.name)
+        .first();
+      if (evidence === undefined) {
+        // missingCardsJson.add(c);
+        missingCardsTxt.add(`1 ${c.name.split(" // ")[0]}`);
+      }
+    }
+    // setMissingJson(Array.from(missingCardsJson));
+    navigator.clipboard.writeText(
+      Array.from(missingCardsTxt).join("\n").substring(0, 99999)
+    );
+    setIsGeneratingMssing(false);
+    props.toaster("Copied to clipboard!", ToasterSeverityEnum.SUCCESS);
+  }
 
   return isLoading ? (
     <div
@@ -426,6 +449,21 @@ const AddNewCard = (props: MTGDBProps) => {
                 </Button>
               )}
             </Grid>
+            <Grid item>
+              {searchResults.length > 0 &&
+                (isGeneratingMissing ? (
+                  <CircularProgress />
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setIsGeneratingMssing(true);
+                      generateMissingTxt();
+                    }}
+                  >
+                    copy missing to clipboard
+                  </Button>
+                ))}
+            </Grid>
           </Grid>
         </Grid>
 
@@ -449,7 +487,7 @@ const AddNewCard = (props: MTGDBProps) => {
                     price?: string,
                     qty?: number
                   ) => storeCard(sr, tags, price, qty)}
-                  cardDict={props.cardDict || {}}
+                  cardDict={props.cardDict || new Set()}
                   defaultTag={defaultTag}
                 />
               </Grid>

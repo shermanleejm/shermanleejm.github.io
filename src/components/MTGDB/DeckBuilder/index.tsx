@@ -53,7 +53,8 @@ const DeckBuilder = (props: MTGDBProps) => {
           (c) =>
             c.name.toLowerCase().includes(text.toLowerCase()) ||
             c.type_line.toLowerCase().includes(text.toLowerCase()) ||
-            c.set_name.toLowerCase().includes(text.toLowerCase())
+            c.set_name.toLowerCase().includes(text.toLowerCase()) ||
+            c.oracle_text?.toLowerCase().includes(text.toLowerCase())
         )
         .sort((a, b) => compare(a, b, "cmc"))
         .sort((a, b) => compare(a, b, "colors"))

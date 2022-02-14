@@ -22,7 +22,7 @@ import { ScryfallDataType } from "./interfaces";
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;
-  cardDict: { [key: string]: boolean };
+  cardDict: Set<string>;
   storeCard: (
     sr: ScryfallDataType,
     tag?: string[],
@@ -52,7 +52,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
 
   useEffect(() => {
     function preCheck() {
-      if (props.cardDict && props.cardDict[props.sr.name]) {
+      if (props.cardDict && props.cardDict.has(props.sr.name)) {
         setIsClicked(true);
       }
 
