@@ -246,6 +246,7 @@ const AddNewCard = (props: MTGDBProps) => {
       tags: tag === undefined ? [] : tag,
       type_line: card.type_line,
       oracle_text: card.oracle_text,
+      edhrec_rank: card.edhrec_rank,
       date_added: Date.now(),
     };
 

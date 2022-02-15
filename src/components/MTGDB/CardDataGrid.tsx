@@ -105,6 +105,14 @@ const CardDataGrid = (props: MTGDBProps) => {
     //   },
     // },
     {
+      field: "edhrec_rank",
+      headerName: "EDHREC Rank",
+      width: colWidth / 1.5,
+      valueGetter: (params) => {
+        return params.row.edhrec_rank ?? 999999;
+      },
+    },
+    {
       field: "tags",
       headerName: "tags",
       minWidth: 400,
@@ -294,6 +302,11 @@ const CardDataGrid = (props: MTGDBProps) => {
                 columns={columns}
                 autoHeight
                 checkboxSelection
+                initialState={{
+                  pagination: {
+                    pageSize: 25,
+                  },
+                }}
                 onSelectionModelChange={(ids) => {
                   let selectedIds = new Set(ids);
                   let selectedRows = cards.filter((card) =>

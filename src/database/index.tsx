@@ -21,6 +21,7 @@ export interface CardsTableType {
   tags: string[];
   type_line: string;
   oracle_text?: string;
+  edhrec_rank?: number;
   date_added: number;
 }
 

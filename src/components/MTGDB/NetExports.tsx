@@ -93,6 +93,7 @@ const NetExports = (props: MTGDBProps) => {
             tags: card.tags,
             type_line: newCard.type_line,
             oracle_text: newCard.oracle_text,
+            edhrec_rank: newCard.edhrec_rank,
             date_added: Date.now(),
           };
 
