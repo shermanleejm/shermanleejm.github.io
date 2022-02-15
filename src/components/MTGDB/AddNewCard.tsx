@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@mui/material";
 import axios from "axios";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import { createWorker } from "tesseract.js";
 import getCroppedImg from "./helper";
@@ -21,6 +21,8 @@ import { MTGDBProps, ToasterSeverityEnum } from ".";
 import SearchResultCard from "./SearchResultCard";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useEffect } from "react";
+import InfiniteScroll from "./InfiniteScroll";
+
 interface SetSearchType {
   label: string;
   code: string;
@@ -32,6 +34,8 @@ enum SearchCardFilter {
   name = "name",
   set_name = "set_name",
 }
+
+const PER_PAGE = 24;
 
 const AddNewCard = (props: MTGDBProps) => {
   const [img, setImg] = useState("");
@@ -52,8 +56,13 @@ const AddNewCard = (props: MTGDBProps) => {
   );
   const [selectedSet, setSelectedSet] = useState<SetSearchType>();
   const [isGeneratingMissing, setIsGeneratingMssing] = useState(false);
-  // const [missingJson, setMissingJson] = useState<ScryfallDataType[]>([]);
-  // const [missingTxt, setMissingTxt] = useState<string[]>([]);
+  const [infiniteData, setInfiniteData] = useState<ScryfallDataType[]>([]);
+  const [infiniteRange, setInfiniteRange] = useState({
+    prev: 0,
+    next: PER_PAGE,
+  });
+  const [hasMoreInfinite, setHasMoreInfinite] = useState(true);
+  const [showBottomSpinner, setShowBottomSpinner] = useState(false);
 
   useEffect(() => {
     function getSets() {
@@ -123,8 +132,14 @@ const AddNewCard = (props: MTGDBProps) => {
     }
   }, [croppedAreaPixels, img, rotation]);
 
+  function rootSetCards(arr: ScryfallDataType[]) {
+    setSearchResults(arr);
+    setInfiniteData(arr.slice(0, PER_PAGE));
+  }
+
   async function searchCard(queryName: string) {
     setIsSearching(true);
+    setInfiniteData([]);
     setSearchResults([]);
     const coolingPeriod = 500;
 
@@ -139,7 +154,7 @@ const AddNewCard = (props: MTGDBProps) => {
         axios
           .get("https://api.scryfall.com/cards/search?q=" + queryName)
           .then((res) => {
-            setSearchResults(
+            rootSetCards(
               res.data.data.filter(
                 (c: ScryfallDataType) => c.name.substring(0, 2) != "A-"
               )
@@ -172,7 +187,7 @@ const AddNewCard = (props: MTGDBProps) => {
             );
             uri = r.data.next_page;
           }
-          setSearchResults(tmp);
+          rootSetCards(tmp);
         }
         setIsSearching(false);
         break;
@@ -249,25 +264,61 @@ const AddNewCard = (props: MTGDBProps) => {
   ];
 
   async function generateMissingTxt() {
-    // let missingCardsJson: Set<ScryfallDataType> = new Set();
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
-      let evidence = await props.db.cards
-        .where("name")
-        .equalsIgnoreCase(c.name)
-        .first();
+      let evidence = props.cardDict?.has(c.name);
       if (evidence === undefined) {
-        // missingCardsJson.add(c);
         missingCardsTxt.add(`1 ${c.name.split(" // ")[0]}`);
       }
     }
-    // setMissingJson(Array.from(missingCardsJson));
     await navigator.clipboard.writeText(
       Array.from(missingCardsTxt).join("\n").substring(0, 99999)
     );
     setIsGeneratingMssing(false);
     props.toaster("Copied to clipboard!", ToasterSeverityEnum.SUCCESS);
   }
+
+  const SearchResults = () => {
+    return (
+      <Grid
+        container
+        direction='row'
+        spacing={1}
+        justifyContent={"start"}
+        alignItems={"stretch"}
+        style={{ width: "80vw" }}
+      >
+        {infiniteData.map((sr: ScryfallDataType, index: number) => (
+          <Grid item xs={6} sm={4} md={3} key={index}>
+            <SearchResultCard
+              sr={sr}
+              storeCard={(
+                sr: ScryfallDataType,
+                tags?: string[],
+                price?: string,
+                qty?: number
+              ) => storeCard(sr, tags, price, qty)}
+              cardDict={props.cardDict || new Set()}
+              defaultTag={defaultTag}
+            />
+          </Grid>
+        ))}
+      </Grid>
+    );
+  };
+
+  const loadMoreCards = () => {
+    setShowBottomSpinner(true);
+
+    setTimeout(() => {
+      setInfiniteData(searchResults.slice(0, infiniteRange.next + PER_PAGE));
+      setInfiniteRange((prevState) => ({
+        prev: prevState.prev + PER_PAGE,
+        next: prevState.next + PER_PAGE,
+      }));
+      setShowBottomSpinner(false);
+    }, 500);
+  };
 
   return isLoading ? (
     <div
@@ -281,7 +332,7 @@ const AddNewCard = (props: MTGDBProps) => {
       <CircularProgress />
     </div>
   ) : (
-    <div>
+    <div style={{ marginBottom: 50 }}>
       <Grid
         container
         direction='column'
@@ -376,8 +427,10 @@ const AddNewCard = (props: MTGDBProps) => {
                       setSelectedFilter(e.target.value as string)
                     }
                   >
-                    {filters.map((f) => (
-                      <MenuItem value={f.slug}>{f.name}</MenuItem>
+                    {filters.map((f, i) => (
+                      <MenuItem value={f.slug} key={i}>
+                        {f.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </Grid>
@@ -442,6 +495,7 @@ const AddNewCard = (props: MTGDBProps) => {
                   fullWidth
                   onClick={() => {
                     setSearchResults([]);
+                    setInfiniteData([]);
                     setText("");
                   }}
                 >
@@ -469,31 +523,20 @@ const AddNewCard = (props: MTGDBProps) => {
 
         {/* Search results */}
         <Grid item>
-          <Grid
-            container
-            direction='row'
-            spacing={1}
-            justifyContent={"start"}
-            alignItems={"stretch"}
-            style={{ width: "80vw" }}
+          <InfiniteScroll
+            hasMoreData={infiniteData.length < searchResults.length}
+            isLoading={showBottomSpinner}
+            onBottomHit={loadMoreCards}
           >
-            {searchResults.map((sr: ScryfallDataType) => (
-              <Grid item xs={6} sm={4} md={3}>
-                <SearchResultCard
-                  sr={sr}
-                  storeCard={(
-                    sr: ScryfallDataType,
-                    tags?: string[],
-                    price?: string,
-                    qty?: number
-                  ) => storeCard(sr, tags, price, qty)}
-                  cardDict={props.cardDict || new Set()}
-                  defaultTag={defaultTag}
-                />
-              </Grid>
-            ))}
-          </Grid>
+            <SearchResults />
+          </InfiniteScroll>
         </Grid>
+
+        {showBottomSpinner && (
+          <Grid item>
+            <CircularProgress />
+          </Grid>
+        )}
       </Grid>
     </div>
   );

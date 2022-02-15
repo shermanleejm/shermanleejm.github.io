@@ -180,7 +180,9 @@ const MTGDB = () => {
   ];
 
   return (
-    <div style={{ margin: "auto", width: "90vw" }}>
+    <div
+      style={{ margin: "auto", width: "90vw" }}
+    >
       <Tabs
         centered
         variant='fullWidth'
@@ -192,8 +194,8 @@ const MTGDB = () => {
         }}
         style={{ marginBottom: 20 }}
       >
-        {CustomTabs.map((e: CustomTabsType) => (
-          <Tab label={e.label} />
+        {CustomTabs.map((e: CustomTabsType, i) => (
+          <Tab label={e.label} key={i} />
         ))}
       </Tabs>
 

@@ -146,6 +146,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           {imgUri.normal.map((s: string, i: number) => (
             <img
+              key={i}
               src={s}
               alt=''
               width={imgUri.normal.length === 1 ? "100%" : "50%"}
@@ -174,8 +175,9 @@ const SearchResultCard = (props: SearchResultCardType) => {
               setPrice(e.target.value);
             }}
           >
-            {priceSelectOptions.map((pso) => (
+            {priceSelectOptions.map((pso, i) => (
               <MenuItem
+                key={i}
                 value={pso.money}
               >{`US$${pso.money} - ${pso.type}`}</MenuItem>
             ))}

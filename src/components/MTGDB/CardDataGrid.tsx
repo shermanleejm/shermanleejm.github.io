@@ -75,7 +75,7 @@ const CardDataGrid = (props: MTGDBProps) => {
               <React.Fragment>
                 <div style={{ display: "flex", flexDirection: "row" }}>
                   {data.image_uri.small.map((s: string, i: number) => (
-                    <img src={data.image_uri.small[i]} alt=''></img>
+                    <img key={i} src={data.image_uri.small[i]} alt=''></img>
                   ))}
                 </div>
               </React.Fragment>
@@ -246,8 +246,10 @@ const CardDataGrid = (props: MTGDBProps) => {
                 defaultValue={filters[0].slug}
                 onChange={(e) => setSelectedFilter(e.target.value as string)}
               >
-                {filters.map((f) => (
-                  <MenuItem value={f.slug}>{f.name}</MenuItem>
+                {filters.map((f, i) => (
+                  <MenuItem key={i} value={f.slug}>
+                    {f.name}
+                  </MenuItem>
                 ))}
               </Select>
             </Grid>
@@ -354,8 +356,8 @@ const CardDataGrid = (props: MTGDBProps) => {
       <Dialog onClose={deleteCards} open={deleteDialogState}>
         <DialogTitle>Confirm delete?</DialogTitle>
         <List>
-          {selectedCards.map((card) => (
-            <ListItem>
+          {selectedCards.map((card, i) => (
+            <ListItem key={i}>
               <ListItemText primary={card.name} />
             </ListItem>
           ))}

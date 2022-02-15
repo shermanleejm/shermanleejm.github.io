@@ -113,8 +113,8 @@ const DeckBuilder = (props: MTGDBProps) => {
             ></TextField>
           </Grid>
           <Grid item>
-            {colorButtons.map((cb) => (
-              <IconButton onClick={() => filterCardArrByColor(cb.name)}>
+            {colorButtons.map((cb, i) => (
+              <IconButton onClick={() => filterCardArrByColor(cb.name)} key={i}>
                 {cb.icon}
               </IconButton>
             ))}

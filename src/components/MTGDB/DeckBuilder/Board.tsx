@@ -51,15 +51,17 @@ const Board = (props: BoardProps) => {
         justifyContent={"flex-start"}
         alignItems={"center"}
       >
-        {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType) => (
-          <Grid item xs={6} sm={3} justifyContent={"center"}>
-            <DraggableCard
-              data={c}
-              addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
-              disabled={props.decklist.has(c)}
-            />
-          </Grid>
-        ))}
+        {props.cardArr
+          .slice(startIndex, endIndex)
+          .map((c: CardsTableType, i) => (
+            <Grid item xs={6} sm={3} justifyContent={"center"} key={i}>
+              <DraggableCard
+                data={c}
+                addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
+                disabled={props.decklist.has(c)}
+              />
+            </Grid>
+          ))}
       </Grid>
 
       <IconButton

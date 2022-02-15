@@ -101,9 +101,9 @@ const Countdown = () => {
             { value: 'lse_close', name: 'LSE Closing' },
             { value: 'nyse_open', name: 'NYSE Opening' },
             { value: 'nyse_close', name: 'NYSE Closing' },
-          ].map((row) => {
+          ].map((row, index) => {
             return (
-              <Grid item xs={6} sm={3}>
+              <Grid item xs={6} sm={3} key={index}>
                 <FormControlLabel
                   value={row.value}
                   label={row.name}

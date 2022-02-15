@@ -10,19 +10,19 @@ import {
   TableContainer,
   TableBody,
   Autocomplete,
-} from '@mui/material';
-import axios from 'axios';
-import NumberFormat from 'react-number-format';
-import React, { useState, useEffect } from 'react';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+} from "@mui/material";
+import axios from "axios";
+import NumberFormat from "react-number-format";
+import React, { useState, useEffect } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const CryptoTracker = () => {
   const [, setCurrencies] = useState([]) as any;
   const [cryptoCurrencies, setCryptoCurrencies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectCurrency] = useState('SGD');
+  const [selectCurrency] = useState("SGD");
   const [cryptoData, setCryptoData] = useState([]) as any;
   const [showAddEntry, setShowAddEntry] = useState(false);
   const [formCrypto, setFormCrypto] = useState() as any;
@@ -47,7 +47,7 @@ const CryptoTracker = () => {
     // get currencies
     async function fetchCurrency() {
       let result = [] as any;
-      await axios.get('https://api.coinbase.com/v2/currencies').then((resp) => {
+      await axios.get("https://api.coinbase.com/v2/currencies").then((resp) => {
         let tempcurrencies = [];
         for (let c of resp.data.data) {
           tempcurrencies.push(c.id);
@@ -60,13 +60,13 @@ const CryptoTracker = () => {
     async function fetchCryptoCurrency(fiatCurrencies: string[]) {
       let result = [] as any;
       await axios
-        .get('https://api.coinbase.com/v2/exchange-rates?currency=BTC')
+        .get("https://api.coinbase.com/v2/exchange-rates?currency=BTC")
         .then((resp) => {
           Object.keys(resp.data.data.rates).map((item) => {
             if (!fiatCurrencies.includes(item)) {
               result.push(item);
             }
-            return '';
+            return "";
           });
           setCryptoCurrencies(result);
         });
@@ -75,14 +75,15 @@ const CryptoTracker = () => {
     async function fetchStoredValues() {
       let x = await fetchCurrency();
       fetchCryptoCurrency(x);
-      let temp = JSON.parse(localStorage.getItem('crypto') || '');
-      if (temp !== '') {
+      let temp = JSON.parse(localStorage.getItem("crypto") || "");
+      if (temp !== "") {
         for (let line of temp) {
           let currPrice = await getCurrentPrice(line.name, selectCurrency);
           line.pl = parseFloat(
-            (((currPrice * line.value - line.principal) / line.principal) * 100).toFixed(
-              2
-            )
+            (
+              ((currPrice * line.value - line.principal) / line.principal) *
+              100
+            ).toFixed(2)
           );
           line.currentPrice = currPrice;
         }
@@ -90,7 +91,7 @@ const CryptoTracker = () => {
         temp = [];
       }
       setCryptoData(temp);
-      localStorage.setItem('crypto', JSON.stringify(temp));
+      localStorage.setItem("crypto", JSON.stringify(temp));
       setIsLoading(false);
     }
     setTimeout(() => {
@@ -110,13 +111,15 @@ const CryptoTracker = () => {
   }
 
   function displayPrincipal(principal: any) {
-    principal = principal.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    principal = principal.toLocaleString(undefined, {
+      maximumFractionDigits: 2,
+    });
     return principal;
   }
 
   const EditValuesButtons: React.FC<{}> = () => {
     return (
-      <div style={{ display: 'inline-block', textAlign: 'center' }}>
+      <div style={{ display: "inline-block", textAlign: "center" }}>
         <IconButton
           onClick={() => {
             setEditValuesIndex({
@@ -124,7 +127,7 @@ const CryptoTracker = () => {
               quantity: -1,
               principal: -1,
             });
-            localStorage.setItem('crypto', JSON.stringify(cryptoData));
+            localStorage.setItem("crypto", JSON.stringify(cryptoData));
             setIsLoading(true);
           }}
         >
@@ -145,11 +148,11 @@ const CryptoTracker = () => {
     );
   };
   return (
-    <div style={{ margin: '0 4% 0 4%' }}>
-      <Typography variant="h4" style={{ margin: '0 0 1% 0' }}>
-        Crypto {'  '}
-        <span style={{ color: calculateNetProfit() > 0 ? 'green' : 'red' }}>
-          {calculateNetProfit() > 0 ? '+' : ''}
+    <div style={{ margin: "0 4% 0 4%" }}>
+      <Typography variant='h4' style={{ margin: "0 0 1% 0" }}>
+        Crypto {"  "}
+        <span style={{ color: calculateNetProfit() > 0 ? "green" : "red" }}>
+          {calculateNetProfit() > 0 ? "+" : ""}
           {calculateNetProfit()}%
         </span>
       </Typography>
@@ -182,15 +185,17 @@ const CryptoTracker = () => {
             {!isLoading &&
               cryptoData.map((crypto: any, index: any) => {
                 return (
-                  <TableRow>
+                  <TableRow key={index}>
                     <TableCell>
                       {`${crypto.name} (${selectCurrency}${displayPrincipal(
                         crypto.currentPrice
                       )})`}
                     </TableCell>
-                    <TableCell colSpan={editValuesIndex.quantity !== -1 ? 3 : 1}>
+                    <TableCell
+                      colSpan={editValuesIndex.quantity !== -1 ? 3 : 1}
+                    >
                       {editValuesIndex.quantity === index ? (
-                        <div style={{ width: '30vw' }}>
+                        <div style={{ width: "30vw" }}>
                           <NumberFormat
                             customInput={TextField}
                             value={crypto.value}
@@ -218,9 +223,11 @@ const CryptoTracker = () => {
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell colSpan={editValuesIndex.principal !== -1 ? 3 : 1}>
+                    <TableCell
+                      colSpan={editValuesIndex.principal !== -1 ? 3 : 1}
+                    >
                       {editValuesIndex.principal === index ? (
-                        <div style={{ width: '30vw' }}>
+                        <div style={{ width: "30vw" }}>
                           <NumberFormat
                             customInput={TextField}
                             prefix={selectCurrency}
@@ -233,7 +240,12 @@ const CryptoTracker = () => {
                             }}
                           />
 
-                          <span style={{ display: 'inline-block', textAlign: 'center' }}>
+                          <span
+                            style={{
+                              display: "inline-block",
+                              textAlign: "center",
+                            }}
+                          >
                             <IconButton
                               onClick={() => {
                                 setEditValuesIndex({
@@ -242,7 +254,7 @@ const CryptoTracker = () => {
                                   principal: -1,
                                 });
                                 localStorage.setItem(
-                                  'crypto',
+                                  "crypto",
                                   JSON.stringify(cryptoData)
                                 );
                                 setIsLoading(true);
@@ -283,21 +295,29 @@ const CryptoTracker = () => {
                       <Typography>
                         {selectCurrency}
                         {(
-                          parseFloat(crypto.currentPrice) * parseFloat(crypto.value)
-                        ).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          parseFloat(crypto.currentPrice) *
+                          parseFloat(crypto.value)
+                        ).toLocaleString(undefined, {
+                          maximumFractionDigits: 2,
+                        })}
                       </Typography>
                     </TableCell>
-                    <TableCell style={{ color: crypto.pl > 0 ? 'green' : 'red' }}>
+                    <TableCell
+                      style={{ color: crypto.pl > 0 ? "green" : "red" }}
+                    >
                       <Typography>
-                        {crypto.pl > 0 && '+'}
-                        {crypto.pl || ''}
+                        {crypto.pl > 0 && "+"}
+                        {crypto.pl || ""}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <IconButton
                         onClick={() => {
                           cryptoData.splice(index, 1);
-                          localStorage.setItem('crypto', JSON.stringify(cryptoData));
+                          localStorage.setItem(
+                            "crypto",
+                            JSON.stringify(cryptoData)
+                          );
                           setIsLoading(true);
                         }}
                       >
@@ -309,16 +329,16 @@ const CryptoTracker = () => {
               })}
             {showAddEntry && (
               <TableRow>
-                <TableCell style={{ paddingRight: '5%' }}>
+                <TableCell style={{ paddingRight: "5%" }}>
                   <Autocomplete
-                    style={{ padding: '3% 0 3% 0' }}
+                    style={{ padding: "3% 0 3% 0" }}
                     options={cryptoCurrencies}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        variant="outlined"
-                        label="Crypto"
-                        size="small"
+                        variant='outlined'
+                        label='Crypto'
+                        size='small'
                       />
                     )}
                     onChange={(e, value) => setFormCrypto(value)}
@@ -326,18 +346,18 @@ const CryptoTracker = () => {
                 </TableCell>
                 <TableCell>
                   <NumberFormat
-                    style={{ width: '25vw' }}
+                    style={{ width: "25vw" }}
                     customInput={TextField}
                     value={formValue}
                     onValueChange={(values) => {
                       let { floatValue } = values;
-                      setFormValue(floatValue || '');
+                      setFormValue(floatValue || "");
                     }}
                   />
                 </TableCell>
                 <TableCell>
                   <NumberFormat
-                    style={{ width: '25vw' }}
+                    style={{ width: "25vw" }}
                     customInput={TextField}
                     prefix={selectCurrency}
                     value={formPrincipal}
@@ -366,7 +386,7 @@ const CryptoTracker = () => {
                   value: formValue,
                   principal: formPrincipal,
                 });
-                localStorage.setItem('crypto', JSON.stringify(cryptoData));
+                localStorage.setItem("crypto", JSON.stringify(cryptoData));
                 setIsLoading(true);
               }
               setShowAddEntry(false);
