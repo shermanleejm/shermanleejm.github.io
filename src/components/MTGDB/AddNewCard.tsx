@@ -9,6 +9,7 @@ import {
   Select,
   Slider,
   TextField,
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useRef, useState } from "react";
@@ -151,25 +152,29 @@ const AddNewCard = (props: MTGDBProps) => {
 
     switch (selectedFilter) {
       case "name":
-        axios
-          .get("https://api.scryfall.com/cards/search?q=" + queryName)
-          .then((res) => {
-            rootSetCards(
+        const queries = queryName.split("+");
+        let tmp: ScryfallDataType[] = [];
+        for (let i = 0; i < queries.length; i++) {
+          try {
+            let res = await axios.get(
+              "https://api.scryfall.com/cards/search?q=" + queries[i]
+            );
+            console.log(res);
+            tmp = tmp.concat(
               res.data.data.filter(
                 (c: ScryfallDataType) => c.name.substring(0, 2) != "A-"
               )
             );
-          })
-          .catch((err) => {
-            console.error(err);
+          } catch (err: any) {
+            console.log(err);
             if (err.response.status === 404 || err.response.status === 400) {
               props.toaster("No card found", ToasterSeverityEnum.ERROR);
             }
-          })
-          .finally(() => {
-            setLastRequest(Date.now());
-            setIsSearching(false);
-          });
+          }
+        }
+        rootSetCards(tmp);
+        setLastRequest(Date.now());
+        setIsSearching(false);
         break;
       case "set_name":
         if (selectedSet !== undefined) {
@@ -439,9 +444,9 @@ const AddNewCard = (props: MTGDBProps) => {
                     <TextField
                       value={text}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setText(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ""))
+                        setText(e.target.value.replace(/[^a-zA-Z0-9\s\+]/g, ""))
                       }
-                      label='Card Name (remove uneccessary characters)'
+                      label='Card Name (use + to search multiple)'
                       fullWidth
                       InputProps={{
                         endAdornment: (
@@ -537,6 +542,13 @@ const AddNewCard = (props: MTGDBProps) => {
             <CircularProgress />
           </Grid>
         )}
+
+        {searchResults.length > 0 &&
+          infiniteData.length === searchResults.length && (
+            <Grid item>
+              <Typography>You reached the bottom!</Typography>
+            </Grid>
+          )}
       </Grid>
     </div>
   );
