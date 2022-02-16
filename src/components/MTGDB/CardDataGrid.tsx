@@ -175,25 +175,25 @@ const CardDataGrid = (props: MTGDBProps) => {
     }
     switch (k) {
       case "tags":
-        setCards(cards.filter((c) => new Set(c[k]).has(val || "")));
+        setCards(memoCards.filter((c) => new Set(c[k]).has(val || "")));
         break;
       case "set_name":
-        setCards(cards.filter((c) => c[k] === val));
+        setCards(memoCards.filter((c) => c[k] === val));
         break;
       case "name":
         setCards(
-          cards.filter((c) => c.name.toLowerCase().includes(val.toLowerCase()))
+          memoCards.filter((c) => c.name.toLowerCase().includes(val.toLowerCase()))
         );
         break;
       case "price":
-        setCards(cards.filter((c) => c.price > parseFloat(val)));
+        setCards(memoCards.filter((c) => c.price > parseFloat(val)));
         break;
       case "colors":
-        setCards(cards.filter((c) => new Set(c.colors).has(val.toUpperCase())));
+        setCards(memoCards.filter((c) => new Set(c.colors).has(val.toUpperCase())));
         break;
       case "type_line":
         setCards(
-          cards.filter((c) =>
+          memoCards.filter((c) =>
             c.type_line.toLowerCase().includes(val.toLowerCase())
           )
         );
