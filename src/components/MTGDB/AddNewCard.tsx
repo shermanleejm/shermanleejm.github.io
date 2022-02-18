@@ -11,6 +11,7 @@ import {
   Select,
   Slider,
   TextField,
+  Typography,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useCallback, useState } from 'react';
@@ -25,6 +26,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
+import InfiniteScroll from './InfiniteScroll';
 interface SetSearchType {
   label: string;
   code: string;
@@ -56,6 +58,10 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [isGeneratingMissing, setIsGeneratingMssing] = useState(false);
   const [showMissingDialog, setShowMissingDialog] = useState(false);
   const [missingTxt, setMissingTxt] = useState('');
+  const [infiniteData, setInfiniteData] = useState<ScryfallDataType[]>([]);
+  const PER_PAGE = 12;
+  const [endPage, setEndPage] = useState(PER_PAGE * 2);
+  const [showBottomSpinner, setShowBottomSpinner] = useState(false);
 
   const db = useSelector((state: State) => state.database);
 
@@ -122,6 +128,22 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     }
   }, [croppedAreaPixels, img, rotation]);
 
+  function rootStore(arr: ScryfallDataType[]) {
+    setSearchResults(arr);
+    setInfiniteData(arr.slice(0, endPage + PER_PAGE));
+  }
+
+  const loadMoreCards = () => {
+    setShowBottomSpinner(true);
+
+    setTimeout(() => {
+      let newEndPage = endPage + PER_PAGE;
+      setInfiniteData(searchResults.slice(0, newEndPage));
+      setEndPage(newEndPage);
+      setShowBottomSpinner(false);
+    }, 100);
+  };
+
   async function searchCard(queryName: string) {
     setIsSearching(true);
     setSearchResults([]);
@@ -138,7 +160,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         axios
           .get('https://api.scryfall.com/cards/search?q=' + queryName)
           .then((res) => {
-            setSearchResults(
+            rootStore(
               res.data.data.filter(
                 (c: ScryfallDataType) => c.name.substring(0, 2) !== 'A-'
               )
@@ -169,7 +191,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             );
             uri = r.data.next_page;
           }
-          setSearchResults(tmp);
+          rootStore(tmp);
         }
         setIsSearching(false);
         break;
@@ -389,20 +411,35 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
 
         {/* Search results */}
         <Grid item>
-          <Grid
-            container
-            direction="row"
-            spacing={1}
-            justifyContent={'start'}
-            alignItems={'stretch'}
-            style={{ width: '80vw' }}
+          <InfiniteScroll
+            hasMoreData={infiniteData.length < searchResults.length}
+            isLoading={showBottomSpinner}
+            onBottomHit={loadMoreCards}
           >
-            {searchResults.map((sr: ScryfallDataType, i) => (
-              <Grid item xs={6} sm={4} md={3} key={i}>
-                <SearchResultCard sr={sr} defaultTag={defaultTag} toaster={toaster} />
-              </Grid>
-            ))}
-          </Grid>
+            <Grid
+              container
+              direction="row"
+              spacing={1}
+              justifyContent={'start'}
+              alignItems={'stretch'}
+              style={{ width: '80vw' }}
+            >
+              {infiniteData.map((sr: ScryfallDataType, i) => (
+                <Grid item xs={6} md={4} lg={3} key={i}>
+                  <SearchResultCard sr={sr} defaultTag={defaultTag} toaster={toaster} />
+                </Grid>
+              ))}
+            </Grid>
+          </InfiniteScroll>
+        </Grid>
+
+        {/* Bottom Spinner */}
+        <Grid item>
+          {showBottomSpinner ? (
+            <CircularProgress />
+          ) : (
+            <Typography>Bottom of the page.</Typography>
+          )}
         </Grid>
       </Grid>
 
