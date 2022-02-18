@@ -267,8 +267,8 @@ const AddNewCard = (props: MTGDBProps) => {
   async function generateMissingTxt() {
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
-      let exists = props.cardDict?.has(c.name);
-      if (!exists) {
+      let evidence = props.cardDict?.has(c.name);
+      if (evidence === undefined) {
         missingCardsTxt.add(`1 ${c.name.split(" // ")[0]}`);
       }
     }

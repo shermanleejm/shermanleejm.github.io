@@ -26,6 +26,7 @@ const NetExports = (props: MTGDBProps) => {
       } catch (err) {
         json = ee.target.result;
       }
+      console.log(json);
     };
   };
 
@@ -133,6 +134,8 @@ const NetExports = (props: MTGDBProps) => {
           added++;
         }
       }
+      console.log("Added: ", added);
+      console.log("Total: ", (await props.db.cards.toArray()).length);
       setIsLoading(false);
     };
   };
@@ -152,6 +155,7 @@ const NetExports = (props: MTGDBProps) => {
   };
 
   async function sampleJson() {
+    console.log(sample);
     setIsLoading(true);
 
     for (const card of sample) {
