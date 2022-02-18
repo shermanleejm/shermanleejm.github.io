@@ -35,7 +35,7 @@ enum SearchCardFilter {
   set_name = "set_name",
 }
 
-const PER_PAGE = 12;
+const PER_PAGE = 24;
 
 const AddNewCard = (props: MTGDBProps) => {
   const [img, setImg] = useState("");
@@ -318,7 +318,7 @@ const AddNewCard = (props: MTGDBProps) => {
         next: prevState.next + PER_PAGE,
       }));
       setShowBottomSpinner(false);
-    }, 100);
+    }, 500);
   };
 
   return isLoading ? (
