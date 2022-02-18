@@ -23,6 +23,8 @@ import { MTGDBProps, ToasterSeverityEnum } from '.';
 import SearchResultCard from './SearchResultCard';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { State } from '../../state/reducers';
 interface SetSearchType {
   label: string;
   code: string;
@@ -54,6 +56,8 @@ const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
   const [isGeneratingMissing, setIsGeneratingMssing] = useState(false);
   const [showMissingDialog, setShowMissingDialog] = useState(false);
   const [missingTxt, setMissingTxt] = useState('');
+
+  const db = useSelector((state: State) => state.database);
 
   useEffect(() => {
     function getSets() {
@@ -186,14 +190,16 @@ const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
     }
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
-      let exists = cardDict?.has(c.name);
+      // let exists = cardDict?.has(c.name);
+      let exists = await db.cards.where('name').equalsIgnoreCase(c.name).first();
       if (!exists) {
         missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
       }
     }
-    await navigator.clipboard.writeText(
-      Array.from(missingCardsTxt).join('\n').substring(0, 99999)
-    );
+    navigator.clipboard
+      .writeText(Array.from(missingCardsTxt).join('\n').substring(0, 99999))
+      .then(() => console.log('Copied'))
+      .catch((err) => console.log(err));
     setIsGeneratingMssing(false);
     setMissingTxt(Array.from(missingCardsTxt).join('\n').substring(0, 99999));
     setShowMissingDialog(true);
@@ -396,12 +402,7 @@ const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
           >
             {searchResults.map((sr: ScryfallDataType) => (
               <Grid item xs={6} sm={4} md={3}>
-                <SearchResultCard
-                  sr={sr}
-                  cardDict={cardDict || new Set()}
-                  defaultTag={defaultTag}
-                  toaster={toaster}
-                />
+                <SearchResultCard sr={sr} defaultTag={defaultTag} toaster={toaster} />
               </Grid>
             ))}
           </Grid>

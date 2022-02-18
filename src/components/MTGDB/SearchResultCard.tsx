@@ -23,14 +23,12 @@ import { ScryfallDataType } from './interfaces';
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;
-  cardDict: Set<string>;
   defaultTag?: string;
   toaster: (m: string, e: ToasterSeverityEnum) => void;
 };
 
 const SearchResultCard = ({
   sr,
-  cardDict,
   defaultTag,
   toaster,
 }: SearchResultCardType) => {
