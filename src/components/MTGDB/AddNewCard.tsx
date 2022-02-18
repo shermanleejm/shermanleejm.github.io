@@ -2,8 +2,6 @@ import {
   Autocomplete,
   Button,
   CircularProgress,
-  Dialog,
-  DialogTitle,
   Grid,
   IconButton,
   InputAdornment,
@@ -66,8 +64,6 @@ const AddNewCard = (props: MTGDBProps) => {
   });
   const [hasMoreInfinite, setHasMoreInfinite] = useState(true);
   const [showBottomSpinner, setShowBottomSpinner] = useState(false);
-  const [showMissingDialog, setShowMissingDialog] = useState(false);
-  const [missingTxt, setMissingTxt] = useState("");
 
   useEffect(() => {
     function getSets() {
@@ -285,8 +281,6 @@ const AddNewCard = (props: MTGDBProps) => {
       Array.from(missingCardsTxt).join("\n").substring(0, 99999)
     );
     setIsGeneratingMssing(false);
-    setMissingTxt(Array.from(missingCardsTxt).join("\n").substring(0, 99999));
-    setShowMissingDialog(true);
     props.toaster("Copied to clipboard!", ToasterSeverityEnum.SUCCESS);
   }
 
@@ -557,18 +551,6 @@ const AddNewCard = (props: MTGDBProps) => {
             </Grid>
           )}
       </Grid>
-
-      <Dialog
-        open={showMissingDialog}
-        onClose={() => setShowMissingDialog(false)}
-      >
-        <DialogTitle>Missing Cards</DialogTitle>
-        <TextField
-          multiline
-          value={missingTxt}
-          onFocus={(e: any) => e.target.select()}
-        />
-      </Dialog>
     </div>
   );
 };
