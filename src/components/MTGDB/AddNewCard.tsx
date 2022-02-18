@@ -146,7 +146,8 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
 
   async function searchCard(queryName: string) {
     setIsSearching(true);
-    setSearchResults([]);
+    rootStore([]);
+    setEndPage(PER_PAGE * 2);
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
@@ -216,7 +217,12 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     navigator.clipboard
       .writeText(Array.from(missingCardsTxt).join('\n').substring(0, 99999))
       .then(() => console.log('Copied'))
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        toaster(
+          'Sorry, your device settings does not allow me to copy to your clipboard',
+          ToasterSeverityEnum.ERROR
+        )
+      );
     setIsGeneratingMssing(false);
     setMissingTxt(Array.from(missingCardsTxt).join('\n').substring(0, 99999));
     setShowMissingDialog(true);
@@ -383,7 +389,8 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                 <Button
                   fullWidth
                   onClick={() => {
-                    setSearchResults([]);
+                    rootStore([]);
+                    setEndPage(PER_PAGE * 2);
                     setText('');
                   }}
                 >
@@ -431,14 +438,11 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
               ))}
             </Grid>
           </InfiniteScroll>
-        </Grid>
 
-        {/* Bottom Spinner */}
-        <Grid item>
-          {showBottomSpinner ? (
-            <CircularProgress />
-          ) : (
-            <Typography>Bottom of the page.</Typography>
+          {searchResults.length > 0 && infiniteData.length === searchResults.length && (
+            <Grid item>
+              <Typography>You reached the bottom!</Typography>
+            </Grid>
           )}
         </Grid>
       </Grid>
