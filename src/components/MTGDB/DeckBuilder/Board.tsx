@@ -1,9 +1,9 @@
-import { CircularProgress, Grid, IconButton } from "@mui/material";
-import { useEffect, useState } from "react";
-import { CardsTableType } from "../../../database";
-import DraggableCard from "./DraggableCard";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { CircularProgress, Grid, IconButton } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { CardsTableType } from '../../../database';
+import DraggableCard from './DraggableCard';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 type BoardProps = {
   cardArr: CardsTableType[];
@@ -34,7 +34,7 @@ const Board = (props: BoardProps) => {
   return isLoading ? (
     <CircularProgress />
   ) : (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: 'flex' }}>
       <IconButton
         disabled={startIndex - perPage < 0}
         onClick={() => {
@@ -45,14 +45,9 @@ const Board = (props: BoardProps) => {
         <ArrowBackIosNewIcon />
       </IconButton>
 
-      <Grid
-        container
-        spacing={1}
-        justifyContent={"flex-start"}
-        alignItems={"center"}
-      >
-        {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType) => (
-          <Grid item xs={6} sm={3} justifyContent={"center"}>
+      <Grid container spacing={1} justifyContent={'flex-start'} alignItems={'center'}>
+        {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType, i) => (
+          <Grid item xs={6} sm={3} justifyContent={'center'} key={i}>
             <DraggableCard
               data={c}
               addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}

@@ -80,14 +80,7 @@ export async function storeCard(
 }
 
 export type MTGDBProps = {
-  refresh: (e: boolean) => void;
   toaster: (m: string, e: ToasterSeverityEnum) => void;
-  db: MTGDatabase;
-  cardArr: CardsTableType[];
-  filterCard?: (k: string, val: string) => void;
-  cardDict?: Set<string>;
-  uniqueSets?: string[];
-  uniqueTags?: string[];
 };
 
 const MTGDB = () => {
@@ -176,10 +169,6 @@ const MTGDB = () => {
       label: 'Add Card',
       component: (
         <AddNewCard
-          refresh={(e: boolean) => setIsLoading(e)}
-          db={db}
-          cardDict={cardDict}
-          cardArr={cardArr}
           toaster={function (m: string, e: ToasterSeverityEnum): void {
             openToaster(m, e);
           }}
@@ -188,29 +177,12 @@ const MTGDB = () => {
     },
     {
       label: 'Cards Table',
-      component: (
-        <CardDataGrid
-          refresh={(e: boolean) => setIsLoading(e)}
-          db={db}
-          cardArr={cardArr}
-          toaster={function (m: string, e: ToasterSeverityEnum): void {
-            openToaster(m, e);
-          }}
-          uniqueSets={uniqueSets}
-          uniqueTags={uniqueTags}
-          filterCard={function (k: string, v: string): void {
-            filterCardArr(k, v);
-          }}
-        />
-      ),
+      component: <CardDataGrid />,
     },
     {
       label: 'Deck Builder',
       component: (
         <DeckBuilder
-          refresh={(e: boolean) => setIsLoading(e)}
-          db={db}
-          cardArr={cardArr}
           toaster={function (m: string, e: ToasterSeverityEnum): void {
             openToaster(m, e);
           }}
@@ -221,9 +193,6 @@ const MTGDB = () => {
       label: 'Import Export',
       component: (
         <NetExports
-          db={db}
-          refresh={(e: boolean) => setIsLoading(e)}
-          cardArr={cardArr}
           toaster={function (m: string, e: ToasterSeverityEnum): void {
             openToaster(m, e);
           }}
@@ -245,8 +214,8 @@ const MTGDB = () => {
         }}
         style={{ marginBottom: 20 }}
       >
-        {CustomTabs.map((e: CustomTabsType) => (
-          <Tab label={e.label} />
+        {CustomTabs.map((e: CustomTabsType, i) => (
+          <Tab key={i} label={e.label} />
         ))}
       </Tabs>
 

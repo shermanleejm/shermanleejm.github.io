@@ -28,8 +28,8 @@ const ManaChart = (props: ManaChartInterface) => {
           <XAxis dataKey="cmc" />
           <Tooltip />
           <Legend height={40} />
-          {TypeColors.map((t) => (
-            <Bar dataKey={t.dataKey} stackId={'a'} fill={t.color} />
+          {TypeColors.map((t, i) => (
+            <Bar dataKey={t.dataKey} stackId={'a'} fill={t.color} key={i} />
           ))}
         </BarChart>
       </ResponsiveContainer>

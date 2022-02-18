@@ -1,11 +1,4 @@
-import {
-  Backdrop,
-  Card,
-  CardActionArea,
-  CardMedia,
-  Grid,
-  IconButton,
-} from '@mui/material';
+import { Backdrop, Card, CardActions, CardMedia, Grid, IconButton } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useState } from 'react';
@@ -35,6 +28,7 @@ const DraggableCard = (props: DraggableCardProps) => {
             {props.data.image_uri.normal !== undefined
               ? props.data.image_uri.normal.map((s: string, i: number) => (
                   <img
+                    key={i}
                     src={s}
                     alt=""
                     width={props.data.image_uri.normal.length === 1 ? '' : '50%'}
@@ -52,7 +46,7 @@ const DraggableCard = (props: DraggableCardProps) => {
           component={'img'}
           image={props.data.image_uri.small[0]}
         />
-        <CardActionArea onClick={() => setShowOverlay(true)}>
+        <CardActions onClick={() => setShowOverlay(true)}>
           <Grid container direction={'row'}>
             <Grid item>
               <IconButton>
@@ -65,7 +59,7 @@ const DraggableCard = (props: DraggableCardProps) => {
               </IconButton>
             </Grid>
           </Grid>
-        </CardActionArea>
+        </CardActions>
       </Card>
     </>
   );

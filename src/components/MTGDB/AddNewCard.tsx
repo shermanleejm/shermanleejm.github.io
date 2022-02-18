@@ -37,7 +37,7 @@ enum SearchCardFilter {
   set_name = 'set_name',
 }
 
-const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
+const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [img, setImg] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -184,13 +184,8 @@ const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
   ];
 
   async function generateMissingTxt() {
-    if (cardDict === undefined) {
-      setIsGeneratingMssing(false);
-      toaster('Error', ToasterSeverityEnum.ERROR);
-    }
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
-      // let exists = cardDict?.has(c.name);
       let exists = await db.cards.where('name').equalsIgnoreCase(c.name).first();
       if (!exists) {
         missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
@@ -301,8 +296,10 @@ const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
                     defaultValue={selectedFilter}
                     onChange={(e) => setSelectedFilter(e.target.value as string)}
                   >
-                    {filters.map((f) => (
-                      <MenuItem value={f.slug}>{f.name}</MenuItem>
+                    {filters.map((f, i) => (
+                      <MenuItem value={f.slug} key={i}>
+                        {f.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </Grid>
@@ -400,8 +397,8 @@ const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
             alignItems={'stretch'}
             style={{ width: '80vw' }}
           >
-            {searchResults.map((sr: ScryfallDataType) => (
-              <Grid item xs={6} sm={4} md={3}>
+            {searchResults.map((sr: ScryfallDataType, i) => (
+              <Grid item xs={6} sm={4} md={3} key={i}>
                 <SearchResultCard sr={sr} defaultTag={defaultTag} toaster={toaster} />
               </Grid>
             ))}

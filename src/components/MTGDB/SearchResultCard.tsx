@@ -27,11 +27,7 @@ export type SearchResultCardType = {
   toaster: (m: string, e: ToasterSeverityEnum) => void;
 };
 
-const SearchResultCard = ({
-  sr,
-  defaultTag,
-  toaster,
-}: SearchResultCardType) => {
+const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => {
   const [tags, setTags] = useState<string[]>([]);
   const [isClicked, setIsClicked] = useState(false);
   const [price, setPrice] = useState<string>();
@@ -142,7 +138,12 @@ const SearchResultCard = ({
       >
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           {imgUri.normal.map((s: string, i: number) => (
-            <img src={s} alt="" width={imgUri.normal.length === 1 ? '100%' : '50%'}></img>
+            <img
+              key={i}
+              src={s}
+              alt=""
+              width={imgUri.normal.length === 1 ? '100%' : '50%'}
+            ></img>
           ))}
         </div>
       </Backdrop>
@@ -167,8 +168,11 @@ const SearchResultCard = ({
               setPrice(e.target.value);
             }}
           >
-            {priceSelectOptions.map((pso) => (
-              <MenuItem value={pso.money}>{`US$${pso.money} - ${pso.type}`}</MenuItem>
+            {priceSelectOptions.map((pso, i) => (
+              <MenuItem
+                key={i}
+                value={pso.money}
+              >{`US$${pso.money} - ${pso.type}`}</MenuItem>
             ))}
           </TextField>
           <br />
