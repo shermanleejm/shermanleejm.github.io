@@ -6,20 +6,20 @@ import {
   CardMedia,
   Typography,
   Grid,
-} from "@mui/material";
-import { Link } from "react-router-dom";
-import { Pages, PageType } from "..";
+} from '@mui/material';
+import { Link } from 'react-router-dom';
+import { Pages, PageType } from '..';
 
 const CarouselCard = ({ img, link, name, description }: PageType) => {
   return (
     <Card sx={{ maxWidth: 560 }} elevation={3}>
-      <CardMedia component='img' image={img} />
+      <CardMedia component="img" image={img} />
       <CardContent>
-        <Typography variant='h5'>{name}</Typography>
-        <Typography variant='body2'>{description}</Typography>
+        <Typography variant="h5">{name}</Typography>
+        <Typography variant="body2">{description}</Typography>
       </CardContent>
       <CardActions>
-        <Button size='small' component={Link} to={link}>
+        <Button size="small" component={Link} to={link}>
           bring me there
         </Button>
       </CardActions>
@@ -31,16 +31,16 @@ const Carousel = () => {
   return (
     <Grid
       container
-      direction='row'
-      justifyContent='center'
-      alignItems='center'
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
       spacing={1}
-      style={{ margin: "auto" }}
+      style={{ margin: 'auto' }}
     >
-      {Pages.map((p, i) => {
+      {Pages.map((p) => {
         return (
-          p.link !== "/" && (
-            <Grid item md={4} key={i}>
+          p.link !== '/' && (
+            <Grid item md={4}>
               <CarouselCard {...p} />
             </Grid>
           )

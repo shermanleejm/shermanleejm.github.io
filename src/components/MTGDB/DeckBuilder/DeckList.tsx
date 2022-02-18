@@ -149,8 +149,8 @@ const DeckList = (props: DeckListType) => {
         </Grid>
 
         <Grid item xs={12}>
-          {cards.map((c, i) => (
-            <Card elevation={3} style={{ marginBottom: 5 }} key={i}>
+          {cards.map((c) => (
+            <Card elevation={3} style={{ marginBottom: 5 }}>
               <CardActionArea
                 style={{ padding: 3 }}
                 onClick={() => {
