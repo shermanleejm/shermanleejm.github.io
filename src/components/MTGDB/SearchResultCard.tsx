@@ -12,28 +12,28 @@ import {
   MenuItem,
   TextField,
   Typography,
-} from "@mui/material";
-import { SyntheticEvent, useEffect, useState } from "react";
-import NumberFormat from "react-number-format";
-import { useSelector } from "react-redux";
-import { CustomImageUris } from "../../database";
-import { State } from "../../state/reducers";
-import { ScryfallDataType } from "./interfaces";
+} from '@mui/material';
+import { SyntheticEvent, useEffect, useState } from 'react';
+import NumberFormat from 'react-number-format';
+import { useSelector } from 'react-redux';
+import { storeCard, ToasterSeverityEnum } from '.';
+import { CustomImageUris } from '../../database';
+import { State } from '../../state/reducers';
+import { ScryfallDataType } from './interfaces';
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;
   cardDict: Set<string>;
-  storeCard: (
-    sr: ScryfallDataType,
-    tag?: string[],
-    price?: string,
-    qty?: number,
-    imgUri?: string
-  ) => void;
   defaultTag?: string;
+  toaster: (m: string, e: ToasterSeverityEnum) => void;
 };
 
-const SearchResultCard = (props: SearchResultCardType) => {
+const SearchResultCard = ({
+  sr,
+  cardDict,
+  defaultTag,
+  toaster,
+}: SearchResultCardType) => {
   const [tags, setTags] = useState<string[]>([]);
   const [isClicked, setIsClicked] = useState(false);
   const [price, setPrice] = useState<string>();
@@ -51,28 +51,29 @@ const SearchResultCard = (props: SearchResultCardType) => {
   const db = useSelector((state: State) => state.database);
 
   useEffect(() => {
-    function preCheck() {
-      if (props.cardDict && props.cardDict.has(props.sr.name)) {
+    async function preCheck() {
+      let check = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
+      if (check !== undefined) {
         setIsClicked(true);
       }
 
       let tmp: { type: string; money: string }[] = [];
-      if (props.sr.prices.usd !== null) {
+      if (sr.prices.usd !== null) {
         tmp.push({
-          type: "Non-foil",
-          money: props.sr.prices.usd,
+          type: 'Non-foil',
+          money: sr.prices.usd,
         });
       }
-      if (props.sr.prices.usd_foil !== null) {
+      if (sr.prices.usd_foil !== null) {
         tmp.push({
-          type: "Foil",
-          money: props.sr.prices.usd_foil,
+          type: 'Foil',
+          money: sr.prices.usd_foil,
         });
       }
-      if (props.sr.prices.usd_etched !== null) {
+      if (sr.prices.usd_etched !== null) {
         tmp.push({
-          type: "Etched",
-          money: props.sr.prices.usd_etched,
+          type: 'Etched',
+          money: sr.prices.usd_etched,
         });
       }
       setPriceSelectOptions(tmp);
@@ -81,27 +82,27 @@ const SearchResultCard = (props: SearchResultCardType) => {
       }
       setIsLoading(false);
 
-      if (props.defaultTag) {
-        setTags([props.defaultTag]);
+      if (defaultTag) {
+        setTags([defaultTag]);
       }
 
       let imageUris: CustomImageUris = { small: [], normal: [] };
-      if (props.sr.card_faces && "image_uris" in props.sr.card_faces[0]) {
-        for (let i = 0; i < props.sr.card_faces.length; i++) {
-          imageUris.small.push(props.sr.card_faces[i].image_uris.small);
-          imageUris.normal.push(props.sr.card_faces[i].image_uris.normal);
+      if (sr.card_faces && 'image_uris' in sr.card_faces[0]) {
+        for (let i = 0; i < sr.card_faces.length; i++) {
+          imageUris.small.push(sr.card_faces[i].image_uris.small);
+          imageUris.normal.push(sr.card_faces[i].image_uris.normal);
         }
       } else {
         imageUris = {
-          small: [props.sr.image_uris?.small || ""],
-          normal: [props.sr.image_uris?.normal || ""],
+          small: [sr.image_uris?.small || ''],
+          normal: [sr.image_uris?.normal || ''],
         };
       }
       setImgUri(imageUris);
     }
 
     preCheck();
-  }, [props]);
+  }, []);
 
   const handleTagChange = (
     event: SyntheticEvent<Element, Event>,
@@ -110,7 +111,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
     let tmp: string[] = [];
     if (Array.isArray(value)) {
       for (let c of value) {
-        if (typeof c === "string") {
+        if (typeof c === 'string') {
           tmp.push(c);
         }
       }
@@ -119,14 +120,12 @@ const SearchResultCard = (props: SearchResultCardType) => {
   };
 
   async function removeCard() {
-    let cardToDelete = await db.cards
-      .where("name")
-      .equalsIgnoreCase(props.sr.name)
-      .first();
+    let cardToDelete = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
     if (cardToDelete && cardToDelete.id) {
       await db.cards.delete(cardToDelete.id);
     }
     setIsClicked(!isClicked);
+    toaster(`Removed ${sr.name}!`, ToasterSeverityEnum.SUCCESS);
   }
 
   return isLoading ? (
@@ -137,33 +136,29 @@ const SearchResultCard = (props: SearchResultCardType) => {
     <>
       <Backdrop
         sx={{
-          color: "#fff",
+          color: '#fff',
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
         open={showOverlay}
         onClick={() => setShowOverlay(false)}
       >
-        <div style={{ display: "flex", flexDirection: "row" }}>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
           {imgUri.normal.map((s: string, i: number) => (
-            <img
-              src={s}
-              alt=''
-              width={imgUri.normal.length === 1 ? "100%" : "50%"}
-            ></img>
+            <img src={s} alt="" width={imgUri.normal.length === 1 ? '100%' : '50%'}></img>
           ))}
         </div>
       </Backdrop>
 
-      <Card raised sx={{ bgcolor: "grey" }}>
+      <Card raised sx={{ bgcolor: 'grey' }}>
         <CardMedia
-          component='img'
+          component="img"
           image={imgUri.small[0]}
           onClick={() => setShowOverlay(true)}
         />
         <CardContent>
-          <Typography>{props.sr.name}</Typography>
+          <Typography>{sr.name}</Typography>
           <br />
-          <Typography>{props.sr.set_name}</Typography>
+          <Typography>{sr.set_name}</Typography>
           <br />
           <TextField
             select
@@ -175,9 +170,7 @@ const SearchResultCard = (props: SearchResultCardType) => {
             }}
           >
             {priceSelectOptions.map((pso) => (
-              <MenuItem
-                value={pso.money}
-              >{`US$${pso.money} - ${pso.type}`}</MenuItem>
+              <MenuItem value={pso.money}>{`US$${pso.money} - ${pso.type}`}</MenuItem>
             ))}
           </TextField>
           <br />
@@ -187,16 +180,16 @@ const SearchResultCard = (props: SearchResultCardType) => {
             value={qty}
             thousandSeparator
             decimalScale={0}
-            label='Quantity'
+            label="Quantity"
             onValueChange={(values) => {
               let { floatValue } = values;
               setQty(floatValue || 1);
             }}
-            inputProps={{ fullWidth: "true" }}
+            inputProps={{ fullWidth: 'true' }}
           />
         </CardContent>
         <CardActions>
-          <Grid container direction={"column"}>
+          <Grid container direction={'column'}>
             <Grid item>
               <Autocomplete
                 freeSolo
@@ -206,16 +199,10 @@ const SearchResultCard = (props: SearchResultCardType) => {
                 value={tags}
                 renderTags={(value: readonly string[], getTagProps) =>
                   value.map((option: string, index: number) => (
-                    <Chip
-                      variant='outlined'
-                      label={option}
-                      {...getTagProps({ index })}
-                    />
+                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
                   ))
                 }
-                renderInput={(params) => (
-                  <TextField {...params} label={"tags"} />
-                )}
+                renderInput={(params) => <TextField {...params} label={'tags'} />}
               />
             </Grid>
             <Grid item>
@@ -225,7 +212,8 @@ const SearchResultCard = (props: SearchResultCardType) => {
                     disabled={isClicked}
                     onClick={() => {
                       setIsClicked(true);
-                      props.storeCard(props.sr, tags, price, qty);
+                      storeCard(db, sr, tags, price, qty);
+                      toaster(`Added ${sr.name}!`, ToasterSeverityEnum.SUCCESS);
                     }}
                   >
                     add card

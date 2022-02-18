@@ -1,26 +1,82 @@
-import {
-  Alert,
-  CircularProgress,
-  IconButton,
-  Snackbar,
-  Tab,
-  Tabs,
-} from "@mui/material";
-import React from "react";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { CardsTableType, MTGDatabase } from "../../database";
-import { State } from "../../state/reducers";
-import AddNewCard from "./AddNewCard";
-import CloseIcon from "@mui/icons-material/Close";
-import CardDataGrid from "./CardDataGrid";
-import NetExports from "./NetExports";
-import DeckBuilder from "./DeckBuilder";
-import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import { Alert, CircularProgress, IconButton, Snackbar, Tab, Tabs } from '@mui/material';
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { CardsTableType, CustomImageUris, MTGDatabase } from '../../database';
+import { State } from '../../state/reducers';
+import AddNewCard from './AddNewCard';
+import CloseIcon from '@mui/icons-material/Close';
+import CardDataGrid from './CardDataGrid';
+import NetExports from './NetExports';
+import DeckBuilder from './DeckBuilder';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import { ScryfallDataType } from './interfaces';
 
 export enum ToasterSeverityEnum {
-  SUCCESS = "success",
-  ERROR = "error",
+  SUCCESS = 'success',
+  ERROR = 'error',
+}
+
+export async function storeCard(
+  db: MTGDatabase,
+  card: ScryfallDataType,
+  tag?: string[],
+  price?: string,
+  qty?: number
+) {
+  let colors = [];
+  if (card.card_faces) {
+    colors = card.card_faces[0].colors;
+  } else {
+    colors = card.colors || [];
+  }
+
+  let imgUris: CustomImageUris = { small: [], normal: [] };
+  if (card.card_faces) {
+    for (let i = 0; i < card.card_faces.length; i++) {
+      imgUris.small.push(card.card_faces[i].image_uris.small);
+      imgUris.normal.push(card.card_faces[i].image_uris.normal);
+    }
+  } else if (card.image_uris) {
+    imgUris = {
+      small: [card.image_uris?.small],
+      normal: [card.image_uris?.normal],
+    };
+  }
+
+  const newEntry: CardsTableType = {
+    name: card.name,
+    scryfall_id: card.id,
+    price: price ? parseFloat(price) : parseFloat(card.prices.usd || '0'),
+    quantity: qty || 1,
+    set_name: card.set_name,
+    rarity: card.rarity,
+    mana_cost: card.mana_cost,
+    cmc: card.cmc,
+    image_uri: imgUris,
+    colors: colors,
+    color_identity: card.color_identity,
+    tags: tag === undefined ? [] : tag,
+    type_line: card.type_line,
+    oracle_text: card.oracle_text,
+    edhrec_rank: card.edhrec_rank,
+    date_added: Date.now(),
+  };
+
+  const collision: CardsTableType | undefined = await db.cards
+    .where('name')
+    .equalsIgnoreCase(card.name)
+    .first();
+
+  if (collision === undefined) {
+    db.transaction('rw', db.cards, async () => {
+      await db.cards.add(newEntry);
+    });
+  } else {
+    db.transaction('rw', db.cards, async () => {
+      await db.cards.update(collision.id || 0, newEntry);
+    });
+  }
 }
 
 export type MTGDBProps = {
@@ -42,18 +98,15 @@ const MTGDB = () => {
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
-  const [toasterMessage, setToasterMessage] = useState("");
+  const [toasterMessage, setToasterMessage] = useState('');
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
   const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
 
-  const handleCloseToaster = (
-    _event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
+  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
       return;
     }
     setShowToaster(false);
@@ -61,10 +114,10 @@ const MTGDB = () => {
 
   function filterCardArr(k: string, val: string) {
     switch (k) {
-      case "tags":
+      case 'tags':
         setCardArr(cardArr.filter((c) => new Set(c[k]).has(val)));
         break;
-      case "set_name":
+      case 'set_name':
         setCardArr(cardArr.filter((c) => c[k] === val));
         break;
       default:
@@ -104,12 +157,12 @@ const MTGDB = () => {
   const toaster = (
     <React.Fragment>
       <IconButton
-        size='small'
-        aria-label='close'
-        color='inherit'
+        size="small"
+        aria-label="close"
+        color="inherit"
         onClick={handleCloseToaster}
       >
-        <CloseIcon fontSize='small' />
+        <CloseIcon fontSize="small" />
       </IconButton>
     </React.Fragment>
   );
@@ -120,7 +173,7 @@ const MTGDB = () => {
   };
   const CustomTabs: CustomTabsType[] = [
     {
-      label: "Add Card",
+      label: 'Add Card',
       component: (
         <AddNewCard
           refresh={(e: boolean) => setIsLoading(e)}
@@ -134,7 +187,7 @@ const MTGDB = () => {
       ),
     },
     {
-      label: "Cards Table",
+      label: 'Cards Table',
       component: (
         <CardDataGrid
           refresh={(e: boolean) => setIsLoading(e)}
@@ -152,7 +205,7 @@ const MTGDB = () => {
       ),
     },
     {
-      label: "Deck Builder",
+      label: 'Deck Builder',
       component: (
         <DeckBuilder
           refresh={(e: boolean) => setIsLoading(e)}
@@ -165,7 +218,7 @@ const MTGDB = () => {
       ),
     },
     {
-      label: "Import Export",
+      label: 'Import Export',
       component: (
         <NetExports
           db={db}
@@ -180,10 +233,10 @@ const MTGDB = () => {
   ];
 
   return (
-    <div style={{ margin: "auto", width: "90vw" }}>
+    <div style={{ margin: 'auto', width: '90vw' }}>
       <Tabs
         centered
-        variant='fullWidth'
+        variant="fullWidth"
         scrollButtons={true}
         value={chosenTab}
         onChange={(e: React.SyntheticEvent, newValue: number) => {
@@ -221,13 +274,13 @@ const MTGDB = () => {
       </Snackbar>
 
       <IconButton
-        size='large'
-        style={{ position: "fixed", right: 20, bottom: 20 }}
+        size="large"
+        style={{ position: 'fixed', right: 20, bottom: 20 }}
         onClick={() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       >
-        <ArrowCircleUpIcon style={{ transform: "scale(1.8)" }} />
+        <ArrowCircleUpIcon style={{ transform: 'scale(1.8)' }} />
       </IconButton>
     </div>
   );

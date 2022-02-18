@@ -35,7 +35,7 @@ enum SearchCardFilter {
   set_name = 'set_name',
 }
 
-const AddNewCard = (props: MTGDBProps) => {
+const AddNewCard = ({ cardDict, toaster }: MTGDBProps) => {
   const [img, setImg] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
@@ -124,7 +124,7 @@ const AddNewCard = (props: MTGDBProps) => {
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
-      props.toaster('Too many requests', ToasterSeverityEnum.ERROR);
+      toaster('Too many requests', ToasterSeverityEnum.ERROR);
       setIsSearching(false);
       return 0;
     }
@@ -143,7 +143,7 @@ const AddNewCard = (props: MTGDBProps) => {
           .catch((err) => {
             console.error(err);
             if (err.response.status === 404 || err.response.status === 400) {
-              props.toaster('No card found', ToasterSeverityEnum.ERROR);
+              toaster('No card found', ToasterSeverityEnum.ERROR);
             }
           })
           .finally(() => {
@@ -174,82 +174,19 @@ const AddNewCard = (props: MTGDBProps) => {
     }
   }
 
-  async function storeCard(
-    card: ScryfallDataType,
-    tag?: string[],
-    price?: string,
-    qty?: number
-  ) {
-    let colors = [];
-    if (card.card_faces) {
-      colors = card.card_faces[0].colors;
-    } else {
-      colors = card.colors || [];
-    }
-
-    let imgUris: CustomImageUris = { small: [], normal: [] };
-    if (card.card_faces) {
-      for (let i = 0; i < card.card_faces.length; i++) {
-        imgUris.small.push(card.card_faces[i].image_uris.small);
-        imgUris.normal.push(card.card_faces[i].image_uris.normal);
-      }
-    } else if (card.image_uris) {
-      imgUris = {
-        small: [card.image_uris?.small],
-        normal: [card.image_uris?.normal],
-      };
-    }
-
-    const newEntry: CardsTableType = {
-      name: card.name,
-      scryfall_id: card.id,
-      price: price ? parseFloat(price) : parseFloat(card.prices.usd || '0'),
-      quantity: qty || 1,
-      set_name: card.set_name,
-      rarity: card.rarity,
-      mana_cost: card.mana_cost,
-      cmc: card.cmc,
-      image_uri: imgUris,
-      colors: colors,
-      color_identity: card.color_identity,
-      tags: tag === undefined ? [] : tag,
-      type_line: card.type_line,
-      oracle_text: card.oracle_text,
-      edhrec_rank: card.edhrec_rank,
-      date_added: Date.now(),
-    };
-
-    const collision: CardsTableType | undefined = await props.db.cards
-      .where('name')
-      .equalsIgnoreCase(card.name)
-      .first();
-
-    if (collision === undefined) {
-      props.db.transaction('rw', props.db.cards, async () => {
-        await props.db.cards.add(newEntry);
-      });
-    } else {
-      props.db.transaction('rw', props.db.cards, async () => {
-        await props.db.cards.update(collision.id || 0, newEntry);
-      });
-    }
-
-    props.toaster('Recorded card!', ToasterSeverityEnum.SUCCESS);
-  }
-
   const filters = [
     { slug: SearchCardFilter.name, name: 'Card Name' },
     { slug: SearchCardFilter.set_name, name: 'Set Name' },
   ];
 
   async function generateMissingTxt() {
-    if (props.cardDict === undefined) {
+    if (cardDict === undefined) {
       setIsGeneratingMssing(false);
-      props.toaster('Error', ToasterSeverityEnum.ERROR);
+      toaster('Error', ToasterSeverityEnum.ERROR);
     }
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
-      let exists = props.cardDict?.has(c.name);
+      let exists = cardDict?.has(c.name);
       if (!exists) {
         missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
       }
@@ -260,7 +197,7 @@ const AddNewCard = (props: MTGDBProps) => {
     setIsGeneratingMssing(false);
     setMissingTxt(Array.from(missingCardsTxt).join('\n').substring(0, 99999));
     setShowMissingDialog(true);
-    props.toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
+    toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
   }
 
   return isLoading ? (
@@ -461,14 +398,9 @@ const AddNewCard = (props: MTGDBProps) => {
               <Grid item xs={6} sm={4} md={3}>
                 <SearchResultCard
                   sr={sr}
-                  storeCard={(
-                    sr: ScryfallDataType,
-                    tags?: string[],
-                    price?: string,
-                    qty?: number
-                  ) => storeCard(sr, tags, price, qty)}
-                  cardDict={props.cardDict || new Set()}
+                  cardDict={cardDict || new Set()}
                   defaultTag={defaultTag}
+                  toaster={toaster}
                 />
               </Grid>
             ))}
