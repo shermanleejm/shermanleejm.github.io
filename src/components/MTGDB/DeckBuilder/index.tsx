@@ -6,7 +6,6 @@ import ParkIcon from '@mui/icons-material/Park';
 import LandscapeIcon from '@mui/icons-material/Landscape';
 import LooksIcon from '@mui/icons-material/Looks';
 import { TextField, IconButton, Grid, Typography, Button } from '@mui/material';
-import { MTGDBProps } from '..';
 import Board from './Board';
 import DeckList from './DeckList';
 import { useEffect, useState } from 'react';
@@ -14,7 +13,8 @@ import { CardsTableType } from '../../../database';
 import { useSelector } from 'react-redux';
 import { State } from '../../../state/reducers';
 
-const DeckBuilder = (props: MTGDBProps) => {
+const DeckBuilder = () => {
+  const [memo, setMemo] = useState<CardsTableType[]>([]);
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
   const [searchText, setSearchText] = useState<string>('');
   const [decklist, setDecklist] = useState<Set<CardsTableType>>(new Set());
@@ -31,6 +31,7 @@ const DeckBuilder = (props: MTGDBProps) => {
     async function initialLoad() {
       const arr: CardsTableType[] = await db.cards.toArray();
       setCardArr(arr.sort((a, b) => compare(a, b, 'name')));
+      setMemo(arr.sort((a, b) => compare(a, b, 'name')));
     }
 
     initialLoad();
@@ -45,7 +46,7 @@ const DeckBuilder = (props: MTGDBProps) => {
   }
 
   function filterCardArrByColor(type: colorSlug) {
-    let tmp = cardArr
+    let tmp = memo
       .filter((c) => c.colors.length === 1 && c.colors.includes(type))
       .sort((a, b) => compare(a, b, 'cmc'));
     setCardArr(tmp);
@@ -53,7 +54,7 @@ const DeckBuilder = (props: MTGDBProps) => {
 
   function filterCardArrByText(text: string) {
     setCardArr(
-      cardArr
+      memo
         .filter(
           (c) =>
             c.name.toLowerCase().includes(text.toLowerCase()) ||
@@ -92,6 +93,7 @@ const DeckBuilder = (props: MTGDBProps) => {
       default:
         break;
     }
+    setCardArr(cardArr);
   }
 
   return (
@@ -125,9 +127,7 @@ const DeckBuilder = (props: MTGDBProps) => {
             ))}
             <IconButton
               onClick={() =>
-                setCardArr(
-                  cardArr.filter((c) => c.type_line.toLowerCase().includes('land'))
-                )
+                setCardArr(memo.filter((c) => c.type_line.toLowerCase().includes('land')))
               }
             >
               <LandscapeIcon />
@@ -135,7 +135,7 @@ const DeckBuilder = (props: MTGDBProps) => {
             <IconButton
               onClick={() =>
                 setCardArr(
-                  cardArr
+                  memo
                     .filter(
                       (c) =>
                         c.colors.length > 1 && !c.type_line.toLowerCase().includes('land')
@@ -150,7 +150,7 @@ const DeckBuilder = (props: MTGDBProps) => {
               size="small"
               variant="text"
               onClick={() => {
-                setCardArr(cardArr);
+                setCardArr(memo);
                 setSearchText('');
               }}
             >

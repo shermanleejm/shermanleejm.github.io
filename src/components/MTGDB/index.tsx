@@ -181,13 +181,7 @@ const MTGDB = () => {
     },
     {
       label: 'Deck Builder',
-      component: (
-        <DeckBuilder
-          toaster={function (m: string, e: ToasterSeverityEnum): void {
-            openToaster(m, e);
-          }}
-        />
-      ),
+      component: <DeckBuilder />,
     },
     {
       label: 'Import Export',

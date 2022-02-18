@@ -47,28 +47,31 @@ const CardDataGrid = () => {
   const db = useSelector((state: State) => state.database);
 
   useEffect(() => {
-    async function updateCards() {
-      setIsLoading(true);
-      const arr = await db.cards.toArray();
-      setCards(arr);
-      setMemoCards(arr);
-      let uTags = new Set<string>();
-      let uSets = new Set<string>();
-      let dict: Set<string> = new Set();
-      for (let i = 0; i < arr.length; i++) {
-        let curr = arr[i];
-        dict.add(curr.name);
-        uSets.add(curr.set_name);
-        uTags = new Set([...new Set(curr.tags), ...new Set(Array.from(uTags))]);
-      }
-      setUniqueSets(Array.from(uSets));
-      setUniqueTags(Array.from(uTags));
-
-      setIsLoading(false);
+    function updateCards() {
+      db.cards
+        .toArray()
+        .then((arr) => {
+          console.log(arr);
+          setCards(arr);
+          setMemoCards(arr);
+          let uTags = new Set<string>();
+          let uSets = new Set<string>();
+          let dict: Set<string> = new Set();
+          for (let i = 0; i < arr.length; i++) {
+            let curr = arr[i];
+            dict.add(curr.name);
+            uSets.add(curr.set_name);
+            uTags = new Set([...new Set(curr.tags), ...new Set(Array.from(uTags))]);
+          }
+          setUniqueSets(Array.from(uSets));
+          setUniqueTags(Array.from(uTags));
+        })
+        .catch((err) => console.log(err))
+        .finally(() => setIsLoading(false));
     }
 
     updateCards();
-  }, [isLoading, db]);
+  }, [isLoading]);
 
   const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -211,7 +214,7 @@ const CardDataGrid = () => {
     for (let i = 0; i < selectedCards.length; i++) {
       await db.cards.delete(selectedCards[i].id ?? -1);
     }
-    setIsLoading(false);
+    setIsLoading(true);
   }
 
   function calculateSelected() {
