@@ -2,6 +2,8 @@ import {
   Autocomplete,
   Button,
   CircularProgress,
+  Dialog,
+  DialogTitle,
   Grid,
   IconButton,
   InputAdornment,
@@ -50,8 +52,8 @@ const AddNewCard = (props: MTGDBProps) => {
   const [selectedFilter, setSelectedFilter] = useState<string>(SearchCardFilter.name);
   const [selectedSet, setSelectedSet] = useState<SetSearchType>();
   const [isGeneratingMissing, setIsGeneratingMssing] = useState(false);
-  // const [missingJson, setMissingJson] = useState<ScryfallDataType[]>([]);
-  // const [missingTxt, setMissingTxt] = useState<string[]>([]);
+  const [showMissingDialog, setShowMissingDialog] = useState(false);
+  const [missingTxt, setMissingTxt] = useState('');
 
   useEffect(() => {
     function getSets() {
@@ -245,20 +247,19 @@ const AddNewCard = (props: MTGDBProps) => {
       setIsGeneratingMssing(false);
       props.toaster('Error', ToasterSeverityEnum.ERROR);
     }
-    // let missingCardsJson: Set<ScryfallDataType> = new Set();
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
-      let evidence = props.cardDict?.has(c.name);
-      if (evidence === undefined) {
-        // missingCardsJson.add(c);
+      let exists = props.cardDict?.has(c.name);
+      if (!exists) {
         missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
       }
     }
-    // setMissingJson(Array.from(missingCardsJson));
     await navigator.clipboard.writeText(
       Array.from(missingCardsTxt).join('\n').substring(0, 99999)
     );
     setIsGeneratingMssing(false);
+    setMissingTxt(Array.from(missingCardsTxt).join('\n').substring(0, 99999));
+    setShowMissingDialog(true);
     props.toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
   }
 
@@ -474,6 +475,11 @@ const AddNewCard = (props: MTGDBProps) => {
           </Grid>
         </Grid>
       </Grid>
+
+      <Dialog open={showMissingDialog} onClose={() => setShowMissingDialog(false)}>
+        <DialogTitle>Missing Cards</DialogTitle>
+        <TextField multiline value={missingTxt} onFocus={(e: any) => e.target.select()} />
+      </Dialog>
     </div>
   );
 };
