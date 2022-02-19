@@ -1,5 +1,5 @@
 import { Button, Grid, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import WORDS from './words';
 
@@ -19,11 +19,11 @@ const WordleSolver = () => {
   const [initial, setInitial] = useState<boolean>(true);
   const [showTest, setShowTest] = useState(false);
 
-  const START_DATE = Date.parse('09 Feb 2022 00:00:00 GMT');
+  const START_DATE = Date.parse('09 Feb 2022 00:00:00');
 
   const test =
     WORDS[
-      (Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) + 235) % WORDS.length
+      (Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) + 237) % WORDS.length
     ];
 
   function solve() {
