@@ -59,7 +59,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [missingTxt, setMissingTxt] = useState('');
   const [infiniteData, setInfiniteData] = useState<ScryfallDataType[]>([]);
   const PER_PAGE = 12;
-  const [endPage, setEndPage] = useState(PER_PAGE * 2);
+  const [endPage, setEndPage] = useState(PER_PAGE);
   const [showBottomSpinner, setShowBottomSpinner] = useState(false);
 
   const db = useSelector((state: State) => state.database);
@@ -146,7 +146,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   async function searchCard(queryName: string) {
     setIsSearching(true);
     rootStore([]);
-    setEndPage(PER_PAGE * 2);
+    setEndPage(PER_PAGE);
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
@@ -228,6 +228,16 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
   }
 
+  const BottomSpinner = () => {
+    return infiniteData.length === searchResults.length ? (
+      <Grid item>
+        <Typography>You reached the bottom!</Typography>
+      </Grid>
+    ) : (
+      <CircularProgress />
+    );
+  };
+
   return isLoading ? (
     <div
       style={{
@@ -263,7 +273,6 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             </Grid>
           </Grid>
         </Grid>
-
         {/* Cropper */}
         <Grid item>
           {imgUploaded && (
@@ -303,7 +312,6 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             </Button>
           )}
         </Grid>
-
         {/* Search and Tags */}
         <Grid item xs={12} md={12}>
           <Grid
@@ -414,7 +422,6 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             </Grid>
           </Grid>
         </Grid>
-
         {/* Search results */}
         <Grid item>
           <InfiniteScroll
@@ -437,13 +444,8 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
               ))}
             </Grid>
           </InfiniteScroll>
-
-          {searchResults.length > 0 && infiniteData.length === searchResults.length && (
-            <Grid item>
-              <Typography>You reached the bottom!</Typography>
-            </Grid>
-          )}
         </Grid>
+        {searchResults.length > 0 && <BottomSpinner />}
       </Grid>
 
       <Dialog open={showMissingDialog} onClose={() => setShowMissingDialog(false)}>
