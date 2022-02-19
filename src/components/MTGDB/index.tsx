@@ -85,15 +85,11 @@ export type MTGDBProps = {
 
 const MTGDB = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [cardDict, setCardDict] = useState<Set<string>>(new Set());
-  const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
   const [showToaster, setShowToaster] = useState(false);
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
   const [toasterMessage, setToasterMessage] = useState('');
-  const [uniqueTags, setUniqueTags] = useState<string[]>();
-  const [uniqueSets, setUniqueSets] = useState<string[]>();
   const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
@@ -104,20 +100,6 @@ const MTGDB = () => {
     }
     setShowToaster(false);
   };
-
-  function filterCardArr(k: string, val: string) {
-    switch (k) {
-      case 'tags':
-        setCardArr(cardArr.filter((c) => new Set(c[k]).has(val)));
-        break;
-      case 'set_name':
-        setCardArr(cardArr.filter((c) => c[k] === val));
-        break;
-      default:
-        setIsLoading(true);
-        break;
-    }
-  }
 
   function openToaster(message: string, severity: ToasterSeverityEnum) {
     setToasterMessage(message);
@@ -137,10 +119,6 @@ const MTGDB = () => {
         uSets.add(curr.set_name);
         uTags = new Set([...new Set(curr.tags), ...new Set(Array.from(uTags))]);
       }
-      setUniqueSets(Array.from(uSets));
-      setUniqueTags(Array.from(uTags));
-      setCardDict(dict);
-      setCardArr(arr);
       setIsLoading(false);
     }
 

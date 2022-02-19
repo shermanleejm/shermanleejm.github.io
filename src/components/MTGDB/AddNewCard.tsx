@@ -19,7 +19,6 @@ import Cropper from 'react-easy-crop';
 import { createWorker } from 'tesseract.js';
 import getCroppedImg from './helper';
 import { ScryfallDataType, ScryfallSetType } from './interfaces';
-import { CardsTableType, CustomImageUris } from '../../database';
 import { MTGDBProps, ToasterSeverityEnum } from '.';
 import SearchResultCard from './SearchResultCard';
 import ClearIcon from '@mui/icons-material/Clear';
