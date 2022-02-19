@@ -146,7 +146,6 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   async function searchCard(queryName: string) {
     setIsSearching(true);
     rootStore([]);
-    setEndPage(PER_PAGE);
     const coolingPeriod = 500;
 
     if (Date.now() - lastRequest < coolingPeriod) {
