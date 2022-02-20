@@ -5,7 +5,7 @@ import {
   GridRenderCellParams,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -38,7 +38,7 @@ const CardDataGrid = () => {
   const [totalPrice, setTotalPrice] = useState(-1);
   const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [calculateDialogState, setCalculateDialogState] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<string>('tags');
+  const [selectedFilter, setSelectedFilter] = useState<string>('colors');
   const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
@@ -51,7 +51,6 @@ const CardDataGrid = () => {
       db.cards
         .toArray()
         .then((arr) => {
-          console.log(arr);
           setCards(arr);
           setMemoCards(arr);
           let uTags = new Set<string>();
@@ -164,6 +163,10 @@ const CardDataGrid = () => {
         return uniqueTags;
       case 'set_name':
         return uniqueSets;
+      case 'colors':
+        return ['W', 'U', 'B', 'R', 'G'];
+      case 'type_line':
+        return ['legendary', 'artifact', 'enchantment', 'creature', 'sorcery', 'instant'];
       default:
         return [];
     }
@@ -182,31 +185,42 @@ const CardDataGrid = () => {
     { slug: 'type_line', name: 'Card Type' },
   ];
 
-  function filterCardArr(k: string, val: string | null) {
-    if (val === null) {
+  function filterCardArr(k: string, val: string[]) {
+    if (val.length <= 0) {
       setCards(memoCards);
       return '';
     }
     switch (k) {
       case 'tags':
-        setCards(cards.filter((c) => new Set(c[k]).has(val || '')));
-        break;
       case 'set_name':
-        setCards(cards.filter((c) => c[k] === val));
-        break;
-      case 'name':
-        setCards(cards.filter((c) => c.name.toLowerCase().includes(val.toLowerCase())));
-        break;
-      case 'price':
-        setCards(cards.filter((c) => c.price > parseFloat(val)));
-        break;
-      case 'colors':
-        setCards(cards.filter((c) => new Set(c.colors).has(val.toUpperCase())));
+        setCards(memoCards.filter((c) => val.some((v) => c[k].indexOf(v) >= 0)));
         break;
       case 'type_line':
         setCards(
-          cards.filter((c) => c.type_line.toLowerCase().includes(val.toLowerCase()))
+          memoCards.filter((c) =>
+            val.every((v) => c[k].toLowerCase().includes(v.toLowerCase()))
+          )
         );
+        break;
+      case 'name':
+        setCards(
+          memoCards.filter((c) =>
+            val.some((v) => c[k].toLowerCase().includes(v.toLowerCase()))
+          )
+        );
+        break;
+      case 'price':
+        let p = 0;
+        if (val.length > 0) {
+          p = parseFloat(val[0]);
+        }
+        setCards(memoCards.filter((c) => c.price > p));
+        break;
+      case 'colors':
+        setCards(
+          memoCards.filter((c) => val.every((v) => c.colors.includes(v.toUpperCase())))
+        );
+        break;
     }
   }
 
@@ -258,7 +272,7 @@ const CardDataGrid = () => {
             <Grid item style={{ width: '20vw' }}>
               <Select
                 fullWidth
-                defaultValue={filters[0].slug}
+                defaultValue={selectedFilter}
                 onChange={(e) => setSelectedFilter(e.target.value as string)}
               >
                 {filters.map((f, i) => (
@@ -273,9 +287,10 @@ const CardDataGrid = () => {
                 fullWidth
                 id="tags-standard"
                 options={filterOptions(selectedFilter) || []}
-                // defaultValue={data.tags || []}
                 freeSolo
+                multiple={true}
                 onChange={(_, v) => {
+                  console.log(v);
                   filterCardArr(selectedFilter, v);
                 }}
                 renderTags={(value: readonly string[], getTagProps) =>
