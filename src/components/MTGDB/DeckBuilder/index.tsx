@@ -1,88 +1,183 @@
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import InvertColorsIcon from '@mui/icons-material/InvertColors';
-import ParkIcon from '@mui/icons-material/Park';
-import LandscapeIcon from '@mui/icons-material/Landscape';
-import LooksIcon from '@mui/icons-material/Looks';
-import { TextField, IconButton, Grid, Typography, Button } from '@mui/material';
-import Board from './Board';
-import DeckList from './DeckList';
-import { useEffect, useState } from 'react';
-import { CardsTableType } from '../../../database';
-import { useSelector } from 'react-redux';
-import { State } from '../../../state/reducers';
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import SentimentNeutralIcon from "@mui/icons-material/SentimentNeutral";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
+import InvertColorsIcon from "@mui/icons-material/InvertColors";
+import ParkIcon from "@mui/icons-material/Park";
+import LandscapeIcon from "@mui/icons-material/Landscape";
+import LooksIcon from "@mui/icons-material/Looks";
+import {
+  TextField,
+  IconButton,
+  Grid,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  List,
+  ListItem,
+  ListItemText,
+  Box,
+} from "@mui/material";
+import Board from "./Board";
+import DeckList from "./DeckList";
+import { useEffect, useState } from "react";
+import { CardsTableType } from "../../../database";
+import { useSelector } from "react-redux";
+import { State } from "../../../state/reducers";
+import InfoIcon from "@mui/icons-material/Info";
+
+enum colorSlug {
+  BLACK = "B",
+  WHITE = "W",
+  GREEN = "G",
+  BLUE = "U",
+  RED = "R",
+}
 
 const DeckBuilder = () => {
   const [memo, setMemo] = useState<CardsTableType[]>([]);
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
-  const [searchText, setSearchText] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>("");
   const [decklist, setDecklist] = useState<Set<CardsTableType>>(new Set());
+  const [colorFilters, setColorFilters] = useState<{ [key: string]: boolean }>({
+    [colorSlug.WHITE]: false,
+    [colorSlug.BLACK]: false,
+    [colorSlug.BLUE]: false,
+    [colorSlug.GREEN]: false,
+    [colorSlug.RED]: false,
+  });
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
 
   const db = useSelector((state: State) => state.database);
 
-  function compare(a: any, b: any, type: keyof CardsTableType) {
-    if (a[type] < b[type]) return -1;
-    if (a[type] > b[type]) return 1;
-    return 0;
+  function compare(a: any, b: any, type: keyof CardsTableType | "default") {
+    switch (type) {
+      case "default":
+        if (a["colors"].length < b["colors"].length) return -1;
+        if (a["colors"].length > b["colors"].length) return 1;
+        if (a["colors"] > b["colors"]) return -1;
+        if (a["colors"] < b["colors"]) return 1;
+        if (a["cmc"] < b["cmc"]) return -1;
+        if (a["cmc"] > b["cmc"]) return 1;
+        return 0;
+      case "colors":
+        if (a[type].length < b[type].length) return -1;
+        if (a[type].length > b[type].length) return 1;
+        if (a[type] < b[type]) return -1;
+        if (a[type] > b[type]) return 1;
+        return 0;
+      default:
+        if (a[type] < b[type]) return -1;
+        if (a[type] > b[type]) return 1;
+        return 0;
+    }
   }
 
   useEffect(() => {
     async function initialLoad() {
       const arr: CardsTableType[] = await db.cards.toArray();
-      setCardArr(arr.sort((a, b) => compare(a, b, 'name')));
-      setMemo(arr.sort((a, b) => compare(a, b, 'name')));
+      setCardArr(arr.sort((a, b) => compare(a, b, "default")));
+      setMemo(arr);
     }
 
     initialLoad();
   }, []);
 
-  enum colorSlug {
-    BLACK = 'B',
-    WHITE = 'W',
-    GREEN = 'G',
-    BLUE = 'U',
-    RED = 'R',
-  }
-
   function filterCardArrByColor(type: colorSlug) {
-    let tmp = memo
-      .filter((c) => c.colors.length === 1 && c.colors.includes(type))
-      .sort((a, b) => compare(a, b, 'cmc'));
-    setCardArr(tmp);
+    setColorFilters((prev) => {
+      let curr = { ...prev, [type]: !prev[type] };
+      let filters: string[] = [];
+      for (let c in curr) {
+        if (curr[c]) filters.push(c);
+      }
+      setCardArr(
+        memo
+          .filter((c) => filters.some((f) => c.colors.includes(f)))
+          .sort((a, b) => compare(a, b, "colors"))
+      );
+      return curr;
+    });
   }
 
   function filterCardArrByText(text: string) {
+    let queries = text.split(",").map((q) => q.toLowerCase());
     setCardArr(
       memo
-        .filter(
-          (c) =>
-            c.name.toLowerCase().includes(text.toLowerCase()) ||
-            c.type_line.toLowerCase().includes(text.toLowerCase()) ||
-            c.set_name.toLowerCase().includes(text.toLowerCase()) ||
-            c.oracle_text?.toLowerCase().includes(text.toLowerCase())
+        .filter((c) =>
+          queries.some((q) => {
+            if (q.includes(":")) {
+              let type = q.split(":")[0];
+              let qq = q.split(":")[1];
+              switch (type) {
+                case "t":
+                  return c.type_line.toLowerCase().includes(qq);
+                case "o":
+                  return c.oracle_text?.toLowerCase().includes(qq);
+                case "s":
+                  return c.set_name.toLowerCase().includes(qq);
+                default:
+                  return c.name.includes(qq);
+              }
+            }
+            return c.name.includes(q);
+          })
         )
-        .sort((a, b) => compare(a, b, 'cmc'))
-        .sort((a, b) => compare(a, b, 'colors'))
+        .sort((a, b) => compare(a, b, "default"))
     );
   }
 
   const colorButtons = [
-    { icon: <Brightness7Icon />, name: colorSlug.WHITE },
-    { icon: <InvertColorsIcon />, name: colorSlug.BLUE },
-    { icon: <SentimentNeutralIcon />, name: colorSlug.BLACK },
-    { icon: <WhatshotIcon />, name: colorSlug.RED },
-    { icon: <ParkIcon />, name: colorSlug.GREEN },
+    {
+      icon: (
+        <Brightness7Icon
+          style={{ color: colorFilters[colorSlug.WHITE] ? "yellow" : "" }}
+        />
+      ),
+      name: colorSlug.WHITE,
+    },
+    {
+      icon: (
+        <InvertColorsIcon
+          style={{ color: colorFilters[colorSlug.BLUE] ? "blue" : "" }}
+        />
+      ),
+      name: colorSlug.BLUE,
+    },
+    {
+      icon: (
+        <SentimentNeutralIcon
+          style={{ color: colorFilters[colorSlug.BLACK] ? "grey" : "" }}
+        />
+      ),
+      name: colorSlug.BLACK,
+    },
+    {
+      icon: (
+        <WhatshotIcon
+          style={{ color: colorFilters[colorSlug.RED] ? "red" : "" }}
+        />
+      ),
+      name: colorSlug.RED,
+    },
+    {
+      icon: (
+        <ParkIcon
+          style={{ color: colorFilters[colorSlug.GREEN] ? "green" : "" }}
+        />
+      ),
+      name: colorSlug.GREEN,
+    },
   ];
 
-  function modifyDecklist(c: CardsTableType, type: 'delete' | 'add') {
+  function modifyDecklist(c: CardsTableType, type: "delete" | "add") {
     switch (type) {
-      case 'delete':
+      case "delete":
         let tmp1 = decklist;
         tmp1.delete(c);
         setDecklist(tmp1);
         break;
-      case 'add':
+      case "add":
         let tmp2 = [...Array.from(decklist), c].sort((a, b) => {
           if (a.cmc < b.cmc) return -1;
           if (a.cmc > b.cmc) return 1;
@@ -96,26 +191,90 @@ const DeckBuilder = () => {
     setCardArr(cardArr);
   }
 
+  const infoHelper = [
+    {
+      title: "General",
+      explanation: "Searches the whole card text for the word.",
+      example: "Goldspan Dragon, Tiamat, Land",
+    },
+    {
+      title: "Card Types",
+      explanation: "Use t: in front of the type to search for.",
+      example: "t:legendary creature, t:human, t:artifact",
+    },
+    {
+      title: "Set Names",
+      explanation: "Use s: in front of the set to search for.",
+      example: "s:kamigawa neon dynasty, s:innistrad",
+    },
+    {
+      title: "Card Text (Oracle)",
+      explanation: "Use o: in front of the text to search for.",
+      example: "o:enters the battlefield, o:tap",
+    },
+  ];
+
   return (
     <Grid
       container
       spacing={1}
-      justifyContent={'space-between'}
-      alignItems={'flex-start'}
+      justifyContent={"space-between"}
+      alignItems={"flex-start"}
     >
       <Grid item xs={12}>
-        <Grid container direction={'row'} justifyContent={'center'}>
+        <Grid container direction={"row"} justifyContent={"center"}>
+          <Grid item>
+            <IconButton onClick={() => setShowInfoDialog(true)}>
+              <InfoIcon />
+            </IconButton>
+            <Dialog
+              open={showInfoDialog}
+              onClose={() => setShowInfoDialog(false)}
+            >
+              <DialogTitle>Helpful tips for searching</DialogTitle>
+              <DialogContent>
+                <List>
+                  <ListItem>
+                    <ListItemText>
+                      <Typography variant='body1'>
+                        Seperate multiple queries with a comma.
+                      </Typography>
+                    </ListItemText>
+                  </ListItem>
+                  {infoHelper.map((ele) => (
+                    <ListItem>
+                      <ListItemText>
+                        <Typography variant='body1'>{ele.title}</Typography>
+                        <Typography variant='body2'>
+                          {ele.explanation}
+                        </Typography>
+
+                        <Typography
+                          variant='body2'
+                          sx={{ fontFamily: "monospace" }}
+                        >
+                          {ele.example}
+                        </Typography>
+                      </ListItemText>
+                    </ListItem>
+                  ))}
+                </List>
+              </DialogContent>
+            </Dialog>
+          </Grid>
           <Grid item>
             <TextField
-              style={{ width: '50vw' }}
-              label="general search"
-              size="small"
+              style={{ width: "50vw" }}
+              label='general search'
+              size='small'
               value={searchText}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\/\-]/g, ''))
+                setSearchText(
+                  e.target.value.replace(/[^a-zA-Z0-9\s\/\-:,]/g, "")
+                )
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                if (e.key === 'Enter') filterCardArrByText(searchText);
+                if (e.key === "Enter") filterCardArrByText(searchText);
               }}
             ></TextField>
           </Grid>
@@ -127,7 +286,9 @@ const DeckBuilder = () => {
             ))}
             <IconButton
               onClick={() =>
-                setCardArr(memo.filter((c) => c.type_line.toLowerCase().includes('land')))
+                setCardArr(
+                  memo.filter((c) => c.type_line.toLowerCase().includes("land"))
+                )
               }
             >
               <LandscapeIcon />
@@ -138,20 +299,28 @@ const DeckBuilder = () => {
                   memo
                     .filter(
                       (c) =>
-                        c.colors.length > 1 && !c.type_line.toLowerCase().includes('land')
+                        c.colors.length > 1 &&
+                        !c.type_line.toLowerCase().includes("land")
                     )
-                    .sort((a, b) => compare(a, b, 'colors'))
+                    .sort((a, b) => compare(a, b, "colors"))
                 )
               }
             >
               <LooksIcon />
             </IconButton>
             <Button
-              size="small"
-              variant="text"
+              size='small'
+              variant='text'
               onClick={() => {
-                setCardArr(memo);
-                setSearchText('');
+                setCardArr(memo.sort((a, b) => compare(a, b, "default")));
+                setSearchText("");
+                setColorFilters({
+                  [colorSlug.WHITE]: false,
+                  [colorSlug.BLACK]: false,
+                  [colorSlug.BLUE]: false,
+                  [colorSlug.GREEN]: false,
+                  [colorSlug.RED]: false,
+                });
               }}
             >
               reset
@@ -166,14 +335,16 @@ const DeckBuilder = () => {
           <Board
             cardArr={cardArr}
             decklist={decklist}
-            addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
+            addToDeckList={(c: CardsTableType) => modifyDecklist(c, "add")}
           />
         )}
       </Grid>
       <Grid item xs={12} lg={3}>
         <DeckList
           cards={decklist}
-          deleteFromDeckList={(c: CardsTableType) => modifyDecklist(c, 'delete')}
+          deleteFromDeckList={(c: CardsTableType) =>
+            modifyDecklist(c, "delete")
+          }
         />
       </Grid>
     </Grid>

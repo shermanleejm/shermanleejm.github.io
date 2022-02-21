@@ -129,7 +129,7 @@ const DeckList = (props: DeckListType) => {
 
         <Grid item xs={12}>
           <Typography variant="h4">
-            Non-land cards: {Array.from(props.cards).length}
+            Cards: {Array.from(props.cards).length}
           </Typography>
         </Grid>
 
