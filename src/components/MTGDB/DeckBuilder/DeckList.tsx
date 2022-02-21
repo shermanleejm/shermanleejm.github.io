@@ -52,12 +52,12 @@ const DeckList = (props: DeckListType) => {
       for (let i = 0; i < cardArr.length; i++) {
         let card = cardArr[i];
         let pos = card.cmc > 10 ? 10 : card.cmc;
-        if (card.type_line.toLowerCase().includes(MTGTypesEnum.ARTIFACT)) {
-          manaDataTmp[pos][MTGTypesEnum.ARTIFACT]++;
+        if (card.type_line.toLowerCase().includes(MTGTypesEnum.ENCHANTMENT)) {
+          manaDataTmp[pos][MTGTypesEnum.ENCHANTMENT]++;
         } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.CREATURE)) {
           manaDataTmp[pos][MTGTypesEnum.CREATURE]++;
-        } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.ENCHANTMENT)) {
-          manaData[pos][MTGTypesEnum.ENCHANTMENT]++;
+        } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.ARTIFACT)) {
+          manaDataTmp[pos][MTGTypesEnum.ARTIFACT]++;
         } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.INSTANT)) {
           manaDataTmp[pos][MTGTypesEnum.INSTANT]++;
         } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.SORCERY)) {
