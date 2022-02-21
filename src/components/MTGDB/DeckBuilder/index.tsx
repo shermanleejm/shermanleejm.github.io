@@ -92,7 +92,7 @@ const DeckBuilder = () => {
         if (curr[c]) filters.push(c);
       }
       setCardArr(
-        memo
+        cardArr
           .filter((c) => filters.some((f) => c.colors.includes(f)))
           .sort((a, b) => compare(a, b, "colors"))
       );
@@ -102,13 +102,19 @@ const DeckBuilder = () => {
 
   function filterCardArrByText(text: string) {
     let queries = text.split(",").map((q) => q.toLowerCase());
+    // let queriesEvery = queries.map((q) => q.toLowerCase().includes("t:"));
+    // let queriesSome = queries.map((q) => !q.toLowerCase().includes("t:"));
     setCardArr(
-      memo
+      cardArr
         .filter((c) =>
-          queries.some((q) => {
+          queries.every((q) => {
+            q = q.toLowerCase();
             if (q.includes(":")) {
-              let type = q.split(":")[0];
-              let qq = q.split(":")[1];
+              let type = q.split(":")[0].trim();
+              let qq = q.split(":")[1].trim();
+              if (qq === "tap") {
+                qq = "{t}";
+              }
               switch (type) {
                 case "t":
                   return c.type_line.toLowerCase().includes(qq);
@@ -117,10 +123,16 @@ const DeckBuilder = () => {
                 case "s":
                   return c.set_name.toLowerCase().includes(qq);
                 default:
-                  return c.name.includes(qq);
+                  return false;
               }
             }
-            return c.name.includes(q);
+            console.log(q);
+            return (
+              c.name.toLowerCase().includes(q) ||
+              c.set_name.toLowerCase().includes(q) ||
+              c.oracle_text?.toLowerCase().includes(q) ||
+              c.type_line.toLowerCase().includes(q)
+            );
           })
         )
         .sort((a, b) => compare(a, b, "default"))

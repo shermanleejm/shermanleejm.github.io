@@ -58,7 +58,7 @@ const Board = (props: BoardProps) => {
       </Grid>
 
       <IconButton
-        disabled={startIndex > props.cardArr.length - perPage}
+        disabled={startIndex >= props.cardArr.length - perPage}
         onClick={() => {
           setStartIndex(startIndex + perPage);
           setEndIndex(endIndex + perPage);
