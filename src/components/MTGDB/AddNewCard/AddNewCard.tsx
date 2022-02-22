@@ -156,7 +156,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     switch (selectedFilter) {
       case "bulk":
         queries = queryName.split("\n").map((q) => {
-          if (q.match(/^[0-9]+\s[a-zA-Z\s\\\/,]+$/g)) {
+          if (q.match(/^[0-9]+\s[a-zA-Z\s\\/,]+$/g)) {
             let qArr = q.split(" ");
             qArr.shift();
             return qArr.join(" ");
@@ -169,7 +169,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         break;
       case "name":
         queries = queryName.split("+").map((q) => {
-          if (q.match(/^[0-9]+\s[a-zA-Z\s\\\/,]+$/g)) {
+          if (q.match(/^[0-9]+\s[a-zA-Z\s\\/,]+$/g)) {
             let qArr = q.split(" ");
             qArr.shift();
             return qArr.join(" ");
@@ -254,7 +254,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
           <TextField
             value={text}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.target.value.replace(/[^a-zA-Z0-9\s\+]/g, ""))
+              setText(e.target.value.replace(/[^a-zA-Z0-9\s+]/g, ""))
             }
             label='Card Name'
             fullWidth
@@ -287,7 +287,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
           <TextField
             value={text}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.target.value.replace(/[^a-zA-Z0-9\s\+]/g, ""))
+              setText(e.target.value.replace(/[^a-zA-Z0-9\s+]/g, ""))
             }
             label='Bulk Entry'
             multiline

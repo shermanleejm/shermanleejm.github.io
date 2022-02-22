@@ -18,6 +18,7 @@ import {
   ListItem,
   ListItemText,
   Box,
+  InputAdornment,
 } from "@mui/material";
 import Board from "./Board";
 import DeckList from "./DeckList";
@@ -26,6 +27,7 @@ import { CardsTableType } from "../../../database";
 import { useSelector } from "react-redux";
 import { State } from "../../../state/reducers";
 import InfoIcon from "@mui/icons-material/Info";
+import ClearIcon from "@mui/icons-material/Clear";
 
 enum colorSlug {
   BLACK = "B",
@@ -324,6 +326,21 @@ const DeckBuilder = () => {
               }
               onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
                 if (e.key === "Enter") filterCardArrByText(searchText);
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      edge='end'
+                      onClick={() => {
+                        setSearchText("");
+                        filterCardArrByText("");
+                      }}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             ></TextField>
           </Grid>

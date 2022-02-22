@@ -6,11 +6,11 @@ import {
   Grid,
   TextField,
   Typography,
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { CardsTableType } from '../../../database';
-import { MTGTypesEnum } from '../interfaces';
-import ManaChart from './ManaChart';
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { CardsTableType } from "../../../database";
+import { MTGTypesEnum } from "../interfaces";
+import ManaChart from "./ManaChart";
 
 type DeckListType = {
   cards: Set<CardsTableType>;
@@ -23,14 +23,16 @@ export interface ManaDataInterface {
   [MTGTypesEnum.SORCERY]: number;
   [MTGTypesEnum.ARTIFACT]: number;
   [MTGTypesEnum.ENCHANTMENT]: number;
+  [MTGTypesEnum.PLANESWALKER]: number;
+  [MTGTypesEnum.LAND]: number;
 }
 
 const DeckList = (props: DeckListType) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [deckName, setDeckName] = useState<string>('');
+  const [deckName, setDeckName] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(true);
-  const [exportJson, setExportJson] = useState<string>('');
+  const [exportJson, setExportJson] = useState<string>("");
   const [manaData, setManaData] = useState<ManaDataInterface[]>([]);
 
   useEffect(() => {
@@ -39,29 +41,36 @@ const DeckList = (props: DeckListType) => {
       setIsLoading(false);
       let cardArr = Array.from(props.cards);
       let manaDataTmp: ManaDataInterface[] = [];
-      for (let i = 0; i < 11; i++) {
+      for (let i = 0; i < 12; i++) {
         manaDataTmp.push({
-          cmc: i === 10 ? '10+' : `${i}`,
+          cmc: i === 10 ? "10+" : i === 11 ? "land" : `${i}`,
           [MTGTypesEnum.CREATURE]: 0,
           [MTGTypesEnum.INSTANT]: 0,
           [MTGTypesEnum.SORCERY]: 0,
           [MTGTypesEnum.ARTIFACT]: 0,
           [MTGTypesEnum.ENCHANTMENT]: 0,
+          [MTGTypesEnum.PLANESWALKER]: 0,
+          [MTGTypesEnum.LAND]: 0,
         });
       }
       for (let i = 0; i < cardArr.length; i++) {
         let card = cardArr[i];
         let pos = card.cmc > 10 ? 10 : card.cmc;
-        if (card.type_line.toLowerCase().includes(MTGTypesEnum.ENCHANTMENT)) {
+        let curr = card.type_line.toLowerCase();
+        if (curr.includes(MTGTypesEnum.ENCHANTMENT)) {
           manaDataTmp[pos][MTGTypesEnum.ENCHANTMENT]++;
-        } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.CREATURE)) {
+        } else if (curr.includes(MTGTypesEnum.CREATURE)) {
           manaDataTmp[pos][MTGTypesEnum.CREATURE]++;
-        } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.ARTIFACT)) {
+        } else if (curr.includes(MTGTypesEnum.ARTIFACT)) {
           manaDataTmp[pos][MTGTypesEnum.ARTIFACT]++;
-        } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.INSTANT)) {
+        } else if (curr.includes(MTGTypesEnum.INSTANT)) {
           manaDataTmp[pos][MTGTypesEnum.INSTANT]++;
-        } else if (card.type_line.toLowerCase().includes(MTGTypesEnum.SORCERY)) {
+        } else if (curr.includes(MTGTypesEnum.SORCERY)) {
           manaDataTmp[pos][MTGTypesEnum.SORCERY]++;
+        } else if (curr.includes(MTGTypesEnum.PLANESWALKER)) {
+          manaDataTmp[pos][MTGTypesEnum.PLANESWALKER]++;
+        } else if (curr.includes(MTGTypesEnum.LAND)) {
+          manaDataTmp[11][MTGTypesEnum.LAND]++;
         }
       }
       setManaData(manaDataTmp);
@@ -74,20 +83,25 @@ const DeckList = (props: DeckListType) => {
     <CircularProgress />
   ) : (
     <div>
-      <Grid container justifyContent={'center'} alignItems={'flex-start'} spacing={1}>
+      <Grid
+        container
+        justifyContent={"center"}
+        alignItems={"flex-start"}
+        spacing={1}
+      >
         <Grid item xs={12}>
           <ManaChart data={manaData} />
         </Grid>
 
         <Grid item xs={12}>
           <TextField
-            size="small"
+            size='small'
             fullWidth
-            label={'Deck Name'}
+            label={"Deck Name"}
             value={deckName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-              setDeckName(e.target.value)
-            }
+            onChange={(
+              e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            ) => setDeckName(e.target.value)}
           ></TextField>
         </Grid>
 
@@ -108,7 +122,9 @@ const DeckList = (props: DeckListType) => {
             </Button>
           ) : (
             <Button
-              href={`data:text/json;charset=utf-8,${encodeURIComponent(exportJson)}`}
+              href={`data:text/json;charset=utf-8,${encodeURIComponent(
+                exportJson
+              )}`}
               download={`${deckName}_${Date.now()}.json`}
             >
               download json
@@ -119,7 +135,7 @@ const DeckList = (props: DeckListType) => {
             href={`data:application/octet-stream,${encodeURIComponent(
               Array.from(props.cards)
                 .map((c) => c.name)
-                .join('\n')
+                .join("\n")
             )}`}
             download={`MTGDB_dump_${Date.now()}.txt`}
           >
@@ -128,7 +144,7 @@ const DeckList = (props: DeckListType) => {
         </Grid>
 
         <Grid item xs={12}>
-          <Typography variant="h4">
+          <Typography variant='h4'>
             Cards: {Array.from(props.cards).length}
           </Typography>
         </Grid>

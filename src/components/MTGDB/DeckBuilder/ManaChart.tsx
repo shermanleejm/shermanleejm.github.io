@@ -1,12 +1,21 @@
-import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
-import { MTGTypesEnum } from '../interfaces';
-import { ManaDataInterface } from './DeckList';
+import {
+  Bar,
+  BarChart,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
+import { MTGTypesEnum } from "../interfaces";
+import { ManaDataInterface } from "./DeckList";
 
-const CREATURE_COLOR = '#70ae98';
-const INSTANT_COLOR = '#6eb5ff';
-const SORCERY_COLOR = '#a02c2d';
-const ARTIFACT_COLOR = '#9e6b55';
-const ENCHANTMENT_COLOR = '#f2cf59';
+const CREATURE_COLOR = "#70ae98";
+const INSTANT_COLOR = "#6eb5ff";
+const SORCERY_COLOR = "#a02c2d";
+const ARTIFACT_COLOR = "#9e6b55";
+const ENCHANTMENT_COLOR = "#f2cf59";
+const PLANESWALKER_COLOR = "#7B6688";
+const LAND_COLOR = "#E98125";
 
 const TypeColors = [
   { dataKey: MTGTypesEnum.CREATURE, color: CREATURE_COLOR },
@@ -14,6 +23,8 @@ const TypeColors = [
   { dataKey: MTGTypesEnum.SORCERY, color: SORCERY_COLOR },
   { dataKey: MTGTypesEnum.ARTIFACT, color: ARTIFACT_COLOR },
   { dataKey: MTGTypesEnum.ENCHANTMENT, color: ENCHANTMENT_COLOR },
+  { dataKey: MTGTypesEnum.PLANESWALKER, color: PLANESWALKER_COLOR },
+  { dataKey: MTGTypesEnum.LAND, color: LAND_COLOR },
 ];
 
 interface ManaChartInterface {
@@ -22,14 +33,14 @@ interface ManaChartInterface {
 
 const ManaChart = (props: ManaChartInterface) => {
   return (
-    <div style={{ margin: '0 auto', height: 300 }}>
+    <div style={{ margin: "0 auto", height: 300 }}>
       <ResponsiveContainer>
         <BarChart data={props.data}>
-          <XAxis dataKey="cmc" />
+          <XAxis dataKey='cmc' />
           <Tooltip />
           <Legend height={40} />
           {TypeColors.map((t, i) => (
-            <Bar dataKey={t.dataKey} stackId={'a'} fill={t.color} key={i} />
+            <Bar dataKey={t.dataKey} stackId={"a"} fill={t.color} key={i} />
           ))}
         </BarChart>
       </ResponsiveContainer>
