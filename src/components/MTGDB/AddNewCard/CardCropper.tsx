@@ -9,7 +9,6 @@ interface CardCropperProps {
 }
 
 const CardCropper = ({ setText }: CardCropperProps) => {
-  // const [text, setText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [img, setImg] = useState("");
   const [imgUploaded, setImgUploaded] = useState(false);

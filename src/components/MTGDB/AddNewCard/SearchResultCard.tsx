@@ -16,10 +16,10 @@ import {
 import { SyntheticEvent, useEffect, useState } from 'react';
 import NumberFormat from 'react-number-format';
 import { useSelector } from 'react-redux';
-import { storeCard, ToasterSeverityEnum } from '.';
-import { CustomImageUris } from '../../database';
-import { State } from '../../state/reducers';
-import { ScryfallDataType } from './interfaces';
+import { storeCard, ToasterSeverityEnum } from '..';
+import { CustomImageUris } from '../../../database';
+import { State } from '../../../state/reducers';
+import { ScryfallDataType } from '../interfaces';
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;
