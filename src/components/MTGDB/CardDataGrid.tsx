@@ -4,8 +4,8 @@ import {
   GridColDef,
   GridRenderCellParams,
   GridValueFormatterParams,
-} from '@mui/x-data-grid';
-import React, { memo, useEffect, useState } from 'react';
+} from "@mui/x-data-grid";
+import React, { memo, useEffect, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -26,10 +26,10 @@ import {
   Tooltip,
   TooltipProps,
   Typography,
-} from '@mui/material';
-import { CardsTableType } from '../../database';
-import { useSelector } from 'react-redux';
-import { State } from '../../state/reducers';
+} from "@mui/material";
+import { CardsTableType } from "../../database";
+import { useSelector } from "react-redux";
+import { State } from "../../state/reducers";
 
 const CardDataGrid = () => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
@@ -38,7 +38,7 @@ const CardDataGrid = () => {
   const [totalPrice, setTotalPrice] = useState(-1);
   const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [calculateDialogState, setCalculateDialogState] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<string>('colors');
+  const [selectedFilter, setSelectedFilter] = useState<string>("colors");
   const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
@@ -60,7 +60,10 @@ const CardDataGrid = () => {
             let curr = arr[i];
             dict.add(curr.name);
             uSets.add(curr.set_name);
-            uTags = new Set([...new Set(curr.tags), ...new Set(Array.from(uTags))]);
+            uTags = new Set([
+              ...new Set(curr.tags),
+              ...new Set(Array.from(uTags)),
+            ]);
           }
           setUniqueSets(Array.from(uSets));
           setUniqueTags(Array.from(uTags));
@@ -78,8 +81,9 @@ const CardDataGrid = () => {
 
   const columns: GridColDef[] = [
     {
-      field: 'name',
-      headerName: 'Name',
+      field: "name",
+      headerName:
+        window.innerWidth < 400 ? "Name (tap and hold to preview)" : "Name",
       minWidth: 200,
       flex: 1,
       renderCell: (params: GridRenderCellParams) => {
@@ -88,9 +92,9 @@ const CardDataGrid = () => {
           <HtmlTooltip
             title={
               <React.Fragment>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <div style={{ display: "flex", flexDirection: "row" }}>
                   {data.image_uri.small.map((s: string, i: number) => (
-                    <img key={i} src={data.image_uri.small[i]} alt=""></img>
+                    <img key={i} src={data.image_uri.small[i]} alt=''></img>
                   ))}
                 </div>
               </React.Fragment>
@@ -102,10 +106,10 @@ const CardDataGrid = () => {
         );
       },
     },
-    { field: 'cmc', headerName: 'CMC', width: 65 },
+    { field: "cmc", headerName: "CMC", width: 65 },
     {
-      field: 'price',
-      headerName: 'Price',
+      field: "price",
+      headerName: "Price",
       width: colWidth / 1.8,
       valueFormatter: (params: GridValueFormatterParams) => {
         return `$${params.value}`;
@@ -120,16 +124,16 @@ const CardDataGrid = () => {
     //   },
     // },
     {
-      field: 'edhrec_rank',
-      headerName: 'EDHREC Rank',
+      field: "edhrec_rank",
+      headerName: "EDHREC Rank",
       width: colWidth / 1.5,
       valueGetter: (params) => {
         return params.row.edhrec_rank ?? 999999;
       },
     },
     {
-      field: 'tags',
-      headerName: 'tags',
+      field: "tags",
+      headerName: "tags",
       minWidth: 400,
       flex: 1,
       renderCell: (params: GridRenderCellParams) => {
@@ -138,7 +142,7 @@ const CardDataGrid = () => {
           <Autocomplete
             fullWidth
             multiple
-            id="tags-standard"
+            id='tags-standard'
             options={data.tags || []}
             defaultValue={data.tags || []}
             freeSolo
@@ -147,10 +151,16 @@ const CardDataGrid = () => {
             }}
             renderTags={(value: readonly string[], getTagProps) =>
               value.map((option: string, index: number) => (
-                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                <Chip
+                  variant='outlined'
+                  label={option}
+                  {...getTagProps({ index })}
+                />
               ))
             }
-            renderInput={(params) => <TextField {...params} variant="standard" />}
+            renderInput={(params) => (
+              <TextField {...params} variant='standard' />
+            )}
           />
         );
       },
@@ -159,14 +169,21 @@ const CardDataGrid = () => {
 
   function filterOptions(k: string) {
     switch (k) {
-      case 'tags':
+      case "tags":
         return uniqueTags;
-      case 'set_name':
+      case "set_name":
         return uniqueSets;
-      case 'colors':
-        return ['W', 'U', 'B', 'R', 'G'];
-      case 'type_line':
-        return ['legendary', 'artifact', 'enchantment', 'creature', 'sorcery', 'instant'];
+      case "colors":
+        return ["W", "U", "B", "R", "G"];
+      case "type_line":
+        return [
+          "legendary",
+          "artifact",
+          "enchantment",
+          "creature",
+          "sorcery",
+          "instant",
+        ];
       default:
         return [];
     }
@@ -177,48 +194,52 @@ const CardDataGrid = () => {
   }
 
   const filters = [
-    { slug: 'tags', name: 'Tags' },
-    { slug: 'set_name', name: 'Set Name' },
-    { slug: 'name', name: 'Card Name' },
-    { slug: 'price', name: 'Price' },
-    { slug: 'colors', name: 'Colours' },
-    { slug: 'type_line', name: 'Card Type' },
+    { slug: "tags", name: "Tags" },
+    { slug: "set_name", name: "Set Name" },
+    { slug: "name", name: "Card Name" },
+    { slug: "price", name: "Price" },
+    { slug: "colors", name: "Colours" },
+    { slug: "type_line", name: "Card Type" },
   ];
 
   function filterCardArr(k: string, val: string[]) {
     if (val.length <= 0) {
       setCards(memoCards);
-      return '';
+      return "";
     }
     switch (k) {
-      case 'tags':
-      case 'set_name':
-        setCards(memoCards.filter((c) => val.some((v) => c[k].indexOf(v) >= 0)));
+      case "tags":
+      case "set_name":
+        setCards(
+          memoCards.filter((c) => val.some((v) => c[k].indexOf(v) >= 0))
+        );
         break;
-      case 'type_line':
+      case "type_line":
         setCards(
           memoCards.filter((c) =>
             val.every((v) => c[k].toLowerCase().includes(v.toLowerCase()))
           )
         );
         break;
-      case 'name':
+      case "name":
         setCards(
           memoCards.filter((c) =>
             val.some((v) => c[k].toLowerCase().includes(v.toLowerCase()))
           )
         );
         break;
-      case 'price':
+      case "price":
         let p = 0;
         if (val.length > 0) {
           p = parseFloat(val[0]);
         }
         setCards(memoCards.filter((c) => c.price > p));
         break;
-      case 'colors':
+      case "colors":
         setCards(
-          memoCards.filter((c) => val.every((v) => c.colors.includes(v.toUpperCase())))
+          memoCards.filter((c) =>
+            val.every((v) => c.colors.includes(v.toUpperCase()))
+          )
         );
         break;
     }
@@ -234,7 +255,7 @@ const CardDataGrid = () => {
   function calculateSelected() {
     let res = 0;
     for (let i = 0; i < selectedCards.length; i++) {
-      res += selectedCards[i]['price'];
+      res += selectedCards[i]["price"];
     }
     setTotalPrice(parseFloat(res.toFixed(2)));
   }
@@ -250,26 +271,26 @@ const CardDataGrid = () => {
   ) : (
     <Box
       sx={{
-        '.u-text': { backgroundColor: '#2C458B', color: 'white' },
-        '.b-text': { backgroundColor: '#3C0C5D', color: 'white' },
-        '.r-text': { backgroundColor: '#731421', color: 'white' },
-        '.w-text': { backgroundColor: '#ffffff', color: 'black' },
-        '.g-text': { backgroundColor: '#2A6438', color: 'white' },
-        '.m-text': { backgroundColor: '#FFD700', color: 'black' },
-        '.c-text': { backgroundColor: '#808080', color: 'white' },
-        '.tags': { borderRadius: '50%', border: '1' },
+        ".u-text": { backgroundColor: "#2C458B", color: "white" },
+        ".b-text": { backgroundColor: "#3C0C5D", color: "white" },
+        ".r-text": { backgroundColor: "#731421", color: "white" },
+        ".w-text": { backgroundColor: "#ffffff", color: "black" },
+        ".g-text": { backgroundColor: "#2A6438", color: "white" },
+        ".m-text": { backgroundColor: "#FFD700", color: "black" },
+        ".c-text": { backgroundColor: "#808080", color: "white" },
+        ".tags": { borderRadius: "50%", border: "1" },
       }}
     >
       <Grid
         container
-        direction={'column'}
-        justifyContent={'center'}
-        alignItems={'center'}
+        direction={"column"}
+        justifyContent={"center"}
+        alignItems={"center"}
       >
         {/* Filter */}
         <Grid item>
-          <Grid container direction={'row'}>
-            <Grid item style={{ width: '20vw' }}>
+          <Grid container direction={"row"}>
+            <Grid item style={{ width: "20vw" }}>
               <Select
                 fullWidth
                 defaultValue={selectedFilter}
@@ -282,10 +303,10 @@ const CardDataGrid = () => {
                 ))}
               </Select>
             </Grid>
-            <Grid item style={{ width: '60vw' }}>
+            <Grid item style={{ width: "60vw" }}>
               <Autocomplete
                 fullWidth
-                id="tags-standard"
+                id='tags-standard'
                 options={filterOptions(selectedFilter) || []}
                 freeSolo
                 multiple={true}
@@ -295,21 +316,27 @@ const CardDataGrid = () => {
                 }}
                 renderTags={(value: readonly string[], getTagProps) =>
                   value.map((option: string, index: number) => (
-                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                    <Chip
+                      variant='outlined'
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
                   ))
                 }
-                renderInput={(params) => <TextField {...params} variant="outlined" />}
+                renderInput={(params) => (
+                  <TextField {...params} variant='outlined' />
+                )}
               />
             </Grid>
           </Grid>
         </Grid>
 
         {/* Data Grid */}
-        <Grid item style={{ width: '80vw' }}>
+        <Grid item style={{ width: "80vw" }}>
           <div
             style={{
-              height: '100%',
-              width: '100%',
+              height: "100%",
+              width: "100%",
             }}
           >
             <div style={{ flexGrow: 1 }}>
@@ -331,19 +358,19 @@ const CardDataGrid = () => {
                   setSelectedCards(selectedRows);
                 }}
                 getCellClassName={(params: GridCellParams<number>) => {
-                  let res = '';
-                  if (params.field === 'name') {
+                  let res = "";
+                  if (params.field === "name") {
                     if (params.row.colors.length < 1) {
-                      res += 'c-text';
+                      res += "c-text";
                     } else if (params.row.colors.length > 1) {
-                      res += 'm-text';
+                      res += "m-text";
                     } else {
-                      res += params.row.colors[0].toLowerCase() + '-text';
+                      res += params.row.colors[0].toLowerCase() + "-text";
                     }
                   }
 
-                  if (params.field === 'cmc') {
-                    res += 'pill';
+                  if (params.field === "cmc") {
+                    res += "pill";
                   }
                   return res;
                 }}
@@ -353,7 +380,9 @@ const CardDataGrid = () => {
         </Grid>
 
         <Grid item>
-          <Button onClick={() => setDeleteDialogState(true)}>delete selected</Button>
+          <Button onClick={() => setDeleteDialogState(true)}>
+            delete selected
+          </Button>
         </Grid>
         <Grid item>
           <Button
@@ -404,7 +433,10 @@ const CardDataGrid = () => {
       </Dialog>
 
       {/* Calculate Dialog */}
-      <Dialog onClose={() => setCalculateDialogState(false)} open={calculateDialogState}>
+      <Dialog
+        onClose={() => setCalculateDialogState(false)}
+        open={calculateDialogState}
+      >
         <DialogTitle>US${totalPrice}</DialogTitle>
         <DialogActions>
           <Button onClick={() => setCalculateDialogState(false)}>close</Button>

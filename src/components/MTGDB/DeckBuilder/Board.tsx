@@ -1,9 +1,9 @@
-import { CircularProgress, Grid, IconButton } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { CardsTableType } from '../../../database';
-import DraggableCard from './DraggableCard';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { CircularProgress, Grid, IconButton } from "@mui/material";
+import { useEffect, useState } from "react";
+import { CardsTableType } from "../../../database";
+import DraggableCard from "./DraggableCard";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 type BoardProps = {
   cardArr: CardsTableType[];
@@ -11,7 +11,7 @@ type BoardProps = {
   addToDeckList: (c: CardsTableType) => void;
 };
 
-const Board = (props: BoardProps) => {
+const Board = ({ cardArr, decklist, addToDeckList }: BoardProps) => {
   const perPage = 8;
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(perPage);
@@ -25,16 +25,16 @@ const Board = (props: BoardProps) => {
     }
 
     resetPages();
-  }, []);
+  }, [cardArr]);
 
   function addToDecklistCallback(c: CardsTableType) {
-    props.addToDeckList(c);
+    addToDeckList(c);
   }
 
   return isLoading ? (
     <CircularProgress />
   ) : (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: "flex" }}>
       <IconButton
         disabled={startIndex - perPage < 0}
         onClick={() => {
@@ -45,20 +45,25 @@ const Board = (props: BoardProps) => {
         <ArrowBackIosNewIcon />
       </IconButton>
 
-      <Grid container spacing={1} justifyContent={'flex-start'} alignItems={'center'}>
-        {props.cardArr.slice(startIndex, endIndex).map((c: CardsTableType, i) => (
-          <Grid item xs={6} sm={3} justifyContent={'center'} key={i}>
+      <Grid
+        container
+        spacing={1}
+        justifyContent={"flex-start"}
+        alignItems={"center"}
+      >
+        {cardArr.slice(startIndex, endIndex).map((c: CardsTableType, i) => (
+          <Grid item xs={6} sm={3} justifyContent={"center"} key={i}>
             <DraggableCard
               data={c}
               addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
-              disabled={props.decklist.has(c)}
+              disabled={decklist.has(c)}
             />
           </Grid>
         ))}
       </Grid>
 
       <IconButton
-        disabled={startIndex >= props.cardArr.length - perPage}
+        disabled={startIndex >= cardArr.length - perPage}
         onClick={() => {
           setStartIndex(startIndex + perPage);
           setEndIndex(endIndex + perPage);

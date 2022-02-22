@@ -104,8 +104,15 @@ const DeckBuilder = () => {
     let queries = text.split(",").map((q) => q.toLowerCase());
     // let queriesEvery = queries.map((q) => q.toLowerCase().includes("t:"));
     // let queriesSome = queries.map((q) => !q.toLowerCase().includes("t:"));
+    setColorFilters({
+      [colorSlug.WHITE]: false,
+      [colorSlug.BLACK]: false,
+      [colorSlug.BLUE]: false,
+      [colorSlug.GREEN]: false,
+      [colorSlug.RED]: false,
+    });
     setCardArr(
-      cardArr
+      memo
         .filter((c) =>
           queries.every((q) => {
             q = q.toLowerCase();
@@ -270,6 +277,36 @@ const DeckBuilder = () => {
                       </ListItemText>
                     </ListItem>
                   ))}
+                  <ListItem>
+                    <ListItemText>
+                      <Typography variant='h6'>Deckbuilding tips</Typography>
+                      <Typography>Ramp: 10-12</Typography>
+                      <Typography>Card Draw: 10</Typography>
+                      <Typography>Single Target Removal: 10-12</Typography>
+                      <Typography>Board Wipes: 3-4</Typography>
+                      <Typography>Lands: 35-38</Typography>
+                      <Typography>
+                        Standalone (effective by themselves/with commander): 25
+                      </Typography>
+                      <Typography>
+                        Enhancers (cards that amplify or are amplified by
+                        standalones or commander): 10-12
+                      </Typography>
+                      <Typography>
+                        Enablers (covers a weakness or fills a gap in your
+                        strategy): 7-8
+                      </Typography>
+                      <Typography>Cards on your theme: 30(ish)</Typography>
+                      <Typography>Considerations:</Typography>
+                      <Typography>
+                        Overlaps (cards that count in multiple categories)
+                      </Typography>
+                      <Typography>
+                        Partials (cards that count as 'half' in a given
+                        category. E.g. scry 3 as half a card draw card)
+                      </Typography>
+                    </ListItemText>
+                  </ListItem>
                 </List>
               </DialogContent>
             </Dialog>

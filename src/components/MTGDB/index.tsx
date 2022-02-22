@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { CardsTableType, CustomImageUris, MTGDatabase } from "../../database";
 import { State } from "../../state/reducers";
-import AddNewCard from "./AddNewCard";
+import AddNewCard from "./AddNewCard/AddNewCard";
 import CloseIcon from "@mui/icons-material/Close";
 import CardDataGrid from "./CardDataGrid";
 import NetExports from "./NetExports";
@@ -97,7 +97,7 @@ const MTGDB = () => {
     ToasterSeverityEnum.SUCCESS
   );
   const [toasterMessage, setToasterMessage] = useState("");
-  const [chosenTab, setChosenTab] = useState(2);
+  const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
 
