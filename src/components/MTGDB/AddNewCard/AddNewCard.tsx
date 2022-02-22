@@ -359,7 +359,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                   </Select>
                 </Grid>
                 <Grid item xs={9}>
-                  <FilterTextFields />
+                  {FilterTextFields()}
                 </Grid>
               </Grid>
             </Grid>
