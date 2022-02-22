@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { CardsTableType, CustomImageUris, MTGDatabase } from "../../database";
 import { State } from "../../state/reducers";
-import AddNewCard from "./AddNewCard/AddNewCard";
+import AddNewCard from "./AddNewCard";
 import CloseIcon from "@mui/icons-material/Close";
 import CardDataGrid from "./CardDataGrid";
 import NetExports from "./NetExports";

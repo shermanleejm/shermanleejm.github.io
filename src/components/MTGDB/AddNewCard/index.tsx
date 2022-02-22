@@ -127,14 +127,20 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     }
   }
 
-  async function multiScry(arr: string[]): Promise<ScryfallDataType[]> {
+  interface multiScryResult {
+    arr: ScryfallDataType[];
+    errors: string;
+  }
+  async function multiScry(arr: string[]): Promise<multiScryResult> {
     if (Date.now() - lastRequest < COOLING_PERIOD) {
       toaster("Too many requests. Waiting...", ToasterSeverityEnum.ERROR);
       await new Promise((resolve) => setTimeout(resolve, COOLING_PERIOD + 1));
       setLastRequest(Date.now());
     }
 
+    let erronousBulk: string[] = [];
     let res: ScryfallDataType[] = [];
+
     for (let q of arr) {
       let r = await multiScrySingle(q);
       let maxAttempts = 2;
@@ -143,10 +149,18 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         await new Promise((resolve) => setTimeout(resolve, COOLING_PERIOD + 1));
         r = await multiScrySingle(q);
         startAttempts++;
+        if (r.result === false) {
+          erronousBulk.push(q);
+        }
       }
       res = res.concat(r.output);
     }
-    return res;
+    return {
+      arr: res,
+      errors: Array.from(new Set(erronousBulk)).join(
+        selectedFilter === "bulk" ? "\n" : "+"
+      ),
+    };
   }
 
   async function searchCard(queryName: string) {
@@ -164,7 +178,9 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             return q.trim();
           }
         });
-        rootStore(await multiScry(queries));
+        let res = await multiScry(queries);
+        rootStore(res.arr);
+        setText(res.errors);
         setIsSearching(false);
         break;
       case "name":
@@ -177,7 +193,9 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             return q.trim();
           }
         });
-        rootStore(await multiScry(queries));
+        let res1 = await multiScry(queries);
+        rootStore(res1.arr);
+        setText(res1.errors);
         setIsSearching(false);
         break;
       case "set_name":
@@ -208,7 +226,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   const filters = [
     { slug: SearchCardFilter.name, name: "Card Name" },
     { slug: SearchCardFilter.set_name, name: "Set Name" },
-    { slug: "bulk", name: "Buld Entry" },
+    { slug: "bulk", name: "Bulk Entry" },
   ];
 
   async function generateMissingTxt() {
