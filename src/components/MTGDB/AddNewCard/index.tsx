@@ -339,7 +339,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
       <CircularProgress />
     </div>
   ) : (
-    <div>
+    <div style={{ paddingBottom: 40 }}>
       <Grid
         container
         direction='column'
