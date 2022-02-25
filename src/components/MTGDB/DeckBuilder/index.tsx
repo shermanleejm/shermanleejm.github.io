@@ -29,26 +29,53 @@ import { State } from "../../../state/reducers";
 import InfoIcon from "@mui/icons-material/Info";
 import ClearIcon from "@mui/icons-material/Clear";
 
-enum colorSlug {
+enum filterSlug {
   BLACK = "B",
   WHITE = "W",
   GREEN = "G",
   BLUE = "U",
   RED = "R",
+  LAND = "land",
+  RAINBOW = "rainbow",
+  _1 = "1",
+  _2 = "2",
+  _3 = "3",
+  _4 = "4",
+  _5 = "5",
+  _6 = "6",
+  _7 = "7",
+  _8 = "8",
+  _9 = "9",
+  _10 = "10",
 }
+
+const defaultFilterState = {
+  [filterSlug.WHITE]: false,
+  [filterSlug.BLACK]: false,
+  [filterSlug.BLUE]: false,
+  [filterSlug.GREEN]: false,
+  [filterSlug.RED]: false,
+  [filterSlug.LAND]: false,
+  [filterSlug.RAINBOW]: false,
+  [filterSlug._1]: false,
+  [filterSlug._2]: false,
+  [filterSlug._3]: false,
+  [filterSlug._4]: false,
+  [filterSlug._5]: false,
+  [filterSlug._6]: false,
+  [filterSlug._7]: false,
+  [filterSlug._8]: false,
+  [filterSlug._9]: false,
+  [filterSlug._10]: false,
+};
 
 const DeckBuilder = () => {
   const [memo, setMemo] = useState<CardsTableType[]>([]);
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
   const [searchText, setSearchText] = useState<string>("");
   const [decklist, setDecklist] = useState<Set<CardsTableType>>(new Set());
-  const [colorFilters, setColorFilters] = useState<{ [key: string]: boolean }>({
-    [colorSlug.WHITE]: false,
-    [colorSlug.BLACK]: false,
-    [colorSlug.BLUE]: false,
-    [colorSlug.GREEN]: false,
-    [colorSlug.RED]: false,
-  });
+  const [colorFilters, setColorFilters] =
+    useState<{ [key: string]: boolean }>(defaultFilterState);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
 
   const db = useSelector((state: State) => state.database);
@@ -86,7 +113,7 @@ const DeckBuilder = () => {
     initialLoad();
   }, []);
 
-  function filterCardArrByColor(type: colorSlug) {
+  function filterCardArrByColor(type: filterSlug) {
     setColorFilters((prev) => {
       let curr = { ...prev, [type]: !prev[type] };
       let filters: string[] = [];
@@ -104,14 +131,12 @@ const DeckBuilder = () => {
 
   function filterCardArrByText(text: string) {
     let queries = text.split(",").map((q) => q.toLowerCase());
-    // let queriesEvery = queries.map((q) => q.toLowerCase().includes("t:"));
-    // let queriesSome = queries.map((q) => !q.toLowerCase().includes("t:"));
     setColorFilters({
-      [colorSlug.WHITE]: false,
-      [colorSlug.BLACK]: false,
-      [colorSlug.BLUE]: false,
-      [colorSlug.GREEN]: false,
-      [colorSlug.RED]: false,
+      [filterSlug.WHITE]: false,
+      [filterSlug.BLACK]: false,
+      [filterSlug.BLUE]: false,
+      [filterSlug.GREEN]: false,
+      [filterSlug.RED]: false,
     });
     setCardArr(
       memo
@@ -152,42 +177,42 @@ const DeckBuilder = () => {
     {
       icon: (
         <Brightness7Icon
-          style={{ color: colorFilters[colorSlug.WHITE] ? "yellow" : "" }}
+          style={{ color: colorFilters[filterSlug.WHITE] ? "yellow" : "" }}
         />
       ),
-      name: colorSlug.WHITE,
+      name: filterSlug.WHITE,
     },
     {
       icon: (
         <InvertColorsIcon
-          style={{ color: colorFilters[colorSlug.BLUE] ? "blue" : "" }}
+          style={{ color: colorFilters[filterSlug.BLUE] ? "blue" : "" }}
         />
       ),
-      name: colorSlug.BLUE,
+      name: filterSlug.BLUE,
     },
     {
       icon: (
         <SentimentNeutralIcon
-          style={{ color: colorFilters[colorSlug.BLACK] ? "grey" : "" }}
+          style={{ color: colorFilters[filterSlug.BLACK] ? "grey" : "" }}
         />
       ),
-      name: colorSlug.BLACK,
+      name: filterSlug.BLACK,
     },
     {
       icon: (
         <WhatshotIcon
-          style={{ color: colorFilters[colorSlug.RED] ? "red" : "" }}
+          style={{ color: colorFilters[filterSlug.RED] ? "red" : "" }}
         />
       ),
-      name: colorSlug.RED,
+      name: filterSlug.RED,
     },
     {
       icon: (
         <ParkIcon
-          style={{ color: colorFilters[colorSlug.GREEN] ? "green" : "" }}
+          style={{ color: colorFilters[filterSlug.GREEN] ? "green" : "" }}
         />
       ),
-      name: colorSlug.GREEN,
+      name: filterSlug.GREEN,
     },
   ];
 
@@ -235,6 +260,67 @@ const DeckBuilder = () => {
     },
   ];
 
+  const infoDialog = () => {
+    return (
+      <Dialog open={showInfoDialog} onClose={() => setShowInfoDialog(false)}>
+        <DialogTitle>Helpful tips for searching</DialogTitle>
+        <DialogContent>
+          <List>
+            <ListItem>
+              <ListItemText>
+                <Typography variant='body1'>
+                  Seperate multiple queries with a comma.
+                </Typography>
+              </ListItemText>
+            </ListItem>
+            {infoHelper.map((ele) => (
+              <ListItem>
+                <ListItemText>
+                  <Typography variant='body1'>{ele.title}</Typography>
+                  <Typography variant='body2'>{ele.explanation}</Typography>
+
+                  <Typography variant='body2' sx={{ fontFamily: "monospace" }}>
+                    {ele.example}
+                  </Typography>
+                </ListItemText>
+              </ListItem>
+            ))}
+            <ListItem>
+              <ListItemText>
+                <Typography variant='h6'>Deckbuilding tips</Typography>
+                <Typography>Ramp: 10-12</Typography>
+                <Typography>Card Draw: 10</Typography>
+                <Typography>Single Target Removal: 10-12</Typography>
+                <Typography>Board Wipes: 3-4</Typography>
+                <Typography>Lands: 35-38</Typography>
+                <Typography>
+                  Standalone (effective by themselves/with commander): 25
+                </Typography>
+                <Typography>
+                  Enhancers (cards that amplify or are amplified by standalones
+                  or commander): 10-12
+                </Typography>
+                <Typography>
+                  Enablers (covers a weakness or fills a gap in your strategy):
+                  7-8
+                </Typography>
+                <Typography>Cards on your theme: 30(ish)</Typography>
+                <Typography>Considerations:</Typography>
+                <Typography>
+                  Overlaps (cards that count in multiple categories)
+                </Typography>
+                <Typography>
+                  Partials (cards that count as 'half' in a given category. E.g.
+                  scry 3 as half a card draw card)
+                </Typography>
+              </ListItemText>
+            </ListItem>
+          </List>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return (
     <Grid
       container
@@ -243,77 +329,20 @@ const DeckBuilder = () => {
       alignItems={"flex-start"}
     >
       <Grid item xs={12}>
-        <Grid container direction={"row"} justifyContent={"center"}>
+        <Grid
+          container
+          direction='row'
+          justifyContent='center'
+          alignItems='center'
+        >
           <Grid item>
             <IconButton onClick={() => setShowInfoDialog(true)}>
               <InfoIcon />
             </IconButton>
-            <Dialog
-              open={showInfoDialog}
-              onClose={() => setShowInfoDialog(false)}
-            >
-              <DialogTitle>Helpful tips for searching</DialogTitle>
-              <DialogContent>
-                <List>
-                  <ListItem>
-                    <ListItemText>
-                      <Typography variant='body1'>
-                        Seperate multiple queries with a comma.
-                      </Typography>
-                    </ListItemText>
-                  </ListItem>
-                  {infoHelper.map((ele) => (
-                    <ListItem>
-                      <ListItemText>
-                        <Typography variant='body1'>{ele.title}</Typography>
-                        <Typography variant='body2'>
-                          {ele.explanation}
-                        </Typography>
-
-                        <Typography
-                          variant='body2'
-                          sx={{ fontFamily: "monospace" }}
-                        >
-                          {ele.example}
-                        </Typography>
-                      </ListItemText>
-                    </ListItem>
-                  ))}
-                  <ListItem>
-                    <ListItemText>
-                      <Typography variant='h6'>Deckbuilding tips</Typography>
-                      <Typography>Ramp: 10-12</Typography>
-                      <Typography>Card Draw: 10</Typography>
-                      <Typography>Single Target Removal: 10-12</Typography>
-                      <Typography>Board Wipes: 3-4</Typography>
-                      <Typography>Lands: 35-38</Typography>
-                      <Typography>
-                        Standalone (effective by themselves/with commander): 25
-                      </Typography>
-                      <Typography>
-                        Enhancers (cards that amplify or are amplified by
-                        standalones or commander): 10-12
-                      </Typography>
-                      <Typography>
-                        Enablers (covers a weakness or fills a gap in your
-                        strategy): 7-8
-                      </Typography>
-                      <Typography>Cards on your theme: 30(ish)</Typography>
-                      <Typography>Considerations:</Typography>
-                      <Typography>
-                        Overlaps (cards that count in multiple categories)
-                      </Typography>
-                      <Typography>
-                        Partials (cards that count as 'half' in a given
-                        category. E.g. scry 3 as half a card draw card)
-                      </Typography>
-                    </ListItemText>
-                  </ListItem>
-                </List>
-              </DialogContent>
-            </Dialog>
+            {infoDialog()}
           </Grid>
-          <Grid item>
+
+          <Grid item xs={11}>
             <TextField
               style={{ width: "50vw" }}
               label='general search'
@@ -344,6 +373,7 @@ const DeckBuilder = () => {
               }}
             ></TextField>
           </Grid>
+
           <Grid item>
             {colorButtons.map((cb, i) => (
               <IconButton key={i} onClick={() => filterCardArrByColor(cb.name)}>
@@ -380,17 +410,39 @@ const DeckBuilder = () => {
               onClick={() => {
                 setCardArr(memo.sort((a, b) => compare(a, b, "default")));
                 setSearchText("");
-                setColorFilters({
-                  [colorSlug.WHITE]: false,
-                  [colorSlug.BLACK]: false,
-                  [colorSlug.BLUE]: false,
-                  [colorSlug.GREEN]: false,
-                  [colorSlug.RED]: false,
-                });
+                setColorFilters(defaultFilterState);
               }}
             >
               reset
             </Button>
+          </Grid>
+
+          <Grid item>
+            {[
+              filterSlug._1,
+              filterSlug._2,
+              filterSlug._3,
+              filterSlug._4,
+              filterSlug._5,
+              filterSlug._6,
+              filterSlug._7,
+              filterSlug._8,
+              filterSlug._9,
+              filterSlug._10,
+            ].map((n) => (
+              <Button
+                style={{
+                  maxWidth: "30px",
+                  maxHeight: "30px",
+                  minWidth: "30px",
+                  minHeight: "30px",
+                }}
+                variant={colorFilters[n] ? "contained" : undefined}
+                onClick={() => filterCardArrByColor(n)}
+              >
+                {n}
+              </Button>
+            ))}
           </Grid>
         </Grid>
       </Grid>
