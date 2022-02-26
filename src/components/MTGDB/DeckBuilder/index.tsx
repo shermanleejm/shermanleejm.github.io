@@ -5,6 +5,7 @@ import InvertColorsIcon from '@mui/icons-material/InvertColors';
 import ParkIcon from '@mui/icons-material/Park';
 import LandscapeIcon from '@mui/icons-material/Landscape';
 import LooksIcon from '@mui/icons-material/Looks';
+import BlockIcon from '@mui/icons-material/Block';
 import {
   TextField,
   IconButton,
@@ -53,6 +54,7 @@ enum numberSlug {
 enum miscSlug {
   LAND = 'land',
   RAINBOW = 'rainbow',
+  COLORLESS = 'C',
 }
 
 type combinedSlug = miscSlug | colorSlug | numberSlug;
@@ -63,6 +65,7 @@ const defaultFilterState = {
   [colorSlug.BLUE]: false,
   [colorSlug.GREEN]: false,
   [colorSlug.RED]: false,
+  [miscSlug.COLORLESS]: false,
   [miscSlug.LAND]: false,
   [miscSlug.RAINBOW]: false,
   [numberSlug._1]: false,
@@ -131,11 +134,16 @@ const DeckBuilder = () => {
 
       if (type !== undefined) {
         curr = { ...prev, [type]: !prev[type] };
+        console.log(curr);
         for (let c in curr) {
           if (curr[c]) {
             if (Number.isInteger(parseInt(c))) {
               numberFilters.push(parseInt(c));
-            } else if (c !== miscSlug.LAND && c !== miscSlug.RAINBOW) {
+            } else if (
+              c !== miscSlug.LAND &&
+              c !== miscSlug.RAINBOW &&
+              c !== miscSlug.COLORLESS
+            ) {
               colorFilters.push(c);
             } else {
               miscFilters.push(c);
@@ -143,18 +151,26 @@ const DeckBuilder = () => {
           }
         }
       }
-
+      console.log(miscFilters);
       setCardArr(
         memo
           .filter((c) => {
             if (colorFilters.length > 0) {
-              return colorFilters.some((f) => c.colors.includes(f));
+              return colorFilters.some((f) => c.color_identity.includes(f));
             }
             return true;
           })
           .filter((c) => {
             if (numberFilters.length > 0) {
-              return numberFilters.some((f) => c.cmc === f);
+              return numberFilters.some((f) => {
+                if (f === 10) {
+                  return c.cmc >= f;
+                }
+                if (f === 1) {
+                  return c.cmc <= f && !c.type_line.toLowerCase().includes('land');
+                }
+                return c.cmc === f;
+              });
             }
             return true;
           })
@@ -188,6 +204,21 @@ const DeckBuilder = () => {
               });
             }
             return true;
+          })
+          .filter((c) => {
+            let landCheck = true;
+            let rainbowCheck = true;
+            let colorlessCheck = true;
+            if (miscFilters.includes(miscSlug.LAND)) {
+              landCheck = c.type_line.toLowerCase().includes(miscSlug.LAND);
+            }
+            if (miscFilters.includes(miscSlug.RAINBOW)) {
+              rainbowCheck = c.color_identity.length > 1;
+            }
+            if (miscFilters.includes(miscSlug.COLORLESS)) {
+              colorlessCheck = c.color_identity.length === 0;
+            }
+            return landCheck && rainbowCheck && colorlessCheck;
           })
           .sort((a, b) => compare(a, b, 'colors'))
       );
@@ -225,6 +256,24 @@ const DeckBuilder = () => {
     {
       icon: <ParkIcon style={{ color: colorFilters[colorSlug.GREEN] ? 'green' : '' }} />,
       name: colorSlug.GREEN,
+    },
+    {
+      icon: (
+        <BlockIcon style={{ color: colorFilters[miscSlug.COLORLESS] ? 'brown' : '' }} />
+      ),
+      name: miscSlug.COLORLESS,
+    },
+    {
+      icon: (
+        <LandscapeIcon style={{ color: colorFilters[miscSlug.LAND] ? 'brown' : '' }} />
+      ),
+      name: miscSlug.LAND,
+    },
+    {
+      icon: (
+        <LooksIcon style={{ color: colorFilters[miscSlug.RAINBOW] ? 'brown' : '' }} />
+      ),
+      name: miscSlug.RAINBOW,
     },
   ];
 
@@ -381,30 +430,7 @@ const DeckBuilder = () => {
                   {cb.icon}
                 </IconButton>
               ))}
-              <IconButton
-                onClick={() =>
-                  setCardArr(
-                    memo.filter((c) => c.type_line.toLowerCase().includes('land'))
-                  )
-                }
-              >
-                <LandscapeIcon />
-              </IconButton>
-              <IconButton
-                onClick={() =>
-                  setCardArr(
-                    memo
-                      .filter(
-                        (c) =>
-                          c.colors.length > 1 &&
-                          !c.type_line.toLowerCase().includes('land')
-                      )
-                      .sort((a, b) => compare(a, b, 'colors'))
-                  )
-                }
-              >
-                <LooksIcon />
-              </IconButton>
+
               <Button
                 size="small"
                 variant="text"
