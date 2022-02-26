@@ -114,6 +114,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     let output = [];
     try {
       let res = await axios.get("https://api.scryfall.com/cards/search?q=" + q);
+      toaster(`Searching for ${q}`, ToasterSeverityEnum.SUCCESS);
       output = res.data.data.filter(
         (c: ScryfallDataType) => c.name.substring(0, 2) !== "A-"
       );
