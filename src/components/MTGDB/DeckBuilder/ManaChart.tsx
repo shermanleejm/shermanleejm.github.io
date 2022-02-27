@@ -39,7 +39,7 @@ const ManaChart = (props: ManaChartInterface) => {
   return (
     <div style={{ margin: 'auto', height: 300 }}>
       <ResponsiveContainer>
-        <BarChart data={props.data} margin={{ top: 30 }}>
+        <BarChart data={props.data} margin={{ top: 30, bottom: 30 }}>
           <XAxis dataKey="cmc" />
           <Tooltip />
           <Legend height={40} />

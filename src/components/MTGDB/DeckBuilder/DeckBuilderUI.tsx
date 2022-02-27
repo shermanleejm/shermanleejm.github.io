@@ -82,7 +82,7 @@ const defaultFilterState = {
 
 interface DeckBuilderUIType {
   currDeck: CardsTableType[];
-  deckName: string | undefined;
+  deckName: string;
 }
 
 const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
@@ -523,6 +523,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
           <DeckList
             cards={decklist}
             deleteFromDeckList={(c: CardsTableType) => modifyDecklist(c, 'delete')}
+            deckName={deckName}
           />
         </Grid>
       </Grid>

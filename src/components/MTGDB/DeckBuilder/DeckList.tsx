@@ -12,9 +12,10 @@ import { CardsTableType } from '../../../database';
 import { MTGTypesEnum } from '../interfaces';
 import ManaChart from './ManaChart';
 
-type DeckListType = {
+type DeckListProps = {
   cards: Set<CardsTableType>;
   deleteFromDeckList: (c: CardsTableType) => void;
+  deckName: string | undefined;
 };
 export interface ManaDataInterface {
   cmc: string;
@@ -27,7 +28,7 @@ export interface ManaDataInterface {
   [MTGTypesEnum.LAND]: number;
 }
 
-const DeckList = (props: DeckListType) => {
+const DeckList = (props: DeckListProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deckName, setDeckName] = useState<string>('');
@@ -39,6 +40,7 @@ const DeckList = (props: DeckListType) => {
     function init() {
       setCards(Array.from(props.cards));
       setIsLoading(false);
+      setDeckName(props.deckName || '');
       let cardArr = Array.from(props.cards);
       let manaDataTmp: ManaDataInterface[] = [];
       for (let i = 0; i < 12; i++) {
@@ -90,6 +92,7 @@ const DeckList = (props: DeckListType) => {
 
         <Grid item xs={12}>
           <TextField
+            disabled
             size="small"
             fullWidth
             label={'Deck Name'}
