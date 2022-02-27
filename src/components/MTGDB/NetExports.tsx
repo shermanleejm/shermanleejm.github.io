@@ -132,14 +132,18 @@ const NetExports = (props: MTGDBProps) => {
       }
       let added = 0;
       for (const card of json) {
-        delete card.id;
-        let exists = (await db.cards.where({ name: card.name }).first()) !== undefined;
-
-        if (!exists) {
-          setCurrentUpdateCard(card.name);
+        let originalCard = await db.cards.where({ name: card.name }).first();
+        setCurrentUpdateCard(card.name);
+        if (originalCard === undefined) {
           await db.cards.put(card);
-          added++;
+        } else {
+          if (card.id !== undefined && originalCard !== undefined) {
+            await db.cards.update(card.id, {
+              tags: Array.from(new Set([...card.tags, ...originalCard.tags])),
+            });
+          }
         }
+        added++;
       }
       console.log('Added: ', added);
       console.log('Total: ', (await db.cards.toArray()).length);

@@ -8,7 +8,7 @@ import AddNewCard from './AddNewCard';
 import CloseIcon from '@mui/icons-material/Close';
 import CardDataGrid from './CardDataGrid';
 import NetExports from './NetExports';
-import DeckBuilder from './DeckBuilder';
+import DeckBuilder from './DeckDisplay';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { ScryfallDataType } from './interfaces';
 
@@ -161,7 +161,13 @@ const MTGDB = () => {
     },
     {
       label: 'Deck Builder',
-      component: <DeckBuilder />,
+      component: (
+        <DeckBuilder
+          toaster={function (m: string, e: ToasterSeverityEnum): void {
+            openToaster(m, e);
+          }}
+        />
+      ),
     },
     {
       label: 'Import Export',

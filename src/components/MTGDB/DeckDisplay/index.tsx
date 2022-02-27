@@ -15,37 +15,55 @@ import {
 } from '@mui/material';
 import DeckBuilderUI from './DeckBuilderUI';
 import addnewdeck from '../../../assets/addnewdeck.png';
+import { MTGDBProps, ToasterSeverityEnum } from '..';
 
 type DecksType = { [key: string]: CardsTableType[] };
 
-const DeckDisplay = () => {
+const DeckDisplay = ({ toaster }: MTGDBProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [decks, setDecks] = useState<DecksType>({});
   const [showDecks, setShowDecks] = useState(true);
   const [currDeck, setCurrDeck] = useState<CardsTableType[]>([]);
   const [currDeckName, setCurrDeckName] = useState<string>('');
+  const [deckCardState, setDeckCardState] = useState<Set<string>>(new Set());
 
   const db = useSelector((state: State) => state.database);
 
   useEffect(() => {
     async function getDecks() {
       let _decks: DecksType = {};
+      let _deckCardState: Set<string> = new Set();
       let arr = await db.cards.toArray();
       for (let i = 0; i < arr.length; i++) {
         for (let j = 0; j < arr[i].tags.length; j++) {
           let t = arr[i].tags[j];
           if (!(t in _decks)) {
             _decks[t] = [];
+            _deckCardState.add(t);
           }
           _decks[t].push(arr[i]);
         }
       }
+      setDeckCardState(_deckCardState);
       setDecks(_decks);
       setIsLoading(false);
     }
 
     getDecks();
   }, [isLoading]);
+
+  async function deleteDeck(_deckName: string) {
+    let deckToDelete = decks[_deckName];
+    for (let card of deckToDelete) {
+      if (card.id !== undefined) {
+        toaster(`Removing ${card.name} from ${_deckName}`, ToasterSeverityEnum.INFO);
+        await db.cards.update(card.id, {
+          tags: card.tags.filter((t) => t !== _deckName),
+        });
+      }
+    }
+    setIsLoading(true);
+  }
 
   return isLoading ? (
     <CircularProgress />
@@ -91,6 +109,19 @@ const DeckDisplay = () => {
                     }}
                   >
                     Edit
+                  </Button>
+                  <Button
+                    disabled={!deckCardState.has(deckName)}
+                    onClick={() => {
+                      setDeckCardState((prev) => {
+                        let tmp = prev;
+                        tmp.delete(deckName);
+                        return tmp;
+                      });
+                      deleteDeck(deckName);
+                    }}
+                  >
+                    delete
                   </Button>
                 </CardActions>
               </Card>
