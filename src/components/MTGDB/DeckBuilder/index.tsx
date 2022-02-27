@@ -191,6 +191,16 @@ const DeckBuilder = () => {
                       return c.oracle_text?.toLowerCase().includes(qq);
                     case 's':
                       return c.set_name.toLowerCase().includes(qq);
+                    case 'p':
+                      let currFloat: number = parseFloat(qq.match(/[0-9.]+/)![0]);
+                      if (!isNaN(currFloat)) {
+                        if (qq.includes('<')) {
+                          return c.price < currFloat;
+                        } else if (qq.includes('>')) {
+                          return c.price > currFloat;
+                        }
+                      }
+                      break;
                     default:
                       return false;
                   }
@@ -319,6 +329,12 @@ const DeckBuilder = () => {
       explanation: 'Use o: in front of the text to search for.',
       example: 'o:enters the battlefield, o:tap',
     },
+    {
+      title: 'Price',
+      explanation: 'Use p: in front of the text to search for.',
+      example:
+        'p:<3.0 returns all cards that cost less than $3. Works with < and > only.',
+    },
   ];
 
   const infoDialog = () => {
@@ -400,7 +416,7 @@ const DeckBuilder = () => {
                 value={searchText}
                 fullWidth
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\/\-:,]/g, ''))
+                  setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\/\-:,><]/g, ''))
                 }
                 onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
                   if (e.key === 'Enter') filterCardArr();
