@@ -330,7 +330,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
       <CircularProgress />
     </div>
   ) : (
-    <div style={{ paddingBottom: 40 }}>
+    <div>
       <Grid container direction="column" justifyContent="center" alignItems="center">
         <CardCropper setText={(newText: string) => setText(newText)} />
 

@@ -92,7 +92,7 @@ const MTGDB = () => {
     ToasterSeverityEnum.SUCCESS
   );
   const [toasterMessage, setToasterMessage] = useState('');
-  const [chosenTab, setChosenTab] = useState(0);
+  const [chosenTab, setChosenTab] = useState(2);
 
   const db = useSelector((state: State) => state.database);
 
@@ -176,7 +176,7 @@ const MTGDB = () => {
   ];
 
   return (
-    <div style={{ margin: 'auto', width: '90vw' }}>
+    <div style={{ margin: 'auto', width: '90vw', paddingBottom: 40 }}>
       <Tabs
         centered
         variant="fullWidth"
