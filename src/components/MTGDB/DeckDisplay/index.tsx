@@ -9,6 +9,10 @@ import {
   CardContent,
   CardMedia,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
   TextField,
   Typography,
@@ -26,6 +30,9 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
   const [currDeck, setCurrDeck] = useState<CardsTableType[]>([]);
   const [currDeckName, setCurrDeckName] = useState<string>('');
   const [deckCardState, setDeckCardState] = useState<Set<string>>(new Set());
+  const [deleteDialogState, setDeleteDialogState] = useState(false);
+  const [deleteDeckName, setDeleteDeckName] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const db = useSelector((state: State) => state.database);
 
@@ -63,6 +70,8 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
       }
     }
     setIsLoading(true);
+    setDeleteDialogState(false);
+    setIsDeleting(false);
   }
 
   return isLoading ? (
@@ -113,12 +122,8 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
                   <Button
                     disabled={!deckCardState.has(deckName)}
                     onClick={() => {
-                      setDeckCardState((prev) => {
-                        let tmp = prev;
-                        tmp.delete(deckName);
-                        return tmp;
-                      });
-                      deleteDeck(deckName);
+                      setDeleteDeckName(deckName);
+                      setDeleteDialogState(true);
                     }}
                   >
                     delete
@@ -141,6 +146,28 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
       )}
 
       {!showDecks && <DeckBuilderUI currDeck={currDeck} deckName={currDeckName} />}
+
+      {/* Delete Dialog */}
+      <Dialog onClose={() => setDeleteDialogState(false)} open={deleteDialogState}>
+        <DialogTitle>Confirm delete?</DialogTitle>
+        <DialogContent>{isDeleting && <CircularProgress />}</DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setIsDeleting(true);
+              setDeckCardState((prev) => {
+                let tmp = prev;
+                tmp.delete(deleteDeckName);
+                return tmp;
+              });
+              deleteDeck(deleteDeckName);
+            }}
+          >
+            Confirm
+          </Button>
+          <Button onClick={() => setDeleteDialogState(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
