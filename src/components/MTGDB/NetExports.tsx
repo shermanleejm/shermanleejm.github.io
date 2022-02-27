@@ -166,7 +166,6 @@ const NetExports = (props: MTGDBProps) => {
   };
 
   async function sampleJson() {
-    console.log(sample);
     setIsLoading(true);
 
     for (const card of sample) {

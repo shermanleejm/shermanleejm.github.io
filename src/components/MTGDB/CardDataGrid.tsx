@@ -298,7 +298,6 @@ const CardDataGrid = () => {
                 freeSolo
                 multiple={true}
                 onChange={(_, v) => {
-                  console.log(v);
                   filterCardArr(selectedFilter, v);
                 }}
                 renderTags={(value: readonly string[], getTagProps) =>
