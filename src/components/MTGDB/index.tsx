@@ -92,7 +92,7 @@ const MTGDB = () => {
     ToasterSeverityEnum.SUCCESS
   );
   const [toasterMessage, setToasterMessage] = useState('');
-  const [chosenTab, setChosenTab] = useState(2);
+  const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
 

@@ -52,7 +52,7 @@ const DeckDisplay = () => {
       {showDecks ? (
         <Grid container spacing={3} alignItems={'center'} justifyContent={'center'}>
           {Object.keys(decks).map((deckName) => (
-            <Grid item xs={4}>
+            <Grid item xs={4} sm={3}>
               <Card>
                 <CardMedia component="img" src={decks[deckName][0].image_uri.normal[0]} />
                 <CardContent>

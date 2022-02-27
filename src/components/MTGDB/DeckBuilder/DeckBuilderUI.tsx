@@ -417,7 +417,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
     <CircularProgress />
   ) : (
     <div>
-      <Grid container spacing={1} justifyContent={'center'} alignItems={'center'}>
+      <Grid container spacing={1}>
         <Grid item>
           <Grid container direction="row" justifyContent="center" alignItems="center">
             <Grid item xs={1}>

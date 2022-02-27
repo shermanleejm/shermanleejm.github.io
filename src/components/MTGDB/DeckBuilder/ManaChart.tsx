@@ -1,21 +1,24 @@
+import { useSelector } from 'react-redux';
 import {
   Bar,
   BarChart,
+  LabelList,
   Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
-} from "recharts";
-import { MTGTypesEnum } from "../interfaces";
-import { ManaDataInterface } from "./DeckList";
+} from 'recharts';
+import { State } from '../../../state/reducers';
+import { MTGTypesEnum } from '../interfaces';
+import { ManaDataInterface } from './DeckList';
 
-const CREATURE_COLOR = "#70ae98";
-const INSTANT_COLOR = "#6eb5ff";
-const SORCERY_COLOR = "#a02c2d";
-const ARTIFACT_COLOR = "#9e6b55";
-const ENCHANTMENT_COLOR = "#f2cf59";
-const PLANESWALKER_COLOR = "#7B6688";
-const LAND_COLOR = "#E98125";
+const CREATURE_COLOR = '#70ae98';
+const INSTANT_COLOR = '#6eb5ff';
+const SORCERY_COLOR = '#a02c2d';
+const ARTIFACT_COLOR = '#9e6b55';
+const ENCHANTMENT_COLOR = '#f2cf59';
+const PLANESWALKER_COLOR = '#7B6688';
+const LAND_COLOR = '#E98125';
 
 const TypeColors = [
   { dataKey: MTGTypesEnum.CREATURE, color: CREATURE_COLOR },
@@ -32,15 +35,22 @@ interface ManaChartInterface {
 }
 
 const ManaChart = (props: ManaChartInterface) => {
+  const dm = useSelector((state: State) => state.darkMode);
   return (
-    <div style={{ margin: "0 auto", height: 300 }}>
+    <div style={{ margin: 'auto', height: 300 }}>
       <ResponsiveContainer>
-        <BarChart data={props.data}>
-          <XAxis dataKey='cmc' />
+        <BarChart data={props.data} margin={{ top: 30 }}>
+          <XAxis dataKey="cmc" />
           <Tooltip />
           <Legend height={40} />
           {TypeColors.map((t, i) => (
-            <Bar dataKey={t.dataKey} stackId={"a"} fill={t.color} key={i} />
+            <Bar
+              dataKey={t.dataKey}
+              stackId={'a'}
+              fill={t.color}
+              key={i}
+              label={{ position: 'top', offset: 1, fill: dm ? 'white' : 'black' }}
+            />
           ))}
         </BarChart>
       </ResponsiveContainer>
