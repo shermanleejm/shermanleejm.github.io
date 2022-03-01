@@ -11,5 +11,6 @@ export enum BankingActionType {
 }
 
 export enum DatabaseActionType {
-  GET = 'get',
+  CARDS = 'cards',
+  DECKS = 'decks',
 }

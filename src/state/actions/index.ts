@@ -27,4 +27,6 @@ export type DarkModeAction =
   | { type: DarkModeActionType.LIGHT }
   | { type: DarkModeActionType.TOGGLE };
 
-export type DatabaseAction = { type: DatabaseActionType.GET };
+export type DatabaseAction =
+  | { type: DatabaseActionType.CARDS }
+  | { type: DatabaseActionType.DECKS };

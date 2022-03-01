@@ -1,4 +1,4 @@
-import Dexie, { Table } from "dexie";
+import Dexie, { Table } from 'dexie';
 
 export interface CustomImageUris {
   small: string[];
@@ -26,30 +26,51 @@ export interface CardsTableType {
 }
 
 export const CardsTableColumns = [
-  "id",
-  "name",
-  "price",
-  "quantity",
-  "rarity",
-  "set_name",
-  "mana_cost",
-  "cmc",
-  "image_uri",
-  "colors",
-  "color_identity",
-  "tags",
-  "type_line",
-  "oracle_text",
-  "date_added",
+  'id',
+  'name',
+  'price',
+  'quantity',
+  'rarity',
+  'set_name',
+  'mana_cost',
+  'cmc',
+  'image_uri',
+  'colors',
+  'color_identity',
+  'tags',
+  'type_line',
+  'oracle_text',
+  'date_added',
 ];
 
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
 
   public constructor() {
-    super("mtgdb");
+    super('mtgdb');
     this.version(1).stores({
-      cards: `++${CardsTableColumns.join(",")}`,
+      cards: `++${CardsTableColumns.join(',')}`,
+    });
+  }
+}
+
+export interface DecksTableType {
+  id?: number;
+  card_id: number;
+  name: string;
+  format: string;
+  is_commander: boolean;
+}
+
+export const DecksTableColumns = ['id', 'card_id', 'name', 'format', 'is_commander'];
+
+export class MTGDecksDatabase extends Dexie {
+  public decks!: Table<DecksTableType, number>;
+
+  public constructor() {
+    super('mtgdb');
+    this.version(1).stores({
+      decks: `++${DecksTableColumns.join(',')}`,
     });
   }
 }

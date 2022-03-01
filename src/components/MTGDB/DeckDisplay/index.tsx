@@ -79,7 +79,7 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
   ) : (
     <div>
       {showDecks ? (
-        <Grid container spacing={3} alignItems={'center'} justifyContent={'center'}>
+        <Grid container spacing={3} alignItems={'center'}>
           <Grid item xs={4} sm={3}>
             <Card>
               <CardMedia component="img" image={addnewdeck} />
