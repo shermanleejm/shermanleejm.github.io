@@ -22,25 +22,29 @@ export interface CardsTableType {
   type_line: string;
   oracle_text?: string;
   edhrec_rank?: number;
+  collector_number?: string;
+  set?: string;
   date_added: number;
 }
 
 export const CardsTableColumns = [
-  'id',
-  'name',
-  'price',
-  'quantity',
-  'rarity',
-  'set_name',
-  'mana_cost',
-  'cmc',
-  'image_uri',
-  'colors',
-  'color_identity',
-  'tags',
-  'type_line',
-  'oracle_text',
-  'date_added',
+  "id",
+  "name",
+  "price",
+  "quantity",
+  "rarity",
+  "set_name",
+  "mana_cost",
+  "cmc",
+  "image_uri",
+  "colors",
+  "color_identity",
+  "tags",
+  "type_line",
+  "oracle_text",
+  "collector_number",
+  "set",
+  "date_added",
 ];
 
 export class MTGDatabase extends Dexie {
