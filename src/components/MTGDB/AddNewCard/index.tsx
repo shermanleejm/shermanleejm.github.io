@@ -11,18 +11,18 @@ import {
   Select,
   TextField,
   Typography,
-} from "@mui/material";
-import axios, { AxiosResponse } from "axios";
-import React, { useState } from "react";
-import { ScryfallDataType, ScryfallSetType } from "../interfaces";
-import { MTGDBProps, ToasterSeverityEnum } from "..";
-import SearchResultCard from "./SearchResultCard";
-import ClearIcon from "@mui/icons-material/Clear";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { State } from "../../../state/reducers";
-import InfiniteScroll from "./InfiniteScroll";
-import CardCropper from "./CardCropper";
+} from '@mui/material';
+import axios, { AxiosResponse } from 'axios';
+import React, { useState } from 'react';
+import { ScryfallDataType, ScryfallSetType } from '../interfaces';
+import { MTGDBProps, ToasterSeverityEnum } from '..';
+import SearchResultCard from './SearchResultCard';
+import ClearIcon from '@mui/icons-material/Clear';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { State } from '../../../state/reducers';
+import InfiniteScroll from './InfiniteScroll';
+import CardCropper from './CardCropper';
 
 interface SetSearchType {
   label: string;
@@ -32,8 +32,8 @@ interface SetSearchType {
 }
 
 enum SearchCardFilter {
-  name = "name",
-  set_name = "set_name",
+  name = 'name',
+  set_name = 'set_name',
 }
 
 const COOLING_PERIOD = 500;
@@ -41,18 +41,16 @@ const COOLING_PERIOD = 500;
 const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
-  const [defaultTag, setDefaultTag] = useState("");
+  const [defaultTag, setDefaultTag] = useState('');
   const [setCodes, setSetCodes] = useState<SetSearchType[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState<string>(
-    SearchCardFilter.name
-  );
+  const [selectedFilter, setSelectedFilter] = useState<string>(SearchCardFilter.name);
   const [selectedSet, setSelectedSet] = useState<SetSearchType>();
   const [isGeneratingMissing, setIsGeneratingMssing] = useState(false);
   const [showMissingDialog, setShowMissingDialog] = useState(false);
-  const [missingTxt, setMissingTxt] = useState("");
+  const [missingTxt, setMissingTxt] = useState('');
   const [infiniteData, setInfiniteData] = useState<ScryfallDataType[]>([]);
   const PER_PAGE = 12;
   const [endPage, setEndPage] = useState(PER_PAGE);
@@ -63,7 +61,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   useEffect(() => {
     function getSets() {
       axios
-        .get("https://api.scryfall.com/sets")
+        .get('https://api.scryfall.com/sets')
         .then((res) => {
           setSetCodes(
             res.data.data
@@ -75,7 +73,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                   search_uri: val.search_uri,
                 };
               })
-              .filter((e: SetSearchType) => !e.label.includes("Alchemy"))
+              .filter((e: SetSearchType) => !e.label.includes('Alchemy'))
           );
         })
         .catch((e) => console.error(e))
@@ -111,18 +109,18 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     try {
       toaster(`Searching for ${q}`, ToasterSeverityEnum.INFO);
       let res: AxiosResponse<any, any>;
-      if (q.includes(":")) {
-        let setCode = q.split(":")[0].toLowerCase();
-        let collectorNumber = q.split(":")[1].replace("0", "");
+      if (q.includes(':')) {
+        let setCode = q.split(':')[0].toLowerCase();
+        let collectorNumber = parseInt(q.split(':')[1]);
         res = await axios.get(
           `https://api.scryfall.com/cards/${setCode}/${collectorNumber}`
         );
         output.push(res.data);
         return { output: output, result: true };
       } else {
-        res = await axios.get("https://api.scryfall.com/cards/search?q=" + q);
+        res = await axios.get('https://api.scryfall.com/cards/search?q=' + q);
         output = res.data.data.filter(
-          (c: ScryfallDataType) => c.name.substring(0, 2) !== "A-"
+          (c: ScryfallDataType) => c.name.substring(0, 2) !== 'A-'
         );
         return { output: output, result: true };
       }
@@ -139,7 +137,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   }
   async function multiScry(arr: string[]): Promise<multiScryResult> {
     if (Date.now() - lastRequest < COOLING_PERIOD) {
-      toaster("Too many requests. Waiting...", ToasterSeverityEnum.ERROR);
+      toaster('Too many requests. Waiting...', ToasterSeverityEnum.ERROR);
       await new Promise((resolve) => setTimeout(resolve, COOLING_PERIOD + 1));
       setLastRequest(Date.now());
     }
@@ -164,7 +162,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     return {
       arr: res,
       errors: Array.from(new Set(erronousBulk)).join(
-        selectedFilter === "bulk" ? "\n" : "+"
+        selectedFilter === 'bulk' ? '\n' : '+'
       ),
     };
   }
@@ -174,12 +172,12 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     rootStore([]);
     let queries = [];
     switch (selectedFilter) {
-      case "bulk":
-        queries = queryName.split("\n").map((q) => {
+      case 'bulk':
+        queries = queryName.split('\n').map((q) => {
           if (q.match(/^[0-9]+\s[a-zA-Z\s\\/,]+$/g)) {
-            let qArr = q.split(" ");
+            let qArr = q.split(' ');
             qArr.shift();
-            return qArr.join(" ");
+            return qArr.join(' ');
           } else {
             return q.trim();
           }
@@ -189,12 +187,12 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         setText(res.errors);
         setIsSearching(false);
         break;
-      case "name":
-        queries = queryName.split("+").map((q) => {
+      case 'name':
+        queries = queryName.split('+').map((q) => {
           if (q.match(/^[0-9]+\s[a-zA-Z\s\\/,]+$/g)) {
-            let qArr = q.split(" ");
+            let qArr = q.split(' ');
             qArr.shift();
-            return qArr.join(" ");
+            return qArr.join(' ');
           } else {
             return q.trim();
           }
@@ -204,19 +202,17 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         setText(res1.errors);
         setIsSearching(false);
         break;
-      case "set_name":
+      case 'set_name':
         if (selectedSet !== undefined) {
           const resp = await axios.get(
-            "https://api.scryfall.com/sets/" + selectedSet.code
+            'https://api.scryfall.com/sets/' + selectedSet.code
           );
           let uri = resp.data.search_uri;
           let tmp: ScryfallDataType[] = [];
           while (uri !== undefined) {
             let r = await axios.get(uri);
             tmp = tmp.concat(
-              r.data.data.filter(
-                (c: ScryfallDataType) => c.name.substring(0, 2) !== "A-"
-              )
+              r.data.data.filter((c: ScryfallDataType) => c.name.substring(0, 2) !== 'A-')
             );
             uri = r.data.next_page;
           }
@@ -230,35 +226,32 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   }
 
   const filters = [
-    { slug: SearchCardFilter.name, name: "Card Name" },
-    { slug: SearchCardFilter.set_name, name: "Set Name" },
-    { slug: "bulk", name: "Bulk Entry" },
+    { slug: SearchCardFilter.name, name: 'Card Name' },
+    { slug: SearchCardFilter.set_name, name: 'Set Name' },
+    { slug: 'bulk', name: 'Bulk Entry' },
   ];
 
   async function generateMissingTxt() {
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
-      let exists = await db.cards
-        .where("name")
-        .equalsIgnoreCase(c.name)
-        .first();
+      let exists = await db.cards.where('name').equalsIgnoreCase(c.name).first();
       if (!exists) {
-        missingCardsTxt.add(`1 ${c.name.split(" // ")[0]}`);
+        missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
       }
     }
     navigator.clipboard
-      .writeText(Array.from(missingCardsTxt).join("\n").substring(0, 99999))
-      .then(() => console.log("Copied"))
+      .writeText(Array.from(missingCardsTxt).join('\n').substring(0, 99999))
+      .then(() => console.log('Copied'))
       .catch((err) =>
         toaster(
-          "Sorry, your device settings does not allow me to copy to your clipboard",
+          'Sorry, your device settings does not allow me to copy to your clipboard',
           ToasterSeverityEnum.ERROR
         )
       );
     setIsGeneratingMssing(false);
-    setMissingTxt(Array.from(missingCardsTxt).join("\n").substring(0, 99999));
+    setMissingTxt(Array.from(missingCardsTxt).join('\n').substring(0, 99999));
     setShowMissingDialog(true);
-    toaster("Copied to clipboard!", ToasterSeverityEnum.SUCCESS);
+    toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
   }
 
   const BottomSpinner = () => {
@@ -273,54 +266,52 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
 
   function FilterTextFields() {
     switch (selectedFilter) {
-      case "name":
+      case 'name':
         return (
           <TextField
             value={text}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.target.value.replace(/[^a-zA-Z0-9\s+]/g, ""))
+              setText(e.target.value.replace(/[^a-zA-Z0-9\s+]/g, ''))
             }
-            label='Card Name'
+            label="Card Name"
             fullWidth
             InputProps={{
               endAdornment: (
-                <InputAdornment position='end'>
-                  <IconButton edge='end' onClick={() => setText("")}>
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={() => setText('')}>
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>
               ),
             }}
             onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-              if (e.key === "Enter") searchCard(text);
+              if (e.key === 'Enter') searchCard(text);
             }}
           />
         );
-      case "set_name":
+      case 'set_name':
         return (
           <Autocomplete
             options={setCodes}
-            onChange={(e, val) =>
-              setSelectedSet(val === null ? undefined : val)
-            }
-            renderInput={(params) => <TextField {...params} label='Set Name' />}
+            onChange={(e, val) => setSelectedSet(val === null ? undefined : val)}
+            renderInput={(params) => <TextField {...params} label="Set Name" />}
           />
         );
-      case "bulk":
+      case 'bulk':
         return (
           <TextField
             value={text}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.target.value.replace(/[^a-zA-Z0-9:\s+]/g, ""))
+              setText(e.target.value.replace(/[^a-zA-Z0-9:\s+]/g, ''))
             }
-            label='Bulk Entry (E.g., 1 Boseiju, boseiju, neo:412)'
+            label="Bulk Entry (E.g., 1 Boseiju, boseiju, neo:412)"
             multiline
             maxRows={8}
             fullWidth
             InputProps={{
               endAdornment: (
-                <InputAdornment position='end'>
-                  <IconButton edge='end' onClick={() => setText("")}>
+                <InputAdornment position="end">
+                  <IconButton edge="end" onClick={() => setText('')}>
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>
@@ -336,44 +327,37 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   return isLoading ? (
     <div
       style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "36 0 36 0",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '36 0 36 0',
       }}
     >
       <CircularProgress />
     </div>
   ) : (
     <div>
-      <Grid
-        container
-        direction='column'
-        justifyContent='center'
-        alignItems='center'
-      >
+      <Grid container direction="column" justifyContent="center" alignItems="center">
         <CardCropper setText={(newText: string) => setText(newText)} />
 
         {/* Search and Tags */}
         <Grid item xs={12} md={12}>
           <Grid
             container
-            direction='column'
+            direction="column"
             spacing={1}
             style={{
-              width: "80vw",
-              margin: "16 0 16 0",
+              width: '80vw',
+              margin: '16 0 16 0',
             }}
           >
             <Grid item>
-              <Grid container direction={"row"}>
+              <Grid container direction={'row'}>
                 <Grid item xs={3}>
                   <Select
                     fullWidth
                     defaultValue={selectedFilter}
-                    onChange={(e) =>
-                      setSelectedFilter(e.target.value as string)
-                    }
+                    onChange={(e) => setSelectedFilter(e.target.value as string)}
                   >
                     {filters.map((f, i) => (
                       <MenuItem value={f.slug} key={i}>
@@ -389,7 +373,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             </Grid>
             <Grid item>
               <TextField
-                label='Tag'
+                label="Tag"
                 value={defaultTag}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setDefaultTag(e.target.value)
@@ -412,7 +396,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                   onClick={() => {
                     rootStore([]);
                     setEndPage(PER_PAGE * 2);
-                    setText("");
+                    setText('');
                   }}
                 >
                   clear
@@ -446,19 +430,15 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
           >
             <Grid
               container
-              direction='row'
+              direction="row"
               spacing={1}
-              justifyContent={"start"}
-              alignItems={"stretch"}
-              style={{ width: "80vw" }}
+              justifyContent={'start'}
+              alignItems={'stretch'}
+              style={{ width: '80vw' }}
             >
               {infiniteData.map((sr: ScryfallDataType, i) => (
                 <Grid item xs={6} md={4} lg={3} key={i}>
-                  <SearchResultCard
-                    sr={sr}
-                    defaultTag={defaultTag}
-                    toaster={toaster}
-                  />
+                  <SearchResultCard sr={sr} defaultTag={defaultTag} toaster={toaster} />
                 </Grid>
               ))}
             </Grid>
@@ -467,16 +447,9 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         {searchResults.length > 0 && <BottomSpinner />}
       </Grid>
 
-      <Dialog
-        open={showMissingDialog}
-        onClose={() => setShowMissingDialog(false)}
-      >
+      <Dialog open={showMissingDialog} onClose={() => setShowMissingDialog(false)}>
         <DialogTitle>Missing Cards</DialogTitle>
-        <TextField
-          multiline
-          value={missingTxt}
-          onFocus={(e: any) => e.target.select()}
-        />
+        <TextField multiline value={missingTxt} onFocus={(e: any) => e.target.select()} />
       </Dialog>
     </div>
   );
