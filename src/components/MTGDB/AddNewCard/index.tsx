@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import React, { useState } from "react";
 import { ScryfallDataType, ScryfallSetType } from "../interfaces";
 import { MTGDBProps, ToasterSeverityEnum } from "..";
@@ -110,7 +110,16 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     let output = [];
     try {
       toaster(`Searching for ${q}`, ToasterSeverityEnum.INFO);
-      let res = await axios.get("https://api.scryfall.com/cards/search?q=" + q);
+      let res: AxiosResponse<any, any>;
+      if (q.includes(":")) {
+        let setCode = q.split(":")[0].toLowerCase();
+        let collectorNumber = q.split(":")[1];
+        res = await axios.get(
+          `https://api.scryfall.com/cards/${setCode}/${collectorNumber}`
+        );
+      } else {
+        res = await axios.get("https://api.scryfall.com/cards/search?q=" + q);
+      }
       output = res.data.data.filter(
         (c: ScryfallDataType) => c.name.substring(0, 2) !== "A-"
       );
@@ -302,9 +311,9 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
           <TextField
             value={text}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.target.value.replace(/[^a-zA-Z0-9\s+]/g, ""))
+              setText(e.target.value.replace(/[^a-zA-Z0-9:\s+]/g, ""))
             }
-            label='Bulk Entry'
+            label='Bulk Entry (1 Boseiju, boseiju, neo:412)'
             multiline
             maxRows={8}
             fullWidth
