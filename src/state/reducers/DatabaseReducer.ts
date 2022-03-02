@@ -1,14 +1,14 @@
-import { MTGDatabase, MTGDecksDatabase } from '../../database';
+import { MTGDatabase } from '../../database';
 import { DatabaseAction } from '../actions';
 import { DatabaseActionType } from '../actions/action-types';
 
 const databaseDefault = new MTGDatabase();
-const decksDatabase = new MTGDecksDatabase();
 
 export const DatabaseReducer = (state = databaseDefault, action: DatabaseAction) => {
-  return state;
-};
-
-export const DecksDatabaseReducer = (state = decksDatabase, action: DatabaseAction) => {
-  return state;
+  switch (action.type) {
+    case DatabaseActionType.GET:
+      return state;
+    default:
+      return state;
+  }
 };

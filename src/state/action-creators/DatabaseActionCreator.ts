@@ -5,7 +5,7 @@ import { DatabaseActionType } from '../actions/action-types';
 export const getDatabase = () => {
   return (dispatch: Dispatch<DatabaseAction>) => {
     dispatch({
-      type: DatabaseActionType.CARDS,
+      type: DatabaseActionType.GET,
     });
   };
 };

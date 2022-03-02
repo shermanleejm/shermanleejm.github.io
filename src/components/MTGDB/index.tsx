@@ -1,29 +1,22 @@
-import {
-  Alert,
-  CircularProgress,
-  IconButton,
-  Snackbar,
-  Tab,
-  Tabs,
-} from "@mui/material";
-import React from "react";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { CardsTableType, CustomImageUris, MTGDatabase } from "../../database";
-import { State } from "../../state/reducers";
-import AddNewCard from "./AddNewCard";
-import CloseIcon from "@mui/icons-material/Close";
-import CardDataGrid from "./CardDataGrid";
-import NetExports from "./NetExports";
-import DeckBuilder from "./DeckDisplay";
-import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
-import { ScryfallDataType } from "./interfaces";
+import { Alert, CircularProgress, IconButton, Snackbar, Tab, Tabs } from '@mui/material';
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { CardsTableType, CustomImageUris, MTGDatabase } from '../../database';
+import { State } from '../../state/reducers';
+import AddNewCard from './AddNewCard';
+import CloseIcon from '@mui/icons-material/Close';
+import CardDataGrid from './CardDataGrid';
+import NetExports from './NetExports';
+import DeckBuilder from './DeckDisplay';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import { ScryfallDataType } from './interfaces';
 
 export enum ToasterSeverityEnum {
-  SUCCESS = "success",
-  ERROR = "error",
-  INFO = "info",
-  WARNING = "warning",
+  SUCCESS = 'success',
+  ERROR = 'error',
+  INFO = 'info',
+  WARNING = 'warning',
 }
 
 export async function storeCard(
@@ -55,7 +48,7 @@ export async function storeCard(
   const newEntry: CardsTableType = {
     name: card.name,
     scryfall_id: card.id,
-    price: parseFloat(card.prices.usd || "0"),
+    price: parseFloat(card.prices.usd || '0'),
     quantity: qty || 1,
     set_name: card.set_name,
     rarity: card.rarity,
@@ -74,16 +67,17 @@ export async function storeCard(
   };
 
   const collision: CardsTableType | undefined = await db.cards
-    .where("name")
-    .equalsIgnoreCase(card.name)
+    .where('scryfall_id')
+    .equals(card.id)
     .first();
-
+  console.log(collision?.scryfall_id);
+  console.log(newEntry.scryfall_id);
   if (collision === undefined) {
-    db.transaction("rw", db.cards, async () => {
+    db.transaction('rw', db.cards, async () => {
       await db.cards.add(newEntry);
     });
   } else {
-    db.transaction("rw", db.cards, async () => {
+    db.transaction('rw', db.cards, async () => {
       await db.cards.update(collision.id || 0, newEntry);
     });
   }
@@ -99,16 +93,13 @@ const MTGDB = () => {
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
-  const [toasterMessage, setToasterMessage] = useState("");
+  const [toasterMessage, setToasterMessage] = useState('');
   const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
 
-  const handleCloseToaster = (
-    _event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
+  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
       return;
     }
     setShowToaster(false);
@@ -136,17 +127,17 @@ const MTGDB = () => {
     }
 
     getAllCards();
-  }, [db.cards, isLoading]);
+  }, [isLoading]);
 
   const toaster = (
     <React.Fragment>
       <IconButton
-        size='small'
-        aria-label='close'
-        color='inherit'
+        size="small"
+        aria-label="close"
+        color="inherit"
         onClick={handleCloseToaster}
       >
-        <CloseIcon fontSize='small' />
+        <CloseIcon fontSize="small" />
       </IconButton>
     </React.Fragment>
   );
@@ -157,7 +148,7 @@ const MTGDB = () => {
   };
   const CustomTabs: CustomTabsType[] = [
     {
-      label: "Add Card",
+      label: 'Add Card',
       component: (
         <AddNewCard
           toaster={function (m: string, e: ToasterSeverityEnum): void {
@@ -167,11 +158,11 @@ const MTGDB = () => {
       ),
     },
     {
-      label: "Cards Table",
+      label: 'Cards Table',
       component: <CardDataGrid />,
     },
     {
-      label: "Deck Builder",
+      label: 'Deck Builder',
       component: (
         <DeckBuilder
           toaster={function (m: string, e: ToasterSeverityEnum): void {
@@ -181,7 +172,7 @@ const MTGDB = () => {
       ),
     },
     {
-      label: "Import Export",
+      label: 'Import Export',
       component: (
         <NetExports
           toaster={function (m: string, e: ToasterSeverityEnum): void {
@@ -193,10 +184,10 @@ const MTGDB = () => {
   ];
 
   return (
-    <div style={{ margin: "auto", width: "90vw", paddingBottom: 40 }}>
+    <div style={{ margin: 'auto', width: '90vw', paddingBottom: 40 }}>
       <Tabs
         centered
-        variant='fullWidth'
+        variant="fullWidth"
         scrollButtons={true}
         value={chosenTab}
         onChange={(e: React.SyntheticEvent, newValue: number) => {
@@ -234,13 +225,13 @@ const MTGDB = () => {
       </Snackbar>
 
       <IconButton
-        size='large'
-        style={{ position: "fixed", right: 20, bottom: 20 }}
+        size="large"
+        style={{ position: 'fixed', right: 20, bottom: 20 }}
         onClick={() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       >
-        <ArrowCircleUpIcon style={{ transform: "scale(1.8)" }} />
+        <ArrowCircleUpIcon style={{ transform: 'scale(1.8)' }} />
       </IconButton>
     </div>
   );

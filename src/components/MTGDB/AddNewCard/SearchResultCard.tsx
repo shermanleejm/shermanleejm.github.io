@@ -46,7 +46,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
 
   useEffect(() => {
     async function preCheck() {
-      let check = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
+      let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
 
       let oldTags: string[] = [];
       if (defaultTag !== '') {
@@ -120,7 +120,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
   };
 
   async function removeCard() {
-    let cardToDelete = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
+    let cardToDelete = await db.cards.where('scryfall_id').equals(sr.id).first();
     if (cardToDelete && cardToDelete.id) {
       await db.cards.delete(cardToDelete.id);
     }
