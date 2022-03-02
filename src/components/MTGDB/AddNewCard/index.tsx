@@ -113,7 +113,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
       let res: AxiosResponse<any, any>;
       if (q.includes(":")) {
         let setCode = q.split(":")[0].toLowerCase();
-        let collectorNumber = q.split(":")[1];
+        let collectorNumber = q.split(":")[1].replace("0", "");
         res = await axios.get(
           `https://api.scryfall.com/cards/${setCode}/${collectorNumber}`
         );
@@ -128,9 +128,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
       }
     } catch (err: any) {
       console.error(err);
-      if (err.response.status === 404 || err.response.status === 400) {
-        toaster(`No card found for ${q}`, ToasterSeverityEnum.ERROR);
-      }
+      toaster(`No card found for ${q}`, ToasterSeverityEnum.ERROR);
       return { output: output, result: false };
     }
   }
@@ -315,7 +313,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setText(e.target.value.replace(/[^a-zA-Z0-9:\s+]/g, ""))
             }
-            label='Bulk Entry (1 Boseiju, boseiju, neo:412)'
+            label='Bulk Entry (E.g., 1 Boseiju, boseiju, neo:412)'
             multiline
             maxRows={8}
             fullWidth
