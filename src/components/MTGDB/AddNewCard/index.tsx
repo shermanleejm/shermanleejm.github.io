@@ -117,13 +117,15 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         res = await axios.get(
           `https://api.scryfall.com/cards/${setCode}/${collectorNumber}`
         );
+        output.push(res.data);
+        return { output: output, result: true };
       } else {
         res = await axios.get("https://api.scryfall.com/cards/search?q=" + q);
+        output = res.data.data.filter(
+          (c: ScryfallDataType) => c.name.substring(0, 2) !== "A-"
+        );
+        return { output: output, result: true };
       }
-      output = res.data.data.filter(
-        (c: ScryfallDataType) => c.name.substring(0, 2) !== "A-"
-      );
-      return { output: output, result: true };
     } catch (err: any) {
       console.error(err);
       if (err.response.status === 404 || err.response.status === 400) {
