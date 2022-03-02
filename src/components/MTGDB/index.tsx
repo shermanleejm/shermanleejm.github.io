@@ -70,8 +70,6 @@ export async function storeCard(
     .where('scryfall_id')
     .equals(card.id)
     .first();
-  console.log(collision?.scryfall_id);
-  console.log(newEntry.scryfall_id);
   if (collision === undefined) {
     db.transaction('rw', db.cards, async () => {
       await db.cards.add(newEntry);

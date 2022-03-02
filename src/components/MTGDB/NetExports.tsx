@@ -58,21 +58,21 @@ const NetExports = (props: MTGDBProps) => {
           .first();
         setCurrentUpdateCard(card.name);
         let resp: AxiosResponse<any, any>;
+        let newCard: ScryfallDataType = {} as ScryfallDataType;
         if (check?.collector_number !== undefined && check?.set !== undefined) {
           resp = await axios.get(
             `https://api.scryfall.com/cards/${check.set}/${check.collector_number}`
           );
+          newCard = resp.data;
         } else {
           resp = await axios.get('https://api.scryfall.com/cards/search?q=' + card.name);
-        }
-
-        let newCard: ScryfallDataType = resp.data.data[0];
-        for (let c of resp.data.data) {
-          if (c.name === card.name) {
-            newCard = c;
+          for (let c of resp.data.data) {
+            if (c.name === card.name) {
+              newCard = c;
+            }
           }
         }
-
+        
         if (check !== undefined) {
           db.cards.delete(check.id || -1);
         }
