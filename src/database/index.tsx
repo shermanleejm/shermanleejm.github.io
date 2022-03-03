@@ -24,6 +24,8 @@ export interface CardsTableType {
   edhrec_rank?: number;
   collector_number?: string;
   set?: string;
+  power?: string;
+  toughness?: string;
   date_added: number;
 }
 
@@ -45,8 +47,11 @@ export const CardsTableColumns = [
   'oracle_text',
   'collector_number',
   'set',
+  'power',
+  'toughness',
   'date_added',
 ];
+
 export interface DecksTableType {
   id?: number;
   card_id: number;
@@ -62,7 +67,7 @@ export class MTGDatabase extends Dexie {
 
   public constructor() {
     super('mtgdb');
-    this.version(1).stores({
+    this.version(2).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
     });

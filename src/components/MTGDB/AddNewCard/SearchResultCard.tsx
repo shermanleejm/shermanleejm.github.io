@@ -220,7 +220,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
                     disabled={isClicked}
                     onClick={() => {
                       setIsClicked(true);
-                      storeCard(db, sr, tags, qty);
+                      storeCard(db, sr, tags, qty, price);
                       toaster(`Added ${sr.name}!`, ToasterSeverityEnum.SUCCESS);
                     }}
                   >

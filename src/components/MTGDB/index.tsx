@@ -23,16 +23,24 @@ export async function storeCard(
   db: MTGDatabase,
   card: ScryfallDataType,
   tag?: string[],
-  qty?: number
+  qty?: number,
+  price?: string
 ) {
-  let colors = [];
+  let colors: string[] = [];
+  let imgUris: CustomImageUris = { small: [], normal: [] };
+  let oracleText = '';
+  let typeLine = '';
+
   if (card.card_faces) {
-    colors = card.card_faces[0].colors;
+    for (let i = 0; i < 2; i++) {
+      colors = colors.concat(card.card_faces[i].colors);
+      oracleText += card.card_faces[i].oracle_text + ' ';
+      typeLine += card.card_faces[i].type_line + ' ';
+    }
   } else {
     colors = card.colors || [];
   }
 
-  let imgUris: CustomImageUris = { small: [], normal: [] };
   if (card.card_faces) {
     for (let i = 0; i < card.card_faces.length; i++) {
       imgUris.small.push(card.card_faces[i].image_uris.small);
@@ -48,7 +56,7 @@ export async function storeCard(
   const newEntry: CardsTableType = {
     name: card.name,
     scryfall_id: card.id,
-    price: parseFloat(card.prices.usd || '0'),
+    price: price ? parseFloat(price) : parseFloat(card.prices.usd || '0'),
     quantity: qty || 1,
     set_name: card.set_name,
     rarity: card.rarity,
@@ -58,8 +66,8 @@ export async function storeCard(
     colors: colors,
     color_identity: card.color_identity,
     tags: tag === undefined ? [] : tag,
-    type_line: card.type_line,
-    oracle_text: card.oracle_text,
+    type_line: card.type_line || typeLine,
+    oracle_text: card.oracle_text || oracleText,
     edhrec_rank: card.edhrec_rank,
     collector_number: card.collector_number,
     set: card.set,
