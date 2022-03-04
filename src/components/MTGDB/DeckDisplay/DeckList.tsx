@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   CardActionArea,
+  CardContent,
   CircularProgress,
   Grid,
   TextField,
@@ -160,7 +161,7 @@ const DeckList = (props: DeckListProps) => {
               followCursor
             >
               <Card elevation={3} style={{ marginBottom: 5 }} key={i}>
-                <CardActionArea
+                <CardContent
                   style={{ padding: 3 }}
                   onClick={() => {
                     props.deleteFromDeckList(c);
@@ -175,7 +176,7 @@ const DeckList = (props: DeckListProps) => {
                       <Typography>{c.name}</Typography>
                     </Grid>
                   </Grid>
-                </CardActionArea>
+                </CardContent>
               </Card>
             </HtmlTooltip>
           ))}

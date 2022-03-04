@@ -58,16 +58,24 @@ export interface DecksTableType {
   name: string;
   format: string;
   is_commander: boolean;
+  category?: string;
 }
 
-export const DecksTableColumns = ['id', 'card_id', 'name', 'format', 'is_commander'];
+export const DecksTableColumns = [
+  'id',
+  'card_id',
+  'name',
+  'format',
+  'is_commander',
+  'category',
+];
 
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
 
   public constructor() {
     super('mtgdb');
-    this.version(2).stores({
+    this.version(3).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
     });
