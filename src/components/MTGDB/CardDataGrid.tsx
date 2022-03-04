@@ -31,6 +31,10 @@ import { CardsTableType } from '../../database';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 
+export const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({}));
+
 const CardDataGrid = () => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,10 +76,6 @@ const CardDataGrid = () => {
     updateCards();
   }, [isLoading]);
 
-  const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-  ))(({ theme }) => ({}));
-
   const columns: GridColDef[] = [
     {
       field: 'name',
@@ -111,14 +111,6 @@ const CardDataGrid = () => {
         return `$${params.value}`;
       },
     },
-    // {
-    //   field: "color",
-    //   headerName: "Colours",
-    //   width: colWidth / 1.5,
-    //   valueGetter: (params) => {
-    //     return params.row.colors.join(", ") ?? "";
-    //   },
-    // },
     {
       field: 'edhrec_rank',
       headerName: 'EDHREC Rank',

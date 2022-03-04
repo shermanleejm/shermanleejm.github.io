@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { CardsTableType } from '../../../database';
+import { HtmlTooltip } from '../CardDataGrid';
 import { MTGTypesEnum } from '../interfaces';
 import ManaChart from './ManaChart';
 
@@ -146,24 +147,37 @@ const DeckList = (props: DeckListProps) => {
 
         <Grid item xs={12}>
           {cards.map((c, i) => (
-            <Card elevation={3} style={{ marginBottom: 5 }} key={i}>
-              <CardActionArea
-                style={{ padding: 3 }}
-                onClick={() => {
-                  props.deleteFromDeckList(c);
-                  setIsLoading(true);
-                }}
-              >
-                <Grid container spacing={2}>
-                  <Grid item>
-                    <Typography>{c.cmc}</Typography>
+            <HtmlTooltip
+              title={
+                <React.Fragment>
+                  <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    {c.image_uri.small.map((s: string, i: number) => (
+                      <img key={i} src={c.image_uri.small[i]} alt=""></img>
+                    ))}
+                  </div>
+                </React.Fragment>
+              }
+              followCursor
+            >
+              <Card elevation={3} style={{ marginBottom: 5 }} key={i}>
+                <CardActionArea
+                  style={{ padding: 3 }}
+                  onClick={() => {
+                    props.deleteFromDeckList(c);
+                    setIsLoading(true);
+                  }}
+                >
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <Typography>{c.cmc}</Typography>
+                    </Grid>
+                    <Grid item>
+                      <Typography>{c.name}</Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <Typography>{c.name}</Typography>
-                  </Grid>
-                </Grid>
-              </CardActionArea>
-            </Card>
+                </CardActionArea>
+              </Card>
+            </HtmlTooltip>
           ))}
         </Grid>
       </Grid>
