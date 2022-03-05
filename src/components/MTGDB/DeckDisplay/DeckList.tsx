@@ -184,9 +184,9 @@ const DeckList = (props: DeckListProps) => {
               </HtmlTooltip>
             ))}
           </Category>
-          {categories.map((c) => (
+          {/* {categories.map((c) => (
             <Category title={c} />
-          ))}
+          ))} */}
         </Grid>
       </Grid>
     </div>

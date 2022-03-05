@@ -7,7 +7,7 @@ type CategoryType = {
 
 export const Category = ({ children, title }: CategoryType) => {
   return (
-    <div style={{ border: '20px solid red' }}>
+    <div>
       <Typography variant="h5">{title}</Typography>
       {children}
     </div>
