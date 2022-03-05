@@ -227,6 +227,13 @@ const CardDataGrid = () => {
   async function deleteCards() {
     for (let i = 0; i < selectedCards.length; i++) {
       await db.cards.delete(selectedCards[i].id ?? -1);
+      if (selectedCards[i].id) {
+        await db.decks.bulkDelete(
+          (
+            await db.decks.where({ card_id: selectedCards[i].id }).toArray()
+          ).map((d) => d.id!)
+        );
+      }
     }
     setIsLoading(true);
   }
