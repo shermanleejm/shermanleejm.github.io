@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react';
 import { CardsTableType } from '../../../database';
 import { HtmlTooltip } from '../CardDataGrid';
 import { MTGTypesEnum } from '../interfaces';
+import Category from './Category';
 import ManaChart from './ManaChart';
 
 type DeckListProps = {
@@ -37,6 +38,7 @@ const DeckList = (props: DeckListProps) => {
   const [isGenerating, setIsGenerating] = useState(true);
   const [exportJson, setExportJson] = useState<string>('');
   const [manaData, setManaData] = useState<ManaDataInterface[]>([]);
+  const [categories, setCategories] = useState<string[]>(['cat 1', 'cat 2', 'cat 3']);
 
   useEffect(() => {
     function init() {
@@ -147,38 +149,43 @@ const DeckList = (props: DeckListProps) => {
         </Grid>
 
         <Grid item xs={12}>
-          {cards.map((c, i) => (
-            <HtmlTooltip
-              title={
-                <React.Fragment>
-                  <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    {c.image_uri.small.map((s: string, i: number) => (
-                      <img key={i} src={c.image_uri.small[i]} alt=""></img>
-                    ))}
-                  </div>
-                </React.Fragment>
-              }
-              followCursor
-            >
-              <Card elevation={3} style={{ marginBottom: 5 }} key={i}>
-                <CardContent
-                  style={{ padding: 3 }}
-                  onClick={() => {
-                    props.deleteFromDeckList(c);
-                    setIsLoading(true);
-                  }}
-                >
-                  <Grid container spacing={2}>
-                    <Grid item>
-                      <Typography>{c.cmc}</Typography>
+          <Category title="default">
+            {cards.map((c, i) => (
+              <HtmlTooltip
+                title={
+                  <React.Fragment>
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                      {c.image_uri.small.map((s: string, i: number) => (
+                        <img key={i} src={c.image_uri.small[i]} alt=""></img>
+                      ))}
+                    </div>
+                  </React.Fragment>
+                }
+                followCursor
+              >
+                <Card elevation={3} style={{ marginBottom: 5 }} key={i}>
+                  <CardActionArea
+                    style={{ padding: 3 }}
+                    onClick={() => {
+                      props.deleteFromDeckList(c);
+                      setIsLoading(true);
+                    }}
+                  >
+                    <Grid container spacing={2}>
+                      <Grid item>
+                        <Typography>{c.cmc}</Typography>
+                      </Grid>
+                      <Grid item>
+                        <Typography>{c.name}</Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <Typography>{c.name}</Typography>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </HtmlTooltip>
+                  </CardActionArea>
+                </Card>
+              </HtmlTooltip>
+            ))}
+          </Category>
+          {categories.map((c) => (
+            <Category title={c} />
           ))}
         </Grid>
       </Grid>

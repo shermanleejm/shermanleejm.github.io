@@ -72,6 +72,7 @@ export const DecksTableColumns = [
 
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
+  public decks!: Table<DecksTableType, number>;
 
   public constructor() {
     super('mtgdb');

@@ -2,7 +2,12 @@ import { Alert, CircularProgress, IconButton, Snackbar, Tab, Tabs } from '@mui/m
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { CardsTableType, CustomImageUris, MTGDatabase } from '../../database';
+import {
+  CardsTableType,
+  CustomImageUris,
+  DecksTableType,
+  MTGDatabase,
+} from '../../database';
 import { State } from '../../state/reducers';
 import AddNewCard from './AddNewCard';
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,7 +27,7 @@ export enum ToasterSeverityEnum {
 export async function storeCard(
   db: MTGDatabase,
   card: ScryfallDataType,
-  tag?: string[],
+  tags?: string[],
   qty?: number,
   price?: string
 ) {
@@ -30,6 +35,12 @@ export async function storeCard(
   let imgUris: CustomImageUris = { small: [], normal: [] };
   let oracleText = '';
   let typeLine = '';
+  tags = tags || [];
+
+  const collision: CardsTableType | undefined = await db.cards
+    .where('scryfall_id')
+    .equals(card.id)
+    .first();
 
   if (card.card_faces) {
     for (let i = 0; i < 2; i++) {
@@ -53,6 +64,14 @@ export async function storeCard(
     };
   }
 
+  if (collision !== undefined) {
+    if (tags !== undefined) {
+      tags = [...collision.tags, ...tags];
+    } else {
+      tags = collision.tags;
+    }
+  }
+
   const newEntry: CardsTableType = {
     name: card.name,
     scryfall_id: card.id,
@@ -65,27 +84,47 @@ export async function storeCard(
     image_uri: imgUris,
     colors: colors,
     color_identity: card.color_identity,
-    tags: tag === undefined ? [] : tag,
+    tags: tags || [],
     type_line: card.type_line || typeLine,
     oracle_text: card.oracle_text || oracleText,
     edhrec_rank: card.edhrec_rank,
     collector_number: card.collector_number,
     set: card.set,
+    power: card.power,
+    toughness: card.toughness,
     date_added: Date.now(),
   };
 
-  const collision: CardsTableType | undefined = await db.cards
-    .where('scryfall_id')
-    .equals(card.id)
-    .first();
+  let newEntryId = -1;
   if (collision === undefined) {
-    db.transaction('rw', db.cards, async () => {
-      await db.cards.add(newEntry);
-    });
+    newEntryId = await db.cards.add(newEntry);
   } else {
-    db.transaction('rw', db.cards, async () => {
-      await db.cards.update(collision.id || 0, newEntry);
-    });
+    newEntryId = await db.cards.update(collision.id || 0, newEntry);
+  }
+
+  addToDeck(db, tags, newEntryId);
+}
+
+export async function addToDeck(
+  db: MTGDatabase,
+  tags: string[],
+  cardId: number | undefined
+) {
+  if (cardId === undefined) {
+    return;
+  }
+
+  for (let t of tags) {
+    let deckCollision = await db.decks.where({ name: t, card_id: cardId }).first();
+    if (deckCollision === undefined) {
+      await db.decks.add({
+        card_id: cardId,
+        name: t,
+        format: 'commander',
+        is_commander: false,
+        category: 'default',
+      });
+    }
   }
 }
 

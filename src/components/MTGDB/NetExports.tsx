@@ -1,8 +1,8 @@
 import { Button, CircularProgress, Typography } from '@mui/material';
 import 'dexie-export-import';
 import { useEffect, useState } from 'react';
-import { MTGDBProps, storeCard, ToasterSeverityEnum } from '.';
-import { CardsTableColumns, CardsTableType, CustomImageUris } from '../../database';
+import { addToDeck, MTGDBProps, storeCard, ToasterSeverityEnum } from '.';
+import { CardsTableColumns, CardsTableType } from '../../database';
 import { CSVLink } from 'react-csv';
 import axios, { AxiosResponse } from 'axios';
 import { ScryfallDataType } from './interfaces';
@@ -72,7 +72,7 @@ const NetExports = (props: MTGDBProps) => {
             }
           }
         }
-        
+
         if (check !== undefined) {
           db.cards.delete(check.id || -1);
         }
@@ -98,18 +98,17 @@ const NetExports = (props: MTGDBProps) => {
       }
       let added = 0;
       for (const card of json) {
+        setCurrentUpdateCard(card.name);
         let originalCard = await db.cards
           .where({ scryfall_id: card.scryfall_id || '0' })
           .first();
-        setCurrentUpdateCard(card.name);
         if (originalCard === undefined) {
           await db.cards.put(card);
+          await addToDeck(db, card.tags, card.id);
         } else {
-          if (card.id !== undefined && originalCard !== undefined) {
-            await db.cards.update(card.id, {
-              tags: Array.from(new Set([...card.tags, ...originalCard.tags])),
-            });
-          }
+          let newTags = Array.from(new Set([...card.tags, ...originalCard.tags]));
+          await db.cards.update(originalCard.id || -1, { tags: newTags });
+          await addToDeck(db, newTags, originalCard.id);
         }
         added++;
       }
