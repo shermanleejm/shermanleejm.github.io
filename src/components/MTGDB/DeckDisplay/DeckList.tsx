@@ -82,6 +82,10 @@ const DeckList = (props: DeckListProps) => {
         .map((d) => d.category)
         .filter((v, i, s) => s.indexOf(v) === i);
 
+      if (_categories.length === 0) {
+        _categories.push('default');
+      }
+
       setCategories(_categories);
       setManaData(manaDataTmp);
       setIsLoading(false);

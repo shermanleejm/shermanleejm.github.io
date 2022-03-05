@@ -316,11 +316,13 @@ export async function changeCategory(
 ) {
   if (!deckRow) return;
   // delete old category row
-  await db.decks.delete(deckRow.id || -1);
+  if (deckRow.id) await db.decks.delete(deckRow.id);
   // if newCategory, replace old category field and put
   if (newCategory) {
     delete deckRow.id;
     deckRow['category'] = newCategory;
+    await db.decks.put(deckRow);
+  } else {
     await db.decks.put(deckRow);
   }
 }

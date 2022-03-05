@@ -66,7 +66,7 @@ const DraggableCard = ({
         category: 'default',
       };
     }
-    await changeCategory(db, deckRow, deckName);
+    await changeCategory(db, deckRow, 'default');
     refreshDeckList();
     setIsLoading(true);
   }

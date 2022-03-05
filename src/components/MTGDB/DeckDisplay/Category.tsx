@@ -13,11 +13,7 @@ type CategoryPropsType = {
   refreshParent: () => void;
 };
 
-export const Category = ({
-  title,
-  deckName,
-  refreshParent,
-}: CategoryPropsType) => {
+export const Category = ({ title, deckName, refreshParent }: CategoryPropsType) => {
   const db = useSelector((state: State) => state.database);
   const [deckIdToCard, setDeckIdToCard] = useState<{ [key: string]: CardsTableType }>({});
 
@@ -51,6 +47,7 @@ export const Category = ({
         category: 'default',
       };
     }
+    console.log(deckRow);
     await changeCategory(db, deckRow, title);
 
     refreshParent();
