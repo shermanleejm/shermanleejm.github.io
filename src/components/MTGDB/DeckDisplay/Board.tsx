@@ -10,9 +10,16 @@ type BoardProps = {
   decklist: Set<CardsTableType>;
   addToDeckList: (c: CardsTableType) => void;
   deckName: string;
+  refreshDeckList: () => void;
 };
 
-const Board = ({ cardArr, decklist, addToDeckList, deckName }: BoardProps) => {
+const Board = ({
+  cardArr,
+  decklist,
+  addToDeckList,
+  deckName,
+  refreshDeckList,
+}: BoardProps) => {
   const perPage = 8;
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(perPage);
@@ -52,7 +59,8 @@ const Board = ({ cardArr, decklist, addToDeckList, deckName }: BoardProps) => {
             <DraggableCard
               data={c}
               addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
-              disabled={decklist.has(c)}
+              deckName={deckName}
+              refreshDeckList={refreshDeckList}
             />
           </Grid>
         ))}

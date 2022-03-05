@@ -309,13 +309,19 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
       case 'add':
         setShowDeckList(false);
         if (c.id) {
-          await db.decks.add({
+          let newEntry = {
             card_id: c.id,
             name: deckName,
             format: 'commander',
             is_commander: false,
             category: 'default',
-          });
+          };
+          let collision = await db.decks
+            .where({ format: 'commander', card_id: c.id, name: deckName })
+            .first();
+          if (!collision) {
+            await db.decks.add(newEntry);
+          }
         }
         setShowDeckList(true);
         break;
@@ -412,6 +418,11 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
       </Dialog>
     );
   };
+
+  function refreshDeckList() {
+    setShowDeckList(false);
+    setShowDeckList(true);
+  }
 
   return isLoading ? (
     <CircularProgress />
@@ -516,6 +527,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
               decklist={decklist}
               addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
               deckName={deckName}
+              refreshDeckList={() => refreshDeckList()}
             />
           )}
         </Grid>

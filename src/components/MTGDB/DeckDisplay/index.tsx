@@ -82,6 +82,12 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
                     label="New Deck Name"
                     value={currDeckName}
                     onChange={(e: any) => setCurrDeckName(e.target.value)}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                      if (e.key === 'Enter') {
+                        setCurrDeck([]);
+                        setShowDecks(false);
+                      }
+                    }}
                   />
                 </CardContent>
                 <CardActions>

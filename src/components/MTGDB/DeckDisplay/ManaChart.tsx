@@ -1,3 +1,5 @@
+import { CircularProgress } from '@mui/material';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import {
   Bar,
@@ -30,22 +32,23 @@ const TypeColors = [
   { dataKey: MTGTypesEnum.LAND, color: LAND_COLOR },
 ];
 
-interface ManaChartInterface {
+type ManaChartProps = {
   data: ManaDataInterface[];
-}
+};
 
-const ManaChart = (props: ManaChartInterface) => {
+const ManaChart = ({ data }: ManaChartProps) => {
   const dm = useSelector((state: State) => state.darkMode);
-  
+
   return (
     <div style={{ margin: 'auto', height: 300 }}>
       <ResponsiveContainer>
-        <BarChart data={props.data} margin={{ top: 30, bottom: 30 }}>
+        <BarChart data={data} margin={{ top: 30, bottom: 30 }}>
           <XAxis dataKey="cmc" />
           <Tooltip />
           <Legend height={40} />
           {TypeColors.map((t, i) => (
             <Bar
+              isAnimationActive={false}
               dataKey={t.dataKey}
               stackId={'a'}
               fill={t.color}

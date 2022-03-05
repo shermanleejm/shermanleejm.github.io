@@ -1,18 +1,37 @@
-import { Backdrop, Card, CardActions, CardMedia, Grid, IconButton } from '@mui/material';
+import {
+  Backdrop,
+  Card,
+  CardActions,
+  CardMedia,
+  CircularProgress,
+  Grid,
+  IconButton,
+} from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CardsTableType } from '../../../database';
 import { useDrag } from 'react-dnd';
+import { DBCoreRangeType } from 'dexie';
+import { useSelector } from 'react-redux';
+import { State } from '../../../state/reducers';
+import { changeCategory } from '..';
 
 type DraggableCardType = {
   data: CardsTableType;
   addToDecklist: (c: CardsTableType) => void;
-  disabled: boolean;
+  deckName: string;
+  refreshDeckList: () => void;
 };
 
-const DraggableCard = ({ data, addToDecklist, disabled }: DraggableCardType) => {
+const DraggableCard = ({
+  data,
+  addToDecklist,
+  deckName,
+  refreshDeckList,
+}: DraggableCardType) => {
   const [showOverlay, setShowOverlay] = useState(false);
+  const [disabled, setDisabled] = useState(false);
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'deckListItem',
     item: data,
@@ -20,8 +39,41 @@ const DraggableCard = ({ data, addToDecklist, disabled }: DraggableCardType) => 
       isDragging: monitor.isDragging(),
     }),
   }));
+  const db = useSelector((state: State) => state.database);
+  const [isLoading, setIsLoading] = useState(true);
 
-  return (
+  useEffect(() => {
+    async function init() {
+      if (data.id) {
+        setDisabled(
+          (await db.decks.where({ card_id: data.id, name: deckName }).first()) !==
+            undefined
+        );
+      }
+      setIsLoading(false);
+    }
+    init();
+  }, [data, isLoading]);
+
+  async function updateCategory(card: CardsTableType) {
+    let deckRow = await db.decks.where({ name: deckName, card_id: card.id }).first();
+    if (!deckRow && card.id) {
+      deckRow = {
+        card_id: card.id,
+        name: deckName,
+        format: 'commander',
+        is_commander: false,
+        category: 'default',
+      };
+    }
+    await changeCategory(db, deckRow, deckName);
+    refreshDeckList();
+    setIsLoading(true);
+  }
+
+  return isLoading ? (
+    <CircularProgress />
+  ) : (
     <div>
       <div>
         <Backdrop
@@ -48,9 +100,12 @@ const DraggableCard = ({ data, addToDecklist, disabled }: DraggableCardType) => 
         </Backdrop>
       </div>
 
-      <Card ref={drag} style={{ border: isDragging ? '5px solid pink' : '' }}>
+      <Card
+        ref={drag}
+        style={{ border: isDragging ? '5px solid pink' : '', cursor: 'pointer' }}
+      >
         <CardMedia
-          onClick={() => addToDecklist(data)}
+          onClick={() => updateCategory(data)}
           component={'img'}
           image={data.image_uri.small[0]}
         />
@@ -61,11 +116,10 @@ const DraggableCard = ({ data, addToDecklist, disabled }: DraggableCardType) => 
                 <ZoomInIcon />
               </IconButton>
             </Grid>
-            {disabled && (
-              <Grid item>
-                <IconButton>{disabled ? <CheckCircleIcon /> : ''}</IconButton>
-              </Grid>
-            )}
+
+            <Grid item>
+              <IconButton>{disabled ? <CheckCircleIcon /> : ''}</IconButton>
+            </Grid>
           </Grid>
         </CardActions>
       </Card>
