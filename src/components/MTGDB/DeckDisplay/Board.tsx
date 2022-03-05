@@ -4,8 +4,6 @@ import { CardsTableType } from '../../../database';
 import DraggableCard from './DraggableCard';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { useSelector } from 'react-redux';
-import { State } from '../../../state/reducers';
 
 type BoardProps = {
   cardArr: CardsTableType[];
@@ -19,7 +17,6 @@ const Board = ({ cardArr, decklist, addToDeckList, deckName }: BoardProps) => {
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(perPage);
   const [isLoading, setIsLoading] = useState(true);
-  const db = useSelector((state: State) => state.database);
 
   useEffect(() => {
     function resetPages() {
@@ -33,15 +30,6 @@ const Board = ({ cardArr, decklist, addToDeckList, deckName }: BoardProps) => {
 
   async function addToDecklistCallback(c: CardsTableType) {
     addToDeckList(c);
-    if (c.id) {
-      await db.decks.add({
-        card_id: c.id,
-        name: deckName,
-        format: 'commander',
-        is_commander: false,
-        category: 'default',
-      });
-    }
   }
 
   return isLoading ? (

@@ -3,6 +3,7 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useState } from 'react';
 import { CardsTableType } from '../../../database';
+import { useDrag } from 'react-dnd';
 
 type DraggableCardType = {
   data: CardsTableType;
@@ -12,6 +13,13 @@ type DraggableCardType = {
 
 const DraggableCard = ({ data, addToDecklist, disabled }: DraggableCardType) => {
   const [showOverlay, setShowOverlay] = useState(false);
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'deckListItem',
+    item: data,
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
 
   return (
     <div>
@@ -40,7 +48,7 @@ const DraggableCard = ({ data, addToDecklist, disabled }: DraggableCardType) => 
         </Backdrop>
       </div>
 
-      <Card>
+      <Card ref={drag} style={{ border: isDragging ? '5px solid pink' : '' }}>
         <CardMedia
           onClick={() => addToDecklist(data)}
           component={'img'}

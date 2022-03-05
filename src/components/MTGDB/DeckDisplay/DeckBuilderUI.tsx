@@ -94,6 +94,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
   const [colorFilters, setColorFilters] =
     useState<{ [key in combinedSlug]: boolean }>(defaultFilterState);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [showDeckList, setShowDeckList] = useState(true);
 
   const db = useSelector((state: State) => state.database);
 
@@ -306,17 +307,17 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
         }
         break;
       case 'add':
-        let tmp2 = [...Array.from(decklist), c].sort((a, b) => {
-          if (a.cmc < b.cmc) return -1;
-          if (a.cmc > b.cmc) return 1;
-          return 0;
-        });
-        setDecklist(new Set(tmp2));
-        if (c.id !== undefined && deckName !== '') {
-          await db.cards.update(c.id, {
-            tags: [...c.tags, deckName],
+        setShowDeckList(false);
+        if (c.id) {
+          await db.decks.add({
+            card_id: c.id,
+            name: deckName,
+            format: 'commander',
+            is_commander: false,
+            category: 'default',
           });
         }
+        setShowDeckList(true);
         break;
       default:
         break;
@@ -520,12 +521,14 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
         </Grid>
 
         <Grid item xs={12} lg={3}>
-          <DeckList
-            cards={decklist}
-            deleteFromDeckList={(c: CardsTableType) => modifyDecklist(c, 'delete')}
-            addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
-            deckName={deckName}
-          />
+          {showDeckList && (
+            <DeckList
+              cards={decklist}
+              deleteFromDeckList={(c: CardsTableType) => modifyDecklist(c, 'delete')}
+              addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
+              deckName={deckName}
+            />
+          )}
         </Grid>
       </Grid>
       {infoDialog()}

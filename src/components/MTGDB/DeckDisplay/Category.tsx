@@ -3,7 +3,7 @@ import { ReactFragment, useEffect, useState } from 'react';
 import { useDrop } from 'react-dnd';
 import { useSelector } from 'react-redux';
 import { changeCategory, getDeckCards } from '..';
-import { CardsTableType } from '../../../database';
+import { CardsTableType, DecksTableType } from '../../../database';
 import { State } from '../../../state/reducers';
 import DeckListItem from './DeckListItem';
 
@@ -44,7 +44,17 @@ export const Category = ({
 
   async function updateCategory(card: CardsTableType) {
     let deckRow = await db.decks.where({ name: deckName, card_id: card.id }).first();
+    if (!deckRow && card.id) {
+      deckRow = {
+        card_id: card.id,
+        name: deckName,
+        format: 'commander',
+        is_commander: false,
+        category: 'default',
+      };
+    }
     await changeCategory(db, deckRow, title);
+
     refreshParent();
   }
 
