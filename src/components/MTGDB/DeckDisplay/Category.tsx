@@ -10,14 +10,12 @@ import DeckListItem from './DeckListItem';
 type CategoryPropsType = {
   title: string;
   deckName: string;
-  deleteFromDeckList: (c: CardsTableType) => void;
   refreshParent: () => void;
 };
 
 export const Category = ({
   title,
   deckName,
-  deleteFromDeckList,
   refreshParent,
 }: CategoryPropsType) => {
   const db = useSelector((state: State) => state.database);
@@ -75,7 +73,6 @@ export const Category = ({
           data={deckIdToCard[c]}
           deckId={c}
           key={i}
-          deleteFromDeckList={(c) => deleteFromDeckList(c)}
           refreshParent={() => refreshParent()}
         />
       ))}

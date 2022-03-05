@@ -12,8 +12,7 @@ import { getDeckCards } from '..';
 
 type DeckListProps = {
   cards: Set<CardsTableType>;
-  deleteFromDeckList: (c: CardsTableType) => void;
-  addToDeckList: (c: CardsTableType) => void;
+  addToDeckList: (item: CardsTableType) => void;
   deckName: string;
 };
 export interface ManaDataInterface {
@@ -53,7 +52,6 @@ const DeckList = (props: DeckListProps) => {
     async function init() {
       setIsLoading(false);
       let cardArr = await getDeckCards(db, props.deckName);
-      console.log(cardArr);
       setCards(cardArr);
       let manaDataTmp: ManaDataInterface[] = [];
       for (let i = 0; i < 12; i++) {
@@ -94,7 +92,7 @@ const DeckList = (props: DeckListProps) => {
       )
         .map((d) => d.category)
         .filter((v, i, s) => s.indexOf(v) === i);
-      console.log(categories);
+
       setCategories(_categories);
       setManaData(manaDataTmp);
       setIsLoading(false);
@@ -177,11 +175,9 @@ const DeckList = (props: DeckListProps) => {
             (c) =>
               c && (
                 <Category
-                  deleteFromDeckList={(c) => props.deleteFromDeckList(c)}
                   deckName={props.deckName}
                   title={c}
                   refreshParent={() => {
-                    console.log('REACHED HERE');
                     setIsLoading(true);
                   }}
                 />

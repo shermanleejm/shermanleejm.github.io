@@ -36,6 +36,7 @@ interface ManaChartInterface {
 
 const ManaChart = (props: ManaChartInterface) => {
   const dm = useSelector((state: State) => state.darkMode);
+  
   return (
     <div style={{ margin: 'auto', height: 300 }}>
       <ResponsiveContainer>

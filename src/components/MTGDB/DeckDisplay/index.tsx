@@ -101,7 +101,7 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
                 <Card>
                   <CardMedia
                     component="img"
-                    src={decks[deckName] ? '' : decks[deckName][0].image_uri.normal[0]}
+                    src={decks[deckName] ? decks[deckName][0].image_uri.normal[0] : ''}
                   />
                   <CardContent>
                     <Typography variant="body1">{deckName}</Typography>

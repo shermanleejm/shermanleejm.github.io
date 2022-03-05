@@ -524,7 +524,6 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
           {showDeckList && (
             <DeckList
               cards={decklist}
-              deleteFromDeckList={(c: CardsTableType) => modifyDecklist(c, 'delete')}
               addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
               deckName={deckName}
             />

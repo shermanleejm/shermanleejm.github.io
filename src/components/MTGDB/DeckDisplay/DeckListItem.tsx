@@ -8,7 +8,6 @@ import { State } from '../../../state/reducers';
 
 type DeckListItemType = {
   data: CardsTableType;
-  deleteFromDeckList: (c: CardsTableType) => void;
   refreshParent: () => void;
   key: number;
   deckId: string;
