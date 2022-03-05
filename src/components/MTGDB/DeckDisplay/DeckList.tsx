@@ -37,17 +37,6 @@ const DeckList = (props: DeckListProps) => {
 
   const db = useSelector((state: State) => state.database);
 
-  const [{ isOver, canDrop }, drop] = useDrop(() => ({
-    accept: 'deckListItem',
-    drop: (item: CardsTableType) => {
-      props.addToDeckList(item);
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-    }),
-  }));
-
   useEffect(() => {
     async function init() {
       setIsLoading(false);
@@ -99,19 +88,14 @@ const DeckList = (props: DeckListProps) => {
     }
 
     init();
-  }, [props.cards, isLoading]);
+  }, [isLoading]);
 
   return isLoading ? (
     <CircularProgress />
   ) : (
     <div>
       <Grid container justifyContent={'center'} alignItems={'flex-start'} spacing={1}>
-        <Grid
-          item
-          xs={12}
-          ref={drop}
-          style={{ border: isOver && canDrop ? '5px solid green' : '' }}
-        >
+        <Grid item xs={12}>
           <ManaChart data={manaData} />
         </Grid>
 
