@@ -1,24 +1,20 @@
-import {
-  Button,
-  Card,
-  CardActionArea,
-  CardContent,
-  CircularProgress,
-  Grid,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Button, CircularProgress, Grid, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { CardsTableType } from '../../../database';
-import { HtmlTooltip } from '../CardDataGrid';
 import { MTGTypesEnum } from '../interfaces';
+import DeckListItem from './DeckListItem';
 import Category from './Category';
 import ManaChart from './ManaChart';
+import { useDrop } from 'react-dnd';
+import { useSelector } from 'react-redux';
+import { State } from '../../../state/reducers';
+import { getDeckCards } from '..';
 
 type DeckListProps = {
   cards: Set<CardsTableType>;
   deleteFromDeckList: (c: CardsTableType) => void;
-  deckName: string | undefined;
+  addToDeckList: (c: CardsTableType) => void;
+  deckName: string;
 };
 export interface ManaDataInterface {
   cmc: string;
@@ -34,18 +30,31 @@ export interface ManaDataInterface {
 const DeckList = (props: DeckListProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [deckName, setDeckName] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(true);
   const [exportJson, setExportJson] = useState<string>('');
   const [manaData, setManaData] = useState<ManaDataInterface[]>([]);
-  const [categories, setCategories] = useState<string[]>(['cat 1', 'cat 2', 'cat 3']);
+  const [categories, setCategories] = useState<(string | undefined)[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
+
+  const db = useSelector((state: State) => state.database);
+
+  const [{ isOver, canDrop }, drop] = useDrop(() => ({
+    accept: 'deckListItem',
+    drop: (item: CardsTableType) => {
+      props.addToDeckList(item);
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  }));
 
   useEffect(() => {
-    function init() {
-      setCards(Array.from(props.cards));
+    async function init() {
       setIsLoading(false);
-      setDeckName(props.deckName || '');
-      let cardArr = Array.from(props.cards);
+      let cardArr = await getDeckCards(db, props.deckName);
+      console.log(cardArr);
+      setCards(cardArr);
       let manaDataTmp: ManaDataInterface[] = [];
       for (let i = 0; i < 12; i++) {
         manaDataTmp.push({
@@ -79,7 +88,16 @@ const DeckList = (props: DeckListProps) => {
           manaDataTmp[11][MTGTypesEnum.LAND]++;
         }
       }
+
+      let _categories = await (
+        await db.decks.where('name').equals(props.deckName).toArray()
+      )
+        .map((d) => d.category)
+        .filter((v, i, s) => s.indexOf(v) === i);
+      console.log(categories);
+      setCategories(_categories);
       setManaData(manaDataTmp);
+      setIsLoading(false);
     }
 
     init();
@@ -90,7 +108,12 @@ const DeckList = (props: DeckListProps) => {
   ) : (
     <div>
       <Grid container justifyContent={'center'} alignItems={'flex-start'} spacing={1}>
-        <Grid item xs={12}>
+        <Grid
+          item
+          xs={12}
+          ref={drop}
+          style={{ border: isOver && canDrop ? '5px solid green' : '' }}
+        >
           <ManaChart data={manaData} />
         </Grid>
 
@@ -100,10 +123,10 @@ const DeckList = (props: DeckListProps) => {
             size="small"
             fullWidth
             label={'Deck Name'}
-            value={deckName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-              setDeckName(e.target.value)
-            }
+            value={props.deckName}
+            onChange={(
+              e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            ) => {}}
           ></TextField>
         </Grid>
 
@@ -113,7 +136,8 @@ const DeckList = (props: DeckListProps) => {
               onClick={() => {
                 let tmp = cards.map((c) => {
                   let tmp = c;
-                  tmp.tags.push(deckName);
+                  tmp.tags.push(props.deckName);
+                  tmp.tags = Array.from(new Set(tmp.tags));
                   return tmp;
                 });
                 setExportJson(JSON.stringify(Array.from(new Set(tmp))));
@@ -125,7 +149,7 @@ const DeckList = (props: DeckListProps) => {
           ) : (
             <Button
               href={`data:text/json;charset=utf-8,${encodeURIComponent(exportJson)}`}
-              download={`${deckName}_${Date.now()}.json`}
+              download={`${props.deckName}_${Date.now()}.json`}
               onClick={() => setIsGenerating(true)}
             >
               download json
@@ -145,48 +169,38 @@ const DeckList = (props: DeckListProps) => {
         </Grid>
 
         <Grid item xs={12}>
-          <Typography variant="h4">Cards: {Array.from(props.cards).length}</Typography>
+          <Typography variant="h4">Cards: {cards.length}</Typography>
         </Grid>
 
         <Grid item xs={12}>
-          <Category title="default">
-            {cards.map((c, i) => (
-              <HtmlTooltip
-                title={
-                  <React.Fragment>
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                      {c.image_uri.small.map((s: string, i: number) => (
-                        <img key={i} src={c.image_uri.small[i]} alt=""></img>
-                      ))}
-                    </div>
-                  </React.Fragment>
-                }
-                followCursor
-              >
-                <Card elevation={3} style={{ marginBottom: 5 }} key={i}>
-                  <CardActionArea
-                    style={{ padding: 3 }}
-                    onClick={() => {
-                      props.deleteFromDeckList(c);
-                      setIsLoading(true);
-                    }}
-                  >
-                    <Grid container spacing={2}>
-                      <Grid item>
-                        <Typography>{c.cmc}</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography>{c.name}</Typography>
-                      </Grid>
-                    </Grid>
-                  </CardActionArea>
-                </Card>
-              </HtmlTooltip>
-            ))}
-          </Category>
-          {/* {categories.map((c) => (
-            <Category title={c} />
-          ))} */}
+          {categories.map(
+            (c) =>
+              c && (
+                <Category
+                  deleteFromDeckList={(c) => props.deleteFromDeckList(c)}
+                  deckName={props.deckName}
+                  title={c}
+                  refreshParent={() => {
+                    console.log('REACHED HERE');
+                    setIsLoading(true);
+                  }}
+                />
+              )
+          )}
+        </Grid>
+
+        <Grid item xs={12}>
+          <TextField
+            label="add new category"
+            value={newCategoryName}
+            onChange={(e) => setNewCategoryName(e.target.value)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+              if (e.key === 'Enter') {
+                setCategories((oldCategories) => [...oldCategories, newCategoryName]);
+                setNewCategoryName('');
+              }
+            }}
+          />
         </Grid>
       </Grid>
     </div>

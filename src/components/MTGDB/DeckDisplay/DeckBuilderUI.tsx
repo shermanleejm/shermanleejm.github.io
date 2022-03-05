@@ -321,7 +321,6 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
       default:
         break;
     }
-    setCardArr(cardArr);
   }
 
   const infoHelper = [
@@ -523,6 +522,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
           <DeckList
             cards={decklist}
             deleteFromDeckList={(c: CardsTableType) => modifyDecklist(c, 'delete')}
+            addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
             deckName={deckName}
           />
         </Grid>

@@ -4,17 +4,17 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useState } from 'react';
 import { CardsTableType } from '../../../database';
 
-type DraggableCardProps = {
+type DraggableCardType = {
   data: CardsTableType;
   addToDecklist: (c: CardsTableType) => void;
   disabled: boolean;
 };
 
-const DraggableCard = (props: DraggableCardProps) => {
+const DraggableCard = ({ data, addToDecklist, disabled }: DraggableCardType) => {
   const [showOverlay, setShowOverlay] = useState(false);
 
   return (
-    <>
+    <div>
       <div>
         <Backdrop
           sx={{
@@ -25,13 +25,13 @@ const DraggableCard = (props: DraggableCardProps) => {
           onClick={() => setShowOverlay(false)}
         >
           <div style={{ display: 'flex', flexDirection: 'row' }}>
-            {props.data.image_uri.normal !== undefined
-              ? props.data.image_uri.normal.map((s: string, i: number) => (
+            {data.image_uri.normal !== undefined
+              ? data.image_uri.normal.map((s: string, i: number) => (
                   <img
                     key={i}
                     src={s}
                     alt=""
-                    width={props.data.image_uri.normal.length === 1 ? '100%' : '50%'}
+                    width={data.image_uri.normal.length === 1 ? '100%' : '50%'}
                     height="100%"
                   ></img>
                 ))
@@ -40,29 +40,28 @@ const DraggableCard = (props: DraggableCardProps) => {
         </Backdrop>
       </div>
 
-      <Card sx={{ maxWidth: { xs: '50vh', sm: '22vh' } }}>
+      <Card>
         <CardMedia
-          style={{ cursor: 'pointer' }}
-          onClick={() => props.addToDecklist(props.data)}
+          onClick={() => addToDecklist(data)}
           component={'img'}
-          image={props.data.image_uri.small[0]}
+          image={data.image_uri.small[0]}
         />
-        <CardActions onClick={() => setShowOverlay(true)}>
+        <CardActions style={{ cursor: 'pointer' }} onClick={() => setShowOverlay(true)}>
           <Grid container direction={'row'}>
             <Grid item>
               <IconButton>
                 <ZoomInIcon />
               </IconButton>
             </Grid>
-            <Grid item>
-              <IconButton disabled={props.disabled}>
-                {props.disabled ? <CheckCircleIcon /> : ''}
-              </IconButton>
-            </Grid>
+            {disabled && (
+              <Grid item>
+                <IconButton>{disabled ? <CheckCircleIcon /> : ''}</IconButton>
+              </Grid>
+            )}
           </Grid>
         </CardActions>
       </Card>
-    </>
+    </div>
   );
 };
 export default DraggableCard;
