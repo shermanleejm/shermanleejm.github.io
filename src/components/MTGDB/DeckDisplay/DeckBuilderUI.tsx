@@ -514,6 +514,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
               cardArr={cardArr}
               decklist={decklist}
               addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
+              deckName={deckName}
             />
           )}
         </Grid>

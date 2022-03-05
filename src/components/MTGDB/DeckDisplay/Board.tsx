@@ -1,21 +1,25 @@
-import { CircularProgress, Grid, IconButton } from "@mui/material";
-import { useEffect, useState } from "react";
-import { CardsTableType } from "../../../database";
-import DraggableCard from "./DraggableCard";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { CircularProgress, Grid, IconButton } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { CardsTableType } from '../../../database';
+import DraggableCard from './DraggableCard';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { useSelector } from 'react-redux';
+import { State } from '../../../state/reducers';
 
 type BoardProps = {
   cardArr: CardsTableType[];
   decklist: Set<CardsTableType>;
   addToDeckList: (c: CardsTableType) => void;
+  deckName: string;
 };
 
-const Board = ({ cardArr, decklist, addToDeckList }: BoardProps) => {
+const Board = ({ cardArr, decklist, addToDeckList, deckName }: BoardProps) => {
   const perPage = 8;
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(perPage);
   const [isLoading, setIsLoading] = useState(true);
+  const db = useSelector((state: State) => state.database);
 
   useEffect(() => {
     function resetPages() {
@@ -27,14 +31,23 @@ const Board = ({ cardArr, decklist, addToDeckList }: BoardProps) => {
     resetPages();
   }, [cardArr]);
 
-  function addToDecklistCallback(c: CardsTableType) {
+  async function addToDecklistCallback(c: CardsTableType) {
     addToDeckList(c);
+    if (c.id) {
+      await db.decks.add({
+        card_id: c.id,
+        name: deckName,
+        format: 'commander',
+        is_commander: false,
+        category: 'default',
+      });
+    }
   }
 
   return isLoading ? (
     <CircularProgress />
   ) : (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: 'flex' }}>
       <IconButton
         disabled={startIndex - perPage < 0}
         onClick={() => {
@@ -45,14 +58,9 @@ const Board = ({ cardArr, decklist, addToDeckList }: BoardProps) => {
         <ArrowBackIosNewIcon />
       </IconButton>
 
-      <Grid
-        container
-        spacing={1}
-        justifyContent={"flex-start"}
-        alignItems={"center"}
-      >
+      <Grid container spacing={1} justifyContent={'flex-start'} alignItems={'center'}>
         {cardArr.slice(startIndex, endIndex).map((c: CardsTableType, i) => (
-          <Grid item xs={6} sm={3} justifyContent={"center"} key={i}>
+          <Grid item xs={6} sm={3} justifyContent={'center'} key={i}>
             <DraggableCard
               data={c}
               addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}

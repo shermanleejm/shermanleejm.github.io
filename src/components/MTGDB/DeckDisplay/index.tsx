@@ -58,15 +58,10 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
   }, [isLoading]);
 
   async function deleteDeck(_deckName: string) {
-    let deckToDelete = decks[_deckName];
-    for (let card of deckToDelete) {
-      if (card.id !== undefined) {
-        toaster(`Removing ${card.name} from ${_deckName}`, ToasterSeverityEnum.INFO);
-        await db.cards.update(card.id, {
-          tags: card.tags.filter((t) => t !== _deckName),
-        });
-      }
-    }
+    let deckIds = (await db.decks.where({ name: _deckName }).toArray()).map((r) => r.id);
+    let deckIdsToDelete = deckIds.map((id) => id!);
+    await db.decks.bulkDelete(deckIdsToDelete);
+
     setIsLoading(true);
     setDeleteDialogState(false);
     setIsDeleting(false);
@@ -106,7 +101,7 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
                 <Card>
                   <CardMedia
                     component="img"
-                    src={decks[deckName][0].image_uri.normal[0]}
+                    src={decks[deckName] ? '' : decks[deckName][0].image_uri.normal[0]}
                   />
                   <CardContent>
                     <Typography variant="body1">{deckName}</Typography>
