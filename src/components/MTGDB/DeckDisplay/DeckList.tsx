@@ -98,17 +98,17 @@ const DeckList = (props: DeckListProps) => {
     <CircularProgress />
   ) : (
     <div>
-      <Grid container justifyContent={'center'} alignItems={'flex-start'} spacing={1}>
+      <Grid container alignItems={'flex-start'} spacing={1}>
         <Grid item xs={12}>
           <Typography variant="h4">Cards: {cards.length}</Typography>
         </Grid>
 
         <Grid item xs={12}>
-          <Grid container spacing={1}>
+          <Grid container spacing={1} wrap="nowrap" sx={{ overflow: 'auto' }}>
             {categories.map(
               (c) =>
                 c && (
-                  <Grid item>
+                  <Grid item xs={5}>
                     <Category
                       deckName={props.deckName}
                       title={c}
@@ -119,7 +119,7 @@ const DeckList = (props: DeckListProps) => {
                   </Grid>
                 )
             )}
-            <Grid item>
+            <Grid item xs={2}>
               <TextField
                 label="add new category"
                 value={newCategoryName}
