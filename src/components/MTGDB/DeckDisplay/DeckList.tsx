@@ -100,7 +100,39 @@ const DeckList = (props: DeckListProps) => {
     <div>
       <Grid container justifyContent={'center'} alignItems={'flex-start'} spacing={1}>
         <Grid item xs={12}>
-          <ManaChart data={manaData} />
+          <Typography variant="h4">Cards: {cards.length}</Typography>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Grid container spacing={1}>
+            {categories.map(
+              (c) =>
+                c && (
+                  <Grid item>
+                    <Category
+                      deckName={props.deckName}
+                      title={c}
+                      refreshParent={() => {
+                        setIsLoading(true);
+                      }}
+                    />
+                  </Grid>
+                )
+            )}
+            <Grid item>
+              <TextField
+                label="add new category"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                  if (e.key === 'Enter') {
+                    setCategories((oldCategories) => [...oldCategories, newCategoryName]);
+                    setNewCategoryName('');
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
         </Grid>
 
         <Grid item xs={12}>
@@ -114,6 +146,10 @@ const DeckList = (props: DeckListProps) => {
               e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
             ) => {}}
           ></TextField>
+        </Grid>
+
+        <Grid item xs={12}>
+          <ManaChart data={manaData} />
         </Grid>
 
         <Grid item xs={12}>
@@ -152,39 +188,6 @@ const DeckList = (props: DeckListProps) => {
           >
             export just names
           </Button>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Typography variant="h4">Cards: {cards.length}</Typography>
-        </Grid>
-
-        <Grid item xs={12}>
-          {categories.map(
-            (c) =>
-              c && (
-                <Category
-                  deckName={props.deckName}
-                  title={c}
-                  refreshParent={() => {
-                    setIsLoading(true);
-                  }}
-                />
-              )
-          )}
-        </Grid>
-
-        <Grid item xs={12}>
-          <TextField
-            label="add new category"
-            value={newCategoryName}
-            onChange={(e) => setNewCategoryName(e.target.value)}
-            onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-              if (e.key === 'Enter') {
-                setCategories((oldCategories) => [...oldCategories, newCategoryName]);
-                setNewCategoryName('');
-              }
-            }}
-          />
         </Grid>
       </Grid>
     </div>

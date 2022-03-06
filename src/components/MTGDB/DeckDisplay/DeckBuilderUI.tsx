@@ -95,6 +95,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
     useState<{ [key in combinedSlug]: boolean }>(defaultFilterState);
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [showDeckList, setShowDeckList] = useState(true);
+  const [showCardSearch, setShowCardSearch] = useState(true);
 
   const db = useSelector((state: State) => state.database);
 
@@ -429,110 +430,119 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
   ) : (
     <div>
       <Grid container spacing={1}>
-        <Grid item>
-          <Grid container direction="row" justifyContent="center" alignItems="center">
-            <Grid item xs={1}>
-              <IconButton onClick={() => setShowInfoDialog(true)}>
-                <InfoIcon />
-              </IconButton>
-            </Grid>
-
-            <Grid item xs={10} style={{ paddingLeft: 20 }}>
-              <TextField
-                // style={{ width: "50vw" }}
-                label="general search"
-                size="small"
-                value={searchText}
-                fullWidth
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\/\-:,><]/g, ''))
-                }
-                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                  if (e.key === 'Enter') filterCardArr();
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        onClick={() => {
-                          setSearchText('');
-                          filterCardArr(undefined, true);
-                        }}
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              ></TextField>
-            </Grid>
-
-            <Grid item>
-              {colorButtons.map((cb, i) => (
-                <IconButton key={i} onClick={() => filterCardArr(cb.name)}>
-                  {cb.icon}
+        <Grid item xs={12}>
+          <Button fullWidth onClick={() => setShowCardSearch(!showCardSearch)}>
+            {showCardSearch ? 'Hide' : 'Show'} Card Search
+          </Button>
+        </Grid>
+        {showCardSearch && (
+          <Grid item xs={12}>
+            <Grid container direction="row" justifyContent="center" alignItems="center">
+              <Grid item xs={1}>
+                <IconButton onClick={() => setShowInfoDialog(true)}>
+                  <InfoIcon />
                 </IconButton>
-              ))}
+              </Grid>
 
-              <Button
-                size="small"
-                variant="text"
-                onClick={() => {
-                  setCardArr(memo.sort((a, b) => compare(a, b, 'default')));
-                  setSearchText('');
-                  setColorFilters(defaultFilterState);
-                }}
-              >
-                reset
-              </Button>
-            </Grid>
-
-            <Grid item>
-              {[
-                numberSlug._1,
-                numberSlug._2,
-                numberSlug._3,
-                numberSlug._4,
-                numberSlug._5,
-                numberSlug._6,
-                numberSlug._7,
-                numberSlug._8,
-                numberSlug._9,
-                numberSlug._10,
-              ].map((n) => (
-                <Button
-                  style={{
-                    maxWidth: '30px',
-                    maxHeight: '30px',
-                    minWidth: '30px',
-                    minHeight: '30px',
+              <Grid item xs={11} style={{ paddingLeft: 20 }}>
+                <TextField
+                  // style={{ width: "50vw" }}
+                  label="general search"
+                  size="small"
+                  value={searchText}
+                  fullWidth
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\/\-:,><]/g, ''))
+                  }
+                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                    if (e.key === 'Enter') filterCardArr();
                   }}
-                  variant={colorFilters[n] ? 'contained' : undefined}
-                  onClick={() => filterCardArr(n)}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onClick={() => {
+                            setSearchText('');
+                            filterCardArr(undefined, true);
+                          }}
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                ></TextField>
+              </Grid>
+
+              <Grid item>
+                {colorButtons.map((cb, i) => (
+                  <IconButton key={i} onClick={() => filterCardArr(cb.name)}>
+                    {cb.icon}
+                  </IconButton>
+                ))}
+
+                <Button
+                  size="small"
+                  variant="text"
+                  onClick={() => {
+                    setCardArr(memo.sort((a, b) => compare(a, b, 'default')));
+                    setSearchText('');
+                    setColorFilters(defaultFilterState);
+                  }}
                 >
-                  {n}
+                  reset
                 </Button>
-              ))}
+              </Grid>
+
+              <Grid item>
+                {[
+                  numberSlug._1,
+                  numberSlug._2,
+                  numberSlug._3,
+                  numberSlug._4,
+                  numberSlug._5,
+                  numberSlug._6,
+                  numberSlug._7,
+                  numberSlug._8,
+                  numberSlug._9,
+                  numberSlug._10,
+                ].map((n) => (
+                  <Button
+                    style={{
+                      maxWidth: '30px',
+                      maxHeight: '30px',
+                      minWidth: '30px',
+                      minHeight: '30px',
+                    }}
+                    variant={colorFilters[n] ? 'contained' : undefined}
+                    onClick={() => filterCardArr(n)}
+                  >
+                    {n}
+                  </Button>
+                ))}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
+        )}
 
-        <Grid item xs={12} lg={9}>
-          {cardArr.length === 0 ? (
-            <Typography>Sorry, no cards meet this criteria</Typography>
-          ) : (
-            <Board
-              cardArr={cardArr}
-              decklist={decklist}
-              addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
-              deckName={deckName}
-              refreshDeckList={() => refreshDeckList()}
-            />
-          )}
-        </Grid>
+        {showCardSearch && (
+          <Grid item xs={12}>
+            {cardArr.length === 0 ? (
+              <Typography>Sorry, no cards meet this criteria</Typography>
+            ) : (
+              <Board
+                cardArr={cardArr}
+                decklist={decklist}
+                addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
+                deckName={deckName}
+                refreshDeckList={() => refreshDeckList()}
+              />
+            )}
+          </Grid>
+        )}
 
-        <Grid item xs={12} lg={3}>
+        <Grid item xs={12}>
           {showDeckList && (
             <DeckList
               cards={decklist}

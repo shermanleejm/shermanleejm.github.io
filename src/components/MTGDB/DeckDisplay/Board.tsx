@@ -20,16 +20,16 @@ const Board = ({
   deckName,
   refreshDeckList,
 }: BoardProps) => {
-  const perPage = 8;
+  const PER_PAGE = window.innerWidth < 400 ? 8 : 12;
   const [startIndex, setStartIndex] = useState(0);
-  const [endIndex, setEndIndex] = useState(perPage);
+  const [endIndex, setEndIndex] = useState(PER_PAGE);
   const [isLoading, setIsLoading] = useState(true);
   const [showCards, setShowCards] = useState(true);
 
   useEffect(() => {
     function resetPages() {
       setStartIndex(0);
-      setEndIndex(perPage);
+      setEndIndex(PER_PAGE);
       setIsLoading(false);
     }
 
@@ -50,10 +50,10 @@ const Board = ({
   ) : (
     <div style={{ display: 'flex' }}>
       <IconButton
-        disabled={startIndex - perPage < 0}
+        disabled={startIndex - PER_PAGE < 0}
         onClick={() => {
-          setStartIndex(startIndex - perPage);
-          setEndIndex(endIndex - perPage);
+          setStartIndex(startIndex - PER_PAGE);
+          setEndIndex(endIndex - PER_PAGE);
         }}
       >
         <ArrowBackIosNewIcon />
@@ -62,7 +62,7 @@ const Board = ({
       <Grid container spacing={1} justifyContent={'flex-start'} alignItems={'center'}>
         {showCards &&
           cardArr.slice(startIndex, endIndex).map((c: CardsTableType, i) => (
-            <Grid item xs={6} sm={3} justifyContent={'center'} key={i}>
+            <Grid item xs={3} sm={2} justifyContent={'center'} key={i}>
               <DraggableCard
                 data={c}
                 addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
@@ -75,10 +75,10 @@ const Board = ({
       </Grid>
 
       <IconButton
-        disabled={startIndex >= cardArr.length - perPage}
+        disabled={startIndex >= cardArr.length - PER_PAGE}
         onClick={() => {
-          setStartIndex(startIndex + perPage);
-          setEndIndex(endIndex + perPage);
+          setStartIndex(startIndex + PER_PAGE);
+          setEndIndex(endIndex + PER_PAGE);
         }}
       >
         <ArrowForwardIosIcon />
