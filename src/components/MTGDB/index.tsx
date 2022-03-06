@@ -306,6 +306,14 @@ export async function getDeckCards(
     }
   }
 
+  res.sort((a, b) => {
+    if (a.name < b.name) return -1;
+    if (a.name > b.name) return 1;
+    if (a.cmc < b.cmc) return -1;
+    if (a.cmc > b.cmc) return 1;
+    return 0;
+  });
+
   return res;
 }
 

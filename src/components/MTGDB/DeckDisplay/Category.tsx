@@ -15,35 +15,43 @@ type CategoryPropsType = {
 
 export const Category = ({ title, deckName, refreshParent }: CategoryPropsType) => {
   const db = useSelector((state: State) => state.database);
-  const [deckIdToCard, setDeckIdToCard] = useState<{ [key: string]: CardsTableType }>({});
+  const [cardIdToDeckId, setCardIdToDeckId] = useState<any>({});
+  const [cards, setCards] = useState<CardsTableType[]>([]);
 
   useEffect(() => {
     async function init() {
       let _cards = await getDeckCards(db, deckName, title);
-      let _deckIdToCard: { [key: string]: CardsTableType } = {};
+      let _cardIdToDeckId: any = {};
+      _cards.sort((a, b) => {
+        if (a.cmc > b.cmc) return 1;
+        if (a.cmc < b.cmc) return -1;
+        return 0;
+      });
+      console.log(_cards);
       // get the deck id
       for (let i = 0; i < _cards.length; i++) {
         let _c = _cards[i];
         if (_c.id) {
           let _deckRow = await db.decks.where({ card_id: _c.id }).first();
           if (_deckRow && _deckRow.id) {
-            _deckIdToCard[_deckRow.id] = _c;
+            _cardIdToDeckId[_c.id] = _deckRow.id!;
           }
         }
       }
-      setDeckIdToCard(_deckIdToCard);
+      setCards(_cards);
+      setCardIdToDeckId(_cardIdToDeckId);
     }
     init();
   }, []);
 
   async function updateCategory(card: CardsTableType) {
     let categoryCollision = await db.decks
-    .where({
-      name: deckName,
-      category: title,
-      card_id: card.id!,
-    })
-    .first();
+      .where({
+        name: deckName,
+        category: title,
+        card_id: card.id!,
+      })
+      .first();
     if (categoryCollision) return '';
 
     let old = await db.decks.where({ name: deckName, card_id: card.id! }).first();
@@ -74,12 +82,12 @@ export const Category = ({ title, deckName, refreshParent }: CategoryPropsType) 
   return (
     <div ref={drop} style={{ border: isOver && canDrop ? '5px solid green' : '' }}>
       <Typography variant="h5">
-        {title} - {Object.keys(deckIdToCard).length}
+        {title} - {Object.keys(cardIdToDeckId).length}
       </Typography>
-      {Object.keys(deckIdToCard).map((c: string, i: number) => (
+      {cards.map((c: CardsTableType, i: number) => (
         <DeckListItem
-          data={deckIdToCard[c]}
-          deckId={c}
+          data={c}
+          deckId={cardIdToDeckId[c.id!]}
           key={i}
           refreshParent={() => refreshParent()}
         />
