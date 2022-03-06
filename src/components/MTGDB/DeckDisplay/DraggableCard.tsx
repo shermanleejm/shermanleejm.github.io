@@ -116,7 +116,7 @@ const DraggableCard = ({
         <CardMedia
           onClick={() => addToDeckList(data)}
           component={'img'}
-          image={data.image_uri.small[0]}
+          image={data.image_uri.normal[0]}
         />
         <CardActions style={{ cursor: 'pointer' }} onClick={() => setShowOverlay(true)}>
           <Grid container direction={'row'}>
