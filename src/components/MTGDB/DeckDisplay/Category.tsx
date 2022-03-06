@@ -37,18 +37,27 @@ export const Category = ({ title, deckName, refreshParent }: CategoryPropsType) 
   }, []);
 
   async function updateCategory(card: CardsTableType) {
-    let deckRow = await db.decks.where({ name: deckName, card_id: card.id }).first();
-    if (!deckRow && card.id) {
-      deckRow = {
-        card_id: card.id,
+    let categoryCollision = await db.decks
+    .where({
+      name: deckName,
+      category: title,
+      card_id: card.id!,
+    })
+    .first();
+    if (categoryCollision) return '';
+
+    let old = await db.decks.where({ name: deckName, card_id: card.id! }).first();
+    if (old === undefined) {
+      await db.decks.add({
         name: deckName,
-        format: 'commander',
+        card_id: card.id!,
+        category: title,
         is_commander: false,
-        category: 'default',
-      };
+        format: 'commander',
+      });
+    } else {
+      await db.decks.update(old!.id!, { category: title });
     }
-    console.log(deckRow);
-    await changeCategory(db, deckRow, title);
 
     refreshParent();
   }
@@ -64,7 +73,9 @@ export const Category = ({ title, deckName, refreshParent }: CategoryPropsType) 
 
   return (
     <div ref={drop} style={{ border: isOver && canDrop ? '5px solid green' : '' }}>
-      <Typography variant="h5">{title}</Typography>
+      <Typography variant="h5">
+        {title} - {Object.keys(deckIdToCard).length}
+      </Typography>
       {Object.keys(deckIdToCard).map((c: string, i: number) => (
         <DeckListItem
           data={deckIdToCard[c]}

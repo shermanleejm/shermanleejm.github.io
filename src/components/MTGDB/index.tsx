@@ -321,8 +321,6 @@ export async function changeCategory(
   if (newCategory) {
     delete deckRow.id;
     deckRow['category'] = newCategory;
-    await db.decks.put(deckRow);
-  } else {
-    await db.decks.put(deckRow);
   }
+  await db.decks.put(deckRow);
 }
