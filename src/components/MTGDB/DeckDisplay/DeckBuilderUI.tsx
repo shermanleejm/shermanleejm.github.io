@@ -80,6 +80,13 @@ const defaultFilterState = {
   [numberSlug._10]: false,
 };
 
+enum rarityTypes {
+  RARE = 'rare',
+  MYTHIC = 'mythic',
+  UNCOMMON = 'uncommon',
+  COMMON = 'common',
+}
+
 interface DeckBuilderUIType {
   currDeck: CardsTableType[];
   deckName: string;
@@ -211,6 +218,22 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                         }
                       }
                       break;
+                    case 'r':
+                      let rareType = qq.toLowerCase();
+                      let rareTypes: { [key: string]: string } = {
+                        r: rarityTypes.RARE,
+                        rare: rarityTypes.RARE,
+                        m: rarityTypes.MYTHIC,
+                        mythic: rarityTypes.MYTHIC,
+                        u: rarityTypes.UNCOMMON,
+                        uncommon: rarityTypes.UNCOMMON,
+                        c: rarityTypes.COMMON,
+                        common: rarityTypes.COMMON,
+                      };
+                      if (!Object.keys(rareTypes).includes(rareType)) {
+                        return c.rarity.includes('WRONG');
+                      }
+                      return c.rarity === rareTypes[rareType];
                     default:
                       return false;
                   }
@@ -357,6 +380,11 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
       explanation: 'Use p: in front of the text to search for.',
       example:
         'p:<3.0 returns all cards that cost less than $3. Works with < and > only.',
+    },
+    {
+      title: 'Rarity',
+      explanation: 'Use r: in front of the text to search for.',
+      example: 'r:r, r:M, r:uncommon',
     },
   ];
 
