@@ -9,11 +9,14 @@ import { ScryfallDataType } from './interfaces';
 import sample from '../../assets/War_of_the_spark.json';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
+import * as DexieExportImport from 'dexie-export-import';
 
 const NetExports = (props: MTGDBProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentUpdateCard, setCurrentUpdateCard] = useState('');
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
+  const [bulkExportReady, setBulkExportReady] = useState(false);
+  // const [export , setExport] = useState<Blob>(new Blob());
 
   const db = useSelector((state: State) => state.database);
 
@@ -155,6 +158,27 @@ const NetExports = (props: MTGDBProps) => {
     setIsLoading(false);
   }
 
+  const handleImport = async (e: any) => {
+    setIsLoading(true);
+    const fileReader = new FileReader();
+    fileReader.readAsText(e.target.files[0], 'UTF-8');
+    fileReader.onload = async (ee: any) => {
+      await db.delete();
+      await DexieExportImport.importDB(e.target.files[0]);
+      setIsLoading(false);
+    };
+  };
+
+  async function generateBulkExport() {
+    setBulkExportReady(true);
+    const blob = await db.export();
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = `MTGDB_export.json`;
+    setBulkExportReady(false);
+    link.click();
+  }
+
   return isLoading ? (
     <div style={{ margin: 'auto' }}>
       <CircularProgress />
@@ -214,7 +238,32 @@ const NetExports = (props: MTGDBProps) => {
         </Button>
       </label>
 
-      <Button onClick={() => sampleJson()}>load sample json (testing)</Button>
+      <Button fullWidth onClick={() => sampleJson()}>
+        load sample json (testing)
+      </Button>
+
+      {bulkExportReady ? (
+        <div>
+          <CircularProgress />
+        </div>
+      ) : (
+        <Button fullWidth onClick={() => generateBulkExport()}>
+          download bulk export
+        </Button>
+      )}
+
+      <input
+        type="file"
+        accept="application/json"
+        onChange={handleImport}
+        style={{ display: 'none' }}
+        id="upload-db-import"
+      />
+      <label htmlFor="upload-db-import">
+        <Button component="span" fullWidth>
+          import db (will delete existing data)
+        </Button>
+      </label>
     </div>
   );
 };
