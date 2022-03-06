@@ -24,6 +24,7 @@ const Board = ({
   const [startIndex, setStartIndex] = useState(0);
   const [endIndex, setEndIndex] = useState(perPage);
   const [isLoading, setIsLoading] = useState(true);
+  const [showCards, setShowCards] = useState(true);
 
   useEffect(() => {
     function resetPages() {
@@ -37,6 +38,11 @@ const Board = ({
 
   async function addToDecklistCallback(c: CardsTableType) {
     addToDeckList(c);
+  }
+
+  function refreshCards() {
+    setShowCards(false);
+    setShowCards(true);
   }
 
   return isLoading ? (
@@ -54,16 +60,18 @@ const Board = ({
       </IconButton>
 
       <Grid container spacing={1} justifyContent={'flex-start'} alignItems={'center'}>
-        {cardArr.slice(startIndex, endIndex).map((c: CardsTableType, i) => (
-          <Grid item xs={6} sm={3} justifyContent={'center'} key={i}>
-            <DraggableCard
-              data={c}
-              addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
-              deckName={deckName}
-              refreshDeckList={refreshDeckList}
-            />
-          </Grid>
-        ))}
+        {showCards &&
+          cardArr.slice(startIndex, endIndex).map((c: CardsTableType, i) => (
+            <Grid item xs={6} sm={3} justifyContent={'center'} key={i}>
+              <DraggableCard
+                data={c}
+                addToDecklist={(c: CardsTableType) => addToDecklistCallback(c)}
+                deckName={deckName}
+                refreshDeckList={refreshDeckList}
+                refreshCards={() => refreshCards()}
+              />
+            </Grid>
+          ))}
       </Grid>
 
       <IconButton

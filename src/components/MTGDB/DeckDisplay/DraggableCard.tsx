@@ -22,28 +22,20 @@ type DraggableCardType = {
   addToDecklist: (c: CardsTableType) => void;
   deckName: string;
   refreshDeckList: () => void;
+  refreshCards: () => void;
 };
 
-const DraggableCard = ({ data, deckName, refreshDeckList }: DraggableCardType) => {
+const DraggableCard = ({
+  data,
+  deckName,
+  refreshDeckList,
+  refreshCards,
+}: DraggableCardType) => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const db = useSelector((state: State) => state.database);
-
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'deckListItem',
-    item: data,
-    end: (item, monitor) => {
-      const dropResult = monitor.didDrop();
-      if (item && dropResult) {
-        setIsLoading(true);
-      }
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  }));
 
   useEffect(() => {
     async function init() {
@@ -57,6 +49,21 @@ const DraggableCard = ({ data, deckName, refreshDeckList }: DraggableCardType) =
     }
     init();
   }, [data, isLoading]);
+  
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'deckListItem',
+    item: data,
+    end: (item, monitor) => {
+      const dropResult = monitor.didDrop();
+      if (item && dropResult) {
+        setIsLoading(true);
+        refreshCards();
+      }
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
 
   async function addToDeckList(card: CardsTableType) {
     let collision = await db.decks.where({ name: deckName, card_id: card.id }).first();
@@ -70,6 +77,7 @@ const DraggableCard = ({ data, deckName, refreshDeckList }: DraggableCardType) =
       });
     }
     refreshDeckList();
+    refreshCards();
   }
 
   return isLoading ? (
