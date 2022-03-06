@@ -185,7 +185,7 @@ const CardDataGrid = () => {
     switch (k) {
       case 'tags':
       case 'set_name':
-        setCards(memoCards.filter((c) => val.some((v) => c[k].indexOf(v) >= 0)));
+        setCards(memoCards.filter((c) => val.some((v) => c[k] === v)));
         break;
       case 'type_line':
         setCards(

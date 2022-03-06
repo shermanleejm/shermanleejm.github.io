@@ -120,17 +120,23 @@ const DeckList = (props: DeckListProps) => {
                 )
             )}
             <Grid item xs={2}>
-              <TextField
-                label="add new category"
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                  if (e.key === 'Enter') {
-                    setCategories((oldCategories) => [...oldCategories, newCategoryName]);
-                    setNewCategoryName('');
-                  }
-                }}
-              />
+              <div style={{ width: 200 }}>
+                <TextField
+                  fullWidth
+                  label="add new category"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
+                    if (e.key === 'Enter') {
+                      setCategories((oldCategories) => [
+                        ...oldCategories,
+                        newCategoryName,
+                      ]);
+                      setNewCategoryName('');
+                    }
+                  }}
+                />
+              </div>
             </Grid>
           </Grid>
         </Grid>
