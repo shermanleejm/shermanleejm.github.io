@@ -166,6 +166,7 @@ const NetExports = (props: MTGDBProps) => {
       await db.delete();
       await DexieExportImport.importDB(e.target.files[0]);
       setIsLoading(false);
+      window.location.reload();
     };
   };
 
