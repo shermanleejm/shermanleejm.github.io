@@ -12,8 +12,8 @@ import { Pages, PageType } from '..';
 
 const CarouselCard = ({ img, link, name, description }: PageType) => {
   return (
-    <Card sx={{ maxWidth: 560 }} elevation={3}>
-      <CardMedia component="img" image={img} />
+    <Card elevation={3}>
+      <CardMedia component="img" image={img} sx={{ height: 300 }} />
       <CardContent>
         <Typography variant="h5">{name}</Typography>
         <Typography variant="body2">{description}</Typography>
@@ -32,8 +32,8 @@ const Carousel = () => {
     <Grid
       container
       direction="row"
-      justifyContent="center"
-      alignItems="center"
+      justifyContent="flex-start"
+      alignItems="flex-start"
       spacing={1}
       style={{ margin: 'auto' }}
     >
