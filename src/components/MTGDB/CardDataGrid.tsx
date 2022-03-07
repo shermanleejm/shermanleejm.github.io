@@ -4,8 +4,8 @@ import {
   GridColDef,
   GridRenderCellParams,
   GridValueFormatterParams,
-} from '@mui/x-data-grid';
-import React, { useEffect, useState } from 'react';
+} from "@mui/x-data-grid";
+import React, { useEffect, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -14,8 +14,10 @@ import {
   CircularProgress,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   Grid,
+  IconButton,
   List,
   ListItem,
   ListItemText,
@@ -26,10 +28,12 @@ import {
   Tooltip,
   TooltipProps,
   Typography,
-} from '@mui/material';
-import { CardsTableType } from '../../database';
-import { useSelector } from 'react-redux';
-import { State } from '../../state/reducers';
+} from "@mui/material";
+import { CardsTableType } from "../../database";
+import { useSelector } from "react-redux";
+import { State } from "../../state/reducers";
+import { infoHelper, rarityTypes } from "./DeckDisplay/DeckBuilderUI";
+import InfoIcon from "@mui/icons-material/Info";
 
 export const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -42,10 +46,11 @@ const CardDataGrid = () => {
   const [totalPrice, setTotalPrice] = useState(-1);
   const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [calculateDialogState, setCalculateDialogState] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<string>('colors');
+  const [selectedFilter, setSelectedFilter] = useState<string>("general");
   const [memoCards, setMemoCards] = useState<CardsTableType[]>([]);
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
   const db = useSelector((state: State) => state.database);
@@ -64,7 +69,10 @@ const CardDataGrid = () => {
             let curr = arr[i];
             dict.add(curr.name);
             uSets.add(curr.set_name);
-            uTags = new Set([...new Set(curr.tags), ...new Set(Array.from(uTags))]);
+            uTags = new Set([
+              ...new Set(curr.tags),
+              ...new Set(Array.from(uTags)),
+            ]);
           }
           setUniqueSets(Array.from(uSets));
           setUniqueTags(Array.from(uTags));
@@ -78,8 +86,9 @@ const CardDataGrid = () => {
 
   const columns: GridColDef[] = [
     {
-      field: 'name',
-      headerName: window.innerWidth < 400 ? 'Name (tap and hold to preview)' : 'Name',
+      field: "name",
+      headerName:
+        window.innerWidth < 400 ? "Name (tap and hold to preview)" : "Name",
       minWidth: 200,
       flex: 1,
       renderCell: (params: GridRenderCellParams) => {
@@ -88,9 +97,9 @@ const CardDataGrid = () => {
           <HtmlTooltip
             title={
               <React.Fragment>
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <div style={{ display: "flex", flexDirection: "row" }}>
                   {data.image_uri.small.map((s: string, i: number) => (
-                    <img key={i} src={data.image_uri.small[i]} alt=""></img>
+                    <img key={i} src={data.image_uri.small[i]} alt=''></img>
                   ))}
                 </div>
               </React.Fragment>
@@ -102,26 +111,26 @@ const CardDataGrid = () => {
         );
       },
     },
-    { field: 'cmc', headerName: 'CMC', width: 65 },
+    { field: "cmc", headerName: "CMC", width: 65 },
     {
-      field: 'price',
-      headerName: 'Price',
+      field: "price",
+      headerName: "Price",
       width: colWidth / 1.8,
       valueFormatter: (params: GridValueFormatterParams) => {
         return `$${params.value}`;
       },
     },
     {
-      field: 'edhrec_rank',
-      headerName: 'EDHREC Rank',
+      field: "edhrec_rank",
+      headerName: "EDHREC Rank",
       width: colWidth / 1.5,
       valueGetter: (params) => {
         return params.row.edhrec_rank ?? 999999;
       },
     },
     {
-      field: 'tags',
-      headerName: 'tags',
+      field: "tags",
+      headerName: "tags",
       minWidth: 400,
       flex: 1,
       renderCell: (params: GridRenderCellParams) => {
@@ -130,7 +139,7 @@ const CardDataGrid = () => {
           <Autocomplete
             fullWidth
             multiple
-            id="tags-standard"
+            id='tags-standard'
             options={data.tags || []}
             defaultValue={data.tags || []}
             freeSolo
@@ -139,10 +148,16 @@ const CardDataGrid = () => {
             }}
             renderTags={(value: readonly string[], getTagProps) =>
               value.map((option: string, index: number) => (
-                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                <Chip
+                  variant='outlined'
+                  label={option}
+                  {...getTagProps({ index })}
+                />
               ))
             }
-            renderInput={(params) => <TextField {...params} variant="standard" />}
+            renderInput={(params) => (
+              <TextField {...params} variant='standard' />
+            )}
           />
         );
       },
@@ -151,14 +166,21 @@ const CardDataGrid = () => {
 
   function filterOptions(k: string) {
     switch (k) {
-      case 'tags':
+      case "tags":
         return uniqueTags;
-      case 'set_name':
+      case "set_name":
         return uniqueSets;
-      case 'colors':
-        return ['W', 'U', 'B', 'R', 'G'];
-      case 'type_line':
-        return ['legendary', 'artifact', 'enchantment', 'creature', 'sorcery', 'instant'];
+      case "colors":
+        return ["W", "U", "B", "R", "G"];
+      case "type_line":
+        return [
+          "legendary",
+          "artifact",
+          "enchantment",
+          "creature",
+          "sorcery",
+          "instant",
+        ];
       default:
         return [];
     }
@@ -169,56 +191,122 @@ const CardDataGrid = () => {
   }
 
   const filters = [
-    { slug: 'tags', name: 'Tags' },
-    { slug: 'set_name', name: 'Set Name' },
-    { slug: 'name', name: 'Card Name' },
-    { slug: 'price', name: 'Price' },
-    { slug: 'colors', name: 'Colours' },
-    { slug: 'type_line', name: 'Card Type' },
+    { slug: "tags", name: "Tags" },
+    { slug: "set_name", name: "Set Name" },
+    { slug: "name", name: "Card Name" },
+    { slug: "price", name: "Price" },
+    { slug: "colors", name: "Colours" },
+    { slug: "type_line", name: "Card Type" },
+    { slug: "general", name: "MTG Arena Style" },
   ];
 
   function filterCardArr(k: string, val: string[]) {
     if (val.length <= 0) {
       setCards(memoCards);
-      return '';
+      return "";
     }
     switch (k) {
-      case 'tags':
-      case 'set_name':
+      case "general":
+        setCards(
+          memoCards.filter((c) => {
+            if (val.length > 0) {
+              return val.every((q) => {
+                q = q.toLowerCase();
+                if (q.includes(":")) {
+                  let type = q.split(":")[0].trim();
+                  let qq = q.split(":")[1].trim();
+                  if (qq === "tap") {
+                    qq = "{t}";
+                  }
+                  switch (type) {
+                    case "t":
+                      return c.type_line.toLowerCase().includes(qq);
+                    case "o":
+                      return c.oracle_text?.toLowerCase().includes(qq);
+                    case "s":
+                      return c.set_name.toLowerCase().includes(qq);
+                    case "p":
+                      let currFloat: number = parseFloat(
+                        qq.match(/[0-9.]+/)![0]
+                      );
+                      if (!isNaN(currFloat)) {
+                        if (qq.includes("<")) {
+                          return c.price < currFloat;
+                        } else if (qq.includes(">")) {
+                          return c.price > currFloat;
+                        }
+                      }
+                      break;
+                    case "r":
+                      let rareType = qq.toLowerCase();
+                      let rareTypes: { [key: string]: string } = {
+                        r: rarityTypes.RARE,
+                        rare: rarityTypes.RARE,
+                        m: rarityTypes.MYTHIC,
+                        mythic: rarityTypes.MYTHIC,
+                        u: rarityTypes.UNCOMMON,
+                        uncommon: rarityTypes.UNCOMMON,
+                        c: rarityTypes.COMMON,
+                        common: rarityTypes.COMMON,
+                      };
+                      if (!Object.keys(rareTypes).includes(rareType)) {
+                        return c.rarity.includes("WRONG");
+                      }
+                      return c.rarity === rareTypes[rareType];
+                    default:
+                      return false;
+                  }
+                }
+                return (
+                  c.name.toLowerCase().includes(q) ||
+                  c.set_name.toLowerCase().includes(q) ||
+                  c.oracle_text?.toLowerCase().includes(q) ||
+                  c.type_line.toLowerCase().includes(q)
+                );
+              });
+            }
+            return true;
+          })
+        );
+        break;
+      case "tags":
+      case "set_name":
         setCards(memoCards.filter((c) => val.some((v) => c[k] === v)));
         break;
-      case 'type_line':
+      case "type_line":
         setCards(
           memoCards.filter((c) =>
             val.every((v) => c[k].toLowerCase().includes(v.toLowerCase()))
           )
         );
         break;
-      case 'name':
+      case "name":
         setCards(
           memoCards.filter((c) =>
             val.some((v) => c[k].toLowerCase().includes(v.toLowerCase()))
           )
         );
         break;
-      case 'price':
+      case "price":
         let tmp = memoCards;
         for (let i = 0; i < val.length; i++) {
           let curr = val[i];
           let currFloat: number = parseFloat(curr.match(/[0-9.]+/)![0]);
           if (!isNaN(currFloat)) {
-            if (curr.includes('<')) {
+            if (curr.includes("<")) {
               tmp = tmp.filter((c) => c.price < currFloat);
-            } else if (curr.includes('>')) {
+            } else if (curr.includes(">")) {
               tmp = tmp.filter((c) => c.price > currFloat);
             }
           }
         }
         setCards(tmp);
         break;
-      case 'colors':
+      case "colors":
         setCards(
-          memoCards.filter((c) => val.every((v) => c.colors.includes(v.toUpperCase())))
+          memoCards.filter((c) =>
+            val.every((v) => c.colors.includes(v.toUpperCase()))
+          )
         );
         break;
     }
@@ -241,7 +329,7 @@ const CardDataGrid = () => {
   function calculateSelected() {
     let res = 0;
     for (let i = 0; i < selectedCards.length; i++) {
-      res += selectedCards[i]['price'];
+      res += selectedCards[i]["price"];
     }
     setTotalPrice(parseFloat(res.toFixed(2)));
   }
@@ -252,70 +340,122 @@ const CardDataGrid = () => {
     setIsLoading(true);
   }
 
+  const infoDialog = () => {
+    return (
+      <Dialog open={showInfoDialog} onClose={() => setShowInfoDialog(false)}>
+        <DialogTitle>Helpful tips for searching</DialogTitle>
+        <DialogContent>
+          <List>
+            <ListItem>
+              <ListItemText>
+                <Typography variant='body1'>
+                  Seperate multiple queries with a comma.
+                </Typography>
+              </ListItemText>
+            </ListItem>
+            {infoHelper.map((ele) => (
+              <ListItem>
+                <ListItemText>
+                  <Typography variant='body1'>{ele.title}</Typography>
+                  <Typography variant='body2'>{ele.explanation}</Typography>
+
+                  <Typography variant='body2' sx={{ fontFamily: "monospace" }}>
+                    {ele.example}
+                  </Typography>
+                </ListItemText>
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return isLoading ? (
     <CircularProgress />
   ) : (
     <Box
       sx={{
-        '.u-text': { backgroundColor: '#2C458B', color: 'white' },
-        '.b-text': { backgroundColor: '#3C0C5D', color: 'white' },
-        '.r-text': { backgroundColor: '#731421', color: 'white' },
-        '.w-text': { backgroundColor: '#ffffff', color: 'black' },
-        '.g-text': { backgroundColor: '#2A6438', color: 'white' },
-        '.m-text': { backgroundColor: '#FFD700', color: 'black' },
-        '.c-text': { backgroundColor: '#808080', color: 'white' },
-        '.tags': { borderRadius: '50%', border: '1' },
+        ".u-text": { backgroundColor: "#2C458B", color: "white" },
+        ".b-text": { backgroundColor: "#3C0C5D", color: "white" },
+        ".r-text": { backgroundColor: "#731421", color: "white" },
+        ".w-text": { backgroundColor: "#ffffff", color: "black" },
+        ".g-text": { backgroundColor: "#2A6438", color: "white" },
+        ".m-text": { backgroundColor: "#FFD700", color: "black" },
+        ".c-text": { backgroundColor: "#808080", color: "white" },
+        ".tags": { borderRadius: "50%", border: "1" },
       }}
     >
+      {infoDialog()}
       <Grid
         container
-        direction={'column'}
-        justifyContent={'center'}
-        alignItems={'center'}
+        direction={"column"}
+        justifyContent={"center"}
+        alignItems={"center"}
       >
         {/* Filter */}
         <Grid item>
-          <Grid container direction={'row'}>
-            <Grid item style={{ width: '20vw' }}>
-              <Select
-                fullWidth
-                defaultValue={selectedFilter}
-                onChange={(e) => setSelectedFilter(e.target.value as string)}
+          <div style={{ width: "80vw" }}>
+            <Grid container>
+              {selectedFilter === "general" && (
+                <Grid item xs={2} sm={1}>
+                  <IconButton onClick={() => setShowInfoDialog(true)}>
+                    <InfoIcon />
+                  </IconButton>
+                </Grid>
+              )}
+              <Grid item xs={4} md={3}>
+                <Select
+                  fullWidth
+                  defaultValue={selectedFilter}
+                  onChange={(e) => setSelectedFilter(e.target.value as string)}
+                >
+                  {filters.map((f, i) => (
+                    <MenuItem key={i} value={f.slug}>
+                      {f.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+              <Grid
+                item
+                xs={selectedFilter === "general" ? 6 : 8}
+                sm={selectedFilter === "general" ? 7 : 8}
+                md={selectedFilter === "general" ? 8 : 9}
               >
-                {filters.map((f, i) => (
-                  <MenuItem key={i} value={f.slug}>
-                    {f.name}
-                  </MenuItem>
-                ))}
-              </Select>
+                <Autocomplete
+                  fullWidth
+                  id='tags-standard'
+                  options={filterOptions(selectedFilter) || []}
+                  freeSolo
+                  multiple={true}
+                  onChange={(_, v) => {
+                    filterCardArr(selectedFilter, v);
+                  }}
+                  renderTags={(value: readonly string[], getTagProps) =>
+                    value.map((option: string, index: number) => (
+                      <Chip
+                        variant='outlined'
+                        label={option}
+                        {...getTagProps({ index })}
+                      />
+                    ))
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} variant='outlined' />
+                  )}
+                />
+              </Grid>
             </Grid>
-            <Grid item style={{ width: '60vw' }}>
-              <Autocomplete
-                fullWidth
-                id="tags-standard"
-                options={filterOptions(selectedFilter) || []}
-                freeSolo
-                multiple={true}
-                onChange={(_, v) => {
-                  filterCardArr(selectedFilter, v);
-                }}
-                renderTags={(value: readonly string[], getTagProps) =>
-                  value.map((option: string, index: number) => (
-                    <Chip variant="outlined" label={option} {...getTagProps({ index })} />
-                  ))
-                }
-                renderInput={(params) => <TextField {...params} variant="outlined" />}
-              />
-            </Grid>
-          </Grid>
+          </div>
         </Grid>
 
         {/* Data Grid */}
-        <Grid item style={{ width: '80vw' }}>
+        <Grid item>
           <div
             style={{
-              height: '100%',
-              width: '100%',
+              height: "100%",
+              width: "80vw",
             }}
           >
             <div style={{ flexGrow: 1 }}>
@@ -337,19 +477,19 @@ const CardDataGrid = () => {
                   setSelectedCards(selectedRows);
                 }}
                 getCellClassName={(params: GridCellParams<number>) => {
-                  let res = '';
-                  if (params.field === 'name') {
+                  let res = "";
+                  if (params.field === "name") {
                     if (params.row.colors.length < 1) {
-                      res += 'c-text';
+                      res += "c-text";
                     } else if (params.row.colors.length > 1) {
-                      res += 'm-text';
+                      res += "m-text";
                     } else {
-                      res += params.row.colors[0].toLowerCase() + '-text';
+                      res += params.row.colors[0].toLowerCase() + "-text";
                     }
                   }
 
-                  if (params.field === 'cmc') {
-                    res += 'pill';
+                  if (params.field === "cmc") {
+                    res += "pill";
                   }
                   return res;
                 }}
@@ -359,7 +499,9 @@ const CardDataGrid = () => {
         </Grid>
 
         <Grid item>
-          <Button onClick={() => setDeleteDialogState(true)}>delete selected</Button>
+          <Button onClick={() => setDeleteDialogState(true)}>
+            delete selected
+          </Button>
         </Grid>
         <Grid item>
           <Button
@@ -410,7 +552,10 @@ const CardDataGrid = () => {
       </Dialog>
 
       {/* Calculate Dialog */}
-      <Dialog onClose={() => setCalculateDialogState(false)} open={calculateDialogState}>
+      <Dialog
+        onClose={() => setCalculateDialogState(false)}
+        open={calculateDialogState}
+      >
         <DialogTitle>US${totalPrice}</DialogTitle>
         <DialogActions>
           <Button onClick={() => setCalculateDialogState(false)}>close</Button>
