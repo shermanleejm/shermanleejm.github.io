@@ -18,8 +18,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  InputAdornment,
   CircularProgress,
+  Autocomplete,
 } from '@mui/material';
 import Board from './Board';
 import DeckList from './DeckList';
@@ -28,7 +28,6 @@ import { CardsTableType } from '../../../database';
 import { useSelector } from 'react-redux';
 import { State } from '../../../state/reducers';
 import InfoIcon from '@mui/icons-material/Info';
-import ClearIcon from '@mui/icons-material/Clear';
 
 export const infoHelper = [
   {
@@ -129,7 +128,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
   const [isLoading, setIsLoading] = useState(true);
   const [memo, setMemo] = useState<CardsTableType[]>([]);
   const [cardArr, setCardArr] = useState<CardsTableType[]>([]);
-  const [searchText, setSearchText] = useState<string>('');
+  const [searchQueries, setSearchQueries] = useState<string[]>([]);
   const [decklist, setDecklist] = useState<Set<CardsTableType>>(new Set());
   const [colorFilters, setColorFilters] =
     useState<{ [key in combinedSlug]: boolean }>(defaultFilterState);
@@ -174,9 +173,13 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
     initialLoad();
   }, []);
 
-  function filterCardArr(type?: combinedSlug, clear: boolean = false) {
+  function filterCardArr(
+    type?: combinedSlug,
+    clear: boolean = false,
+    searchQueries: string[] = []
+  ) {
     setColorFilters((prev) => {
-      let queries = clear ? [] : searchText.split(',').map((q) => q.toLowerCase());
+      let queries = clear ? [] : searchQueries.map((q) => q.toLowerCase());
       let numberFilters: number[] = [];
       let colorFilters: string[] = [];
       let miscFilters: string[] = [];
@@ -475,34 +478,20 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
               </Grid>
 
               <Grid item xs={11} style={{ paddingLeft: 20 }}>
-                <TextField
-                  // style={{ width: "50vw" }}
-                  label="general search"
-                  size="small"
-                  value={searchText}
-                  fullWidth
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setSearchText(e.target.value.replace(/[^a-zA-Z0-9\s\/\-:,><]/g, ''))
-                  }
-                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                    if (e.key === 'Enter') filterCardArr();
+                <Autocomplete
+                  multiple
+                  freeSolo
+                  id="tags-standard"
+                  options={[]}
+                  value={searchQueries}
+                  onChange={(_, v) => {
+                    setSearchQueries(v as string[]);
+                    filterCardArr(undefined, false, v as string[]);
                   }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          edge="end"
-                          onClick={() => {
-                            setSearchText('');
-                            filterCardArr(undefined, true);
-                          }}
-                        >
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                ></TextField>
+                  renderInput={(params) => (
+                    <TextField {...params} variant="outlined" label="Search" />
+                  )}
+                />
               </Grid>
 
               <Grid item>
@@ -517,7 +506,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                   variant="text"
                   onClick={() => {
                     setCardArr(memo.sort((a, b) => compare(a, b, 'default')));
-                    setSearchText('');
+                    setSearchQueries([]);
                     setColorFilters(defaultFilterState);
                   }}
                 >
