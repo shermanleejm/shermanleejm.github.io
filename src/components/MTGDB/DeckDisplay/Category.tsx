@@ -27,7 +27,6 @@ export const Category = ({ title, deckName, refreshParent }: CategoryPropsType) 
         if (a.cmc < b.cmc) return -1;
         return 0;
       });
-      console.log(_cards);
       // get the deck id
       for (let i = 0; i < _cards.length; i++) {
         let _c = _cards[i];

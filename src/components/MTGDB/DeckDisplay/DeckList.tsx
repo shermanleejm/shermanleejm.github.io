@@ -1,4 +1,11 @@
-import { Button, CircularProgress, Grid, TextField, Typography } from '@mui/material';
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  Grid,
+  TextField,
+  Typography,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { CardsTableType } from '../../../database';
 import { MTGTypesEnum } from '../interfaces';
@@ -34,6 +41,7 @@ const DeckList = (props: DeckListProps) => {
   const [manaData, setManaData] = useState<ManaDataInterface[]>([]);
   const [categories, setCategories] = useState<(string | undefined)[]>([]);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [commanders, setCommanders] = useState<CardsTableType[]>([]);
 
   const db = useSelector((state: State) => state.database);
 
@@ -86,6 +94,21 @@ const DeckList = (props: DeckListProps) => {
         _categories.push('default');
       }
 
+      let _commandersDecks = (
+        await db.decks
+          .where({
+            name: props.deckName,
+          })
+          .toArray()
+      ).filter((d) => d.is_commander);
+
+      let _commanders: CardsTableType[] = [];
+      for (let i = 0; i < _commandersDecks.length; i++) {
+        let _c = await db.cards.get(_commandersDecks[i].card_id);
+        _commanders.push(_c!);
+      }
+
+      setCommanders(_commanders);
       setCategories(_categories);
       setManaData(manaDataTmp);
       setIsLoading(false);
@@ -94,13 +117,59 @@ const DeckList = (props: DeckListProps) => {
     init();
   }, [isLoading]);
 
+  async function changeCommanders(newCommanders: CardsTableType[]) {
+    let oldCommanders = commanders;
+
+    for (let com of oldCommanders) {
+      let deckRow = await db.decks
+        .where({ name: props.deckName, card_id: com.id! })
+        .first();
+      await db.decks.update(deckRow!.id!, { is_commander: false });
+    }
+
+    for (let com of newCommanders) {
+      let deckRow = await db.decks
+        .where({ name: props.deckName, card_id: com.id! })
+        .first();
+      await db.decks.update(deckRow!.id!, { is_commander: true });
+    }
+
+    setCommanders(newCommanders);
+  }
+
   return isLoading ? (
     <CircularProgress />
   ) : (
-    <div>
-      <Grid container alignItems={'flex-start'} spacing={1}>
+    <div style={{ marginTop: 20 }}>
+      <Grid container alignItems={'flex-start'} spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h4">Cards: {cards.length}</Typography>
+          <Grid
+            container
+            spacing={1}
+            direction="row"
+            justifyContent="flex-start"
+            alignItems="center"
+          >
+            <Grid item xs={2}>
+              <Typography variant="h4">Cards: {cards.length}</Typography>
+            </Grid>
+            <Grid item xs={10}>
+              <Autocomplete
+                fullWidth
+                multiple
+                id="tags-standard"
+                options={cards.filter((c) =>
+                  c.type_line.toLowerCase().includes('legendary')
+                )}
+                getOptionLabel={(option) => option.name}
+                onChange={(e, v) => changeCommanders(v)}
+                value={commanders}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" label="Commander" />
+                )}
+              />
+            </Grid>
+          </Grid>
         </Grid>
 
         <Grid item xs={12}>

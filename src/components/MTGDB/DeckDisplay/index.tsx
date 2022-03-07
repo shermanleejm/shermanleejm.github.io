@@ -35,6 +35,9 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
   const [deleteDialogState, setDeleteDialogState] = useState(false);
   const [deleteDeckName, setDeleteDeckName] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deckFaceCards, setDeckFaceCards] = useState<{
+    [name: string]: CardsTableType;
+  }>({});
 
   const db = useSelector((state: State) => state.database);
 
@@ -44,11 +47,29 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
       let _deckCardState: Set<string> = new Set(
         (await db.decks.toArray()).map((d) => d.name)
       );
+      let _deckFaceCards: { [name: string]: CardsTableType } = {};
       for (let _deckName of _deckCardState) {
         let _deckCards = await getDeckCards(db, _deckName);
         _decks[_deckName] = _deckCards;
+        let _commandersDecks = (
+          await db.decks
+            .where({
+              name: _deckName,
+            })
+            .toArray()
+        ).filter((d) => d.is_commander);
+        let _commanders: CardsTableType[] = [];
+        for (let i = 0; i < _commandersDecks.length; i++) {
+          let _c = await db.cards.get(_commandersDecks[i].card_id);
+          _commanders.push(_c!);
+        }
+        if (_commanders.length === 0) {
+          _deckFaceCards[_deckName] = _deckCards[0];
+        } else {
+          _deckFaceCards[_deckName] = _commanders[0];
+        }
       }
-
+      setDeckFaceCards(_deckFaceCards);
       setDeckCardState(_deckCardState);
       setDecks(_decks);
       setIsLoading(false);
@@ -107,7 +128,11 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
                 <Card>
                   <CardMedia
                     component="img"
-                    src={decks[deckName] ? decks[deckName][0].image_uri.normal[0] : ''}
+                    src={
+                      deckFaceCards[deckName]
+                        ? deckFaceCards[deckName].image_uri.normal[0]
+                        : ''
+                    }
                   />
                   <CardContent>
                     <Typography variant="body1">{deckName}</Typography>
