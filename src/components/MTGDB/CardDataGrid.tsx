@@ -210,7 +210,7 @@ const CardDataGrid = () => {
         setCards(
           memoCards.filter((c) => {
             if (val.length > 0) {
-              return val.every((q) => {
+              return val.some((q) => {
                 q = q.toLowerCase();
                 if (q.includes(":")) {
                   let type = q.split(":")[0].trim();
