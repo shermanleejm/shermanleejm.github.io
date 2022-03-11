@@ -18,6 +18,7 @@ import {
   DialogTitle,
   Grid,
   IconButton,
+  Link,
   List,
   ListItem,
   ListItemText,
@@ -34,6 +35,7 @@ import { useSelector } from "react-redux";
 import { State } from "../../state/reducers";
 import { infoHelper, rarityTypes } from "./DeckDisplay/DeckBuilderUI";
 import InfoIcon from "@mui/icons-material/Info";
+import LaunchIcon from "@mui/icons-material/Launch";
 
 export const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -111,11 +113,11 @@ const CardDataGrid = () => {
         );
       },
     },
-    { field: "cmc", headerName: "CMC", width: 65 },
+    { field: "cmc", headerName: "CMC", flex: 1 },
     {
       field: "price",
       headerName: "Price",
-      width: colWidth / 1.8,
+      flex: 1,
       valueFormatter: (params: GridValueFormatterParams) => {
         return `$${params.value}`;
       },
@@ -123,9 +125,51 @@ const CardDataGrid = () => {
     {
       field: "edhrec_rank",
       headerName: "EDHREC Rank",
-      width: colWidth / 1.5,
+      minWidth: 200,
+      flex: 1,
       valueGetter: (params) => {
         return params.row.edhrec_rank ?? 999999;
+      },
+      renderCell: (params: GridRenderCellParams) => {
+        let data: CardsTableType = params.row;
+        let edhName = data.name
+          .split("//")[0]
+          .trim()
+          .replace(/[^a-zA-Z\s-]/g, "")
+          .replace(/\s/g, "-")
+          .toLowerCase();
+        let typeLine = data.type_line.toLowerCase();
+        return (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography>{params.row.edhrec_rank ?? 999999}</Typography>
+            <IconButton
+              onClick={() =>
+                window.open(`https://edhrec.com/cards/${edhName}`, "_blank")
+              }
+            >
+              <LaunchIcon />
+            </IconButton>
+            {typeLine.includes("legendary") && (
+              <Button
+                onClick={() =>
+                  window.open(
+                    `https://edhrec.com/commanders/${edhName}`,
+                    "_blank"
+                  )
+                }
+              >
+                commander
+              </Button>
+            )}
+          </div>
+        );
       },
     },
     {
@@ -270,7 +314,10 @@ const CardDataGrid = () => {
         );
         break;
       case "tags":
+        setCards(memoCards.filter((c) => val.some((v) => c[k].includes(v))));
+        break;
       case "set_name":
+        console.log(val);
         setCards(memoCards.filter((c) => val.some((v) => c[k] === v)));
         break;
       case "type_line":
