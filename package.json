@@ -52,7 +52,7 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -b master -d build",
-    "lazy": "git add . && git commit -m \"${msg}\" && git push && yarn deploy"
+    "lazy": "git add . && git commit -m \"${m}\" && git push && yarn deploy"
   },
   "eslintConfig": {
     "extends": "react-app"
