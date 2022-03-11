@@ -43,7 +43,7 @@ export const infoHelper = [
   {
     title: "Set Names",
     explanation: "Use s: in front of the set to search for.",
-    example: "s:kamigawa neon dynasty, s:innistrad",
+    example: "set:kamigawa neon dynasty, set:innistrad",
   },
   {
     title: "Card Text (Oracle)",
@@ -60,6 +60,11 @@ export const infoHelper = [
     title: "Rarity",
     explanation: "Use r: in front of the text to search for.",
     example: "r:r, r:M, r:uncommon",
+  },
+  {
+    title: "Special",
+    explanation: "Shortcuts for easier searching.",
+    example: "s:commander, s:etb, s:tap",
   },
 ];
 
@@ -234,15 +239,12 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                 if (q.includes(":")) {
                   let type = q.split(":")[0].trim();
                   let qq = q.split(":")[1].trim();
-                  if (qq === "tap") {
-                    qq = "{t}";
-                  }
                   switch (type) {
                     case "t":
                       return c.type_line.toLowerCase().includes(qq);
                     case "o":
                       return c.oracle_text?.toLowerCase().includes(qq);
-                    case "s":
+                    case "set":
                       return c.set_name.toLowerCase().includes(qq);
                     case "p":
                       let currFloat: number = parseFloat(
@@ -272,6 +274,29 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                         return c.rarity.includes("WRONG");
                       }
                       return c.rarity === rareTypes[rareType];
+                    case "s":
+                      let specialQuery = qq.toLowerCase();
+                      if (specialQuery === "tap") {
+                        return c.oracle_text?.includes("{T}");
+                      }
+                      if (specialQuery === "etb") {
+                        return (
+                          c.oracle_text &&
+                          c.oracle_text
+                            .toLowerCase()
+                            .includes("enters the battlefield")
+                        );
+                      }
+                      if (specialQuery === "commander") {
+                        let _typeLine = c.type_line.toLowerCase();
+                        let _oracleText = c.oracle_text?.toLowerCase();
+                        return (
+                          _typeLine.includes("legendary") &&
+                          (_typeLine.includes("creature") ||
+                            _oracleText?.includes("can be your commander"))
+                        );
+                      }
+                      return false;
                     default:
                       return false;
                   }

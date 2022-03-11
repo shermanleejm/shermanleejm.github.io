@@ -25,6 +25,7 @@ import {
   MenuItem,
   Select,
   styled,
+  Switch,
   TextField,
   Tooltip,
   TooltipProps,
@@ -53,6 +54,8 @@ const CardDataGrid = () => {
   const [uniqueTags, setUniqueTags] = useState<string[]>();
   const [uniqueSets, setUniqueSets] = useState<string[]>();
   const [showInfoDialog, setShowInfoDialog] = useState(false);
+  const [andOr, setAndOr] = useState(false);
+  const [searchQueries, setSearchQueries] = useState<string[]>([]);
 
   const colWidth = (window.innerWidth * 0.8) / 4;
   const db = useSelector((state: State) => state.database);
@@ -139,6 +142,10 @@ const CardDataGrid = () => {
           .replace(/\s/g, "-")
           .toLowerCase();
         let typeLine = data.type_line.toLowerCase();
+        let canBeCommander =
+          typeLine.includes("legendary") &&
+          (typeLine.includes("creature") ||
+            data.oracle_text?.toLowerCase().includes("can be your commander"));
         return (
           <div
             style={{
@@ -156,7 +163,7 @@ const CardDataGrid = () => {
             >
               <LaunchIcon />
             </IconButton>
-            {typeLine.includes("legendary") && (
+            {canBeCommander && (
               <Button
                 onClick={() =>
                   window.open(
@@ -244,6 +251,160 @@ const CardDataGrid = () => {
     { slug: "general", name: "MTG Arena Style" },
   ];
 
+  function filterLogicAnd(c: CardsTableType, val: string[]) {
+    if (val.length > 0) {
+      return val.every((q) => {
+        q = q.toLowerCase();
+        if (q.includes(":")) {
+          let type = q.split(":")[0].trim();
+          let qq = q.split(":")[1].trim();
+
+          switch (type) {
+            case "t":
+              return c.type_line.toLowerCase().includes(qq);
+            case "o":
+              return c.oracle_text?.toLowerCase().includes(qq);
+            case "set":
+              return c.set_name.toLowerCase().includes(qq);
+            case "p":
+              let currFloat: number = parseFloat(qq.match(/[0-9.]+/)![0]);
+              if (!isNaN(currFloat)) {
+                if (qq.includes("<")) {
+                  return c.price < currFloat;
+                } else if (qq.includes(">")) {
+                  return c.price > currFloat;
+                }
+              }
+              break;
+            case "r":
+              let rareType = qq.toLowerCase();
+              let rareTypes: { [key: string]: string } = {
+                r: rarityTypes.RARE,
+                rare: rarityTypes.RARE,
+                m: rarityTypes.MYTHIC,
+                mythic: rarityTypes.MYTHIC,
+                u: rarityTypes.UNCOMMON,
+                uncommon: rarityTypes.UNCOMMON,
+                c: rarityTypes.COMMON,
+                common: rarityTypes.COMMON,
+              };
+              if (!Object.keys(rareTypes).includes(rareType)) {
+                return c.rarity.includes("WRONG");
+              }
+              return c.rarity === rareTypes[rareType];
+            case "s":
+              let specialQuery = qq.toLowerCase();
+              if (specialQuery === "tap") {
+                return c.oracle_text?.includes("{T}");
+              }
+              if (specialQuery === "etb") {
+                return (
+                  c.oracle_text &&
+                  c.oracle_text.toLowerCase().includes("enters the battlefield")
+                );
+              }
+              if (specialQuery === "commander") {
+                let _typeLine = c.type_line.toLowerCase();
+                let _oracleText = c.oracle_text?.toLowerCase();
+                return (
+                  _typeLine.includes("legendary") &&
+                  (_typeLine.includes("creature") ||
+                    _oracleText?.includes("can be your commander"))
+                );
+              }
+              return false;
+            default:
+              return false;
+          }
+        }
+        return (
+          c.name.toLowerCase().includes(q) ||
+          c.set_name.toLowerCase().includes(q) ||
+          c.oracle_text?.toLowerCase().includes(q) ||
+          c.type_line.toLowerCase().includes(q)
+        );
+      });
+    }
+    return true;
+  }
+
+  function filterLogicOr(c: CardsTableType, val: string[]) {
+    if (val.length > 0) {
+      return val.some((q) => {
+        q = q.toLowerCase();
+        if (q.includes(":")) {
+          let type = q.split(":")[0].trim();
+          let qq = q.split(":")[1].trim();
+
+          switch (type) {
+            case "t":
+              return c.type_line.toLowerCase().includes(qq);
+            case "o":
+              return c.oracle_text?.toLowerCase().includes(qq);
+            case "set":
+              return c.set_name.toLowerCase().includes(qq);
+            case "p":
+              let currFloat: number = parseFloat(qq.match(/[0-9.]+/)![0]);
+              if (!isNaN(currFloat)) {
+                if (qq.includes("<")) {
+                  return c.price < currFloat;
+                } else if (qq.includes(">")) {
+                  return c.price > currFloat;
+                }
+              }
+              break;
+            case "r":
+              let rareType = qq.toLowerCase();
+              let rareTypes: { [key: string]: string } = {
+                r: rarityTypes.RARE,
+                rare: rarityTypes.RARE,
+                m: rarityTypes.MYTHIC,
+                mythic: rarityTypes.MYTHIC,
+                u: rarityTypes.UNCOMMON,
+                uncommon: rarityTypes.UNCOMMON,
+                c: rarityTypes.COMMON,
+                common: rarityTypes.COMMON,
+              };
+              if (!Object.keys(rareTypes).includes(rareType)) {
+                return c.rarity.includes("WRONG");
+              }
+              return c.rarity === rareTypes[rareType];
+            case "s":
+              let specialQuery = qq.toLowerCase();
+              if (specialQuery === "tap") {
+                return c.oracle_text?.includes("{T}");
+              }
+              if (specialQuery === "etb") {
+                return (
+                  c.oracle_text &&
+                  c.oracle_text.toLowerCase().includes("enters the battlefield")
+                );
+              }
+              if (specialQuery === "commander") {
+                let _typeLine = c.type_line.toLowerCase();
+                let _oracleText = c.oracle_text?.toLowerCase();
+                return (
+                  _typeLine.includes("legendary") &&
+                  (_typeLine.includes("creature") ||
+                    _oracleText?.includes("can be your commander"))
+                );
+              }
+              return false;
+            default:
+              return false;
+          }
+        }
+        return (
+          c.name.toLowerCase().includes(q) ||
+          c.set_name.toLowerCase().includes(q) ||
+          c.oracle_text?.toLowerCase().includes(q) ||
+          c.type_line.toLowerCase().includes(q)
+        );
+      });
+    }
+    return true;
+  }
+
   function filterCardArr(k: string, val: string[]) {
     if (val.length <= 0) {
       setCards(memoCards);
@@ -252,65 +413,11 @@ const CardDataGrid = () => {
     switch (k) {
       case "general":
         setCards(
-          memoCards.filter((c) => {
-            if (val.length > 0) {
-              return val.some((q) => {
-                q = q.toLowerCase();
-                if (q.includes(":")) {
-                  let type = q.split(":")[0].trim();
-                  let qq = q.split(":")[1].trim();
-                  if (qq === "tap") {
-                    qq = "{t}";
-                  }
-                  switch (type) {
-                    case "t":
-                      return c.type_line.toLowerCase().includes(qq);
-                    case "o":
-                      return c.oracle_text?.toLowerCase().includes(qq);
-                    case "s":
-                      return c.set_name.toLowerCase().includes(qq);
-                    case "p":
-                      let currFloat: number = parseFloat(
-                        qq.match(/[0-9.]+/)![0]
-                      );
-                      if (!isNaN(currFloat)) {
-                        if (qq.includes("<")) {
-                          return c.price < currFloat;
-                        } else if (qq.includes(">")) {
-                          return c.price > currFloat;
-                        }
-                      }
-                      break;
-                    case "r":
-                      let rareType = qq.toLowerCase();
-                      let rareTypes: { [key: string]: string } = {
-                        r: rarityTypes.RARE,
-                        rare: rarityTypes.RARE,
-                        m: rarityTypes.MYTHIC,
-                        mythic: rarityTypes.MYTHIC,
-                        u: rarityTypes.UNCOMMON,
-                        uncommon: rarityTypes.UNCOMMON,
-                        c: rarityTypes.COMMON,
-                        common: rarityTypes.COMMON,
-                      };
-                      if (!Object.keys(rareTypes).includes(rareType)) {
-                        return c.rarity.includes("WRONG");
-                      }
-                      return c.rarity === rareTypes[rareType];
-                    default:
-                      return false;
-                  }
-                }
-                return (
-                  c.name.toLowerCase().includes(q) ||
-                  c.set_name.toLowerCase().includes(q) ||
-                  c.oracle_text?.toLowerCase().includes(q) ||
-                  c.type_line.toLowerCase().includes(q)
-                );
-              });
-            }
-            return true;
-          })
+          memoCards.filter((c) =>
+            andOr
+              ? filterLogicAnd((c = c), (val = val))
+              : filterLogicOr((c = c), (val = val))
+          )
         );
         break;
       case "tags":
@@ -443,15 +550,20 @@ const CardDataGrid = () => {
         {/* Filter */}
         <Grid item>
           <div style={{ width: "80vw" }}>
-            <Grid container>
+            <Grid container alignItems={"center"}>
               {selectedFilter === "general" && (
-                <Grid item xs={2} sm={1}>
+                <Grid item xs={2} sm={1} md={0.5}>
                   <IconButton onClick={() => setShowInfoDialog(true)}>
                     <InfoIcon />
                   </IconButton>
                 </Grid>
               )}
-              <Grid item xs={4} md={3}>
+              <Grid
+                item
+                xs={selectedFilter === "general" ? 10 : 12}
+                sm={selectedFilter === "general" ? 11 : 4}
+                md={selectedFilter === "general" ? 3 : 3.5}
+              >
                 <Select
                   fullWidth
                   defaultValue={selectedFilter}
@@ -464,11 +576,34 @@ const CardDataGrid = () => {
                   ))}
                 </Select>
               </Grid>
+
+              {selectedFilter === "general" && (
+                <Grid item xs={5} sm={2.5} md={1}>
+                  <div
+                    style={{
+                      flexDirection: "row",
+                      display: "flex",
+                      alignItems: "center",
+                      marginLeft: "1rem",
+                    }}
+                  >
+                    And
+                    <Switch
+                      checked={andOr}
+                      onChange={() => {
+                        setAndOr(!andOr);
+                      }}
+                    />
+                    Or
+                  </div>
+                </Grid>
+              )}
+
               <Grid
                 item
-                xs={selectedFilter === "general" ? 6 : 8}
-                sm={selectedFilter === "general" ? 7 : 8}
-                md={selectedFilter === "general" ? 8 : 9}
+                xs={selectedFilter === "general" ? 7 : 12}
+                sm={selectedFilter === "general" ? 9.5 : 8}
+                md={selectedFilter === "general" ? 7.5 : 8.5}
               >
                 <Autocomplete
                   fullWidth
@@ -478,6 +613,7 @@ const CardDataGrid = () => {
                   multiple={true}
                   onChange={(_, v) => {
                     filterCardArr(selectedFilter, v);
+                    setSearchQueries(v);
                   }}
                   renderTags={(value: readonly string[], getTagProps) =>
                     value.map((option: string, index: number) => (
