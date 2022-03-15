@@ -578,7 +578,7 @@ const CardDataGrid = () => {
               </Grid>
 
               {selectedFilter === "general" && (
-                <Grid item xs={5} sm={2.5} md={1}>
+                <Grid item xs={5} sm={2.5} md={2} lg={1.2}>
                   <div
                     style={{
                       flexDirection: "row",
@@ -603,7 +603,8 @@ const CardDataGrid = () => {
                 item
                 xs={selectedFilter === "general" ? 7 : 12}
                 sm={selectedFilter === "general" ? 9.5 : 8}
-                md={selectedFilter === "general" ? 7.5 : 8.5}
+                md={selectedFilter === "general" ? 6.5 : 8.5}
+                lg={selectedFilter === "general" ? 7.3 : 8.5}
               >
                 <Autocomplete
                   fullWidth
