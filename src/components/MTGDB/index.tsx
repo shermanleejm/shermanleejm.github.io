@@ -100,7 +100,11 @@ const MTGDB = () => {
     },
     {
       label: 'Cards Table',
-      component: <CardDataGrid />,
+      component: (
+        <CardDataGrid
+          toaster={(m: string, e: ToasterSeverityEnum) => openToaster(m, e)}
+        />
+      ),
     },
     {
       label: 'Deck Builder',

@@ -238,9 +238,10 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
 
   async function generateMissingText(type = 'ck') {
     let missingCardsTxt: Set<string> = new Set();
+    let visited: Set<string> = new Set();
     for (let c of searchResults) {
       let exists = await db.cards.where('name').equalsIgnoreCase(c.name).first();
-      if (!exists) {
+      if (!exists && !visited.has(c.name)) {
         switch (type) {
           case 'ck':
             missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
@@ -253,6 +254,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             break;
         }
       }
+      visited.add(c.name);
     }
     navigator.clipboard
       .writeText(Array.from(missingCardsTxt).join('\n').substring(0, 99999))

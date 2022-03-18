@@ -37,12 +37,17 @@ import { State } from '../../state/reducers';
 import { infoHelper, rarityTypes } from './DeckDisplay/DeckBuilderUI';
 import InfoIcon from '@mui/icons-material/Info';
 import LaunchIcon from '@mui/icons-material/Launch';
+import { ToasterSeverityEnum } from '.';
 
 export const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({}));
 
-const CardDataGrid = () => {
+type CardDataGridProps = {
+  toaster: (m: string, e: ToasterSeverityEnum) => void;
+};
+
+const CardDataGrid = ({ toaster }: CardDataGridProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCards, setSelectedCards] = useState<CardsTableType[]>([]);
@@ -56,6 +61,9 @@ const CardDataGrid = () => {
   const [showInfoDialog, setShowInfoDialog] = useState(false);
   const [andOr, setAndOr] = useState(false);
   const [searchQueries, setSearchQueries] = useState<string[]>([]);
+  const [isGeneratingMissing, setIsGeneratingMissing] = useState(false);
+  const [showMissingDialog, setShowMissingDialog] = useState(false);
+  const [missingTxt, setMissingTxt] = useState('');
 
   const colWidth = (window.innerWidth * 0.8) / 4;
   const db = useSelector((state: State) => state.database);
@@ -499,6 +507,30 @@ const CardDataGrid = () => {
     );
   };
 
+  async function generateMissingText() {
+    let missingCardsTxt: Set<string> = new Set();
+    let visited: Set<string> = new Set();
+    for (let c of selectedCards) {
+      if (!visited.has(c.name)) {
+        missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
+      }
+      visited.add(c.name);
+    }
+    navigator.clipboard
+      .writeText(Array.from(missingCardsTxt).join('\n').substring(0, 99999))
+      .then(() => console.log('Copied'))
+      .catch((err) =>
+        toaster(
+          'Sorry, your device settings does not allow me to copy to your clipboard',
+          ToasterSeverityEnum.ERROR
+        )
+      );
+    setIsGeneratingMissing(false);
+    setMissingTxt(Array.from(missingCardsTxt).join('\n').substring(0, 99999));
+    setShowMissingDialog(true);
+    toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
+  }
+
   return isLoading ? (
     <CircularProgress />
   ) : (
@@ -551,7 +583,7 @@ const CardDataGrid = () => {
                 </Select>
               </Grid>
 
-              {selectedFilter === "general" && (
+              {selectedFilter === 'general' && (
                 <Grid item xs={5} sm={2.5} md={2} lg={1.2}>
                   <div
                     style={{
@@ -575,10 +607,10 @@ const CardDataGrid = () => {
 
               <Grid
                 item
-                xs={selectedFilter === "general" ? 7 : 12}
-                sm={selectedFilter === "general" ? 9.5 : 8}
-                md={selectedFilter === "general" ? 6.5 : 8.5}
-                lg={selectedFilter === "general" ? 7.3 : 8.5}
+                xs={selectedFilter === 'general' ? 7 : 12}
+                sm={selectedFilter === 'general' ? 9.5 : 8}
+                md={selectedFilter === 'general' ? 6.5 : 8.5}
+                lg={selectedFilter === 'general' ? 7.3 : 8.5}
               >
                 <Autocomplete
                   fullWidth
@@ -668,6 +700,21 @@ const CardDataGrid = () => {
           </Button>
         </Grid>
         <Grid item>
+          {selectedCards.length > 0 &&
+            (isGeneratingMissing ? (
+              <CircularProgress />
+            ) : (
+              <Button
+                onClick={() => {
+                  setIsGeneratingMissing(true);
+                  generateMissingText();
+                }}
+              >
+                copy selected (CardKingdom/TCGPlayer)
+              </Button>
+            ))}
+        </Grid>
+        <Grid item>
           {selectedCards.length > 0 && (
             <Button
               href={`data:text/json;charset=utf-8,${encodeURIComponent(
@@ -711,6 +758,12 @@ const CardDataGrid = () => {
         <DialogActions>
           <Button onClick={() => setCalculateDialogState(false)}>close</Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Missing Dialog */}
+      <Dialog open={showMissingDialog} onClose={() => setShowMissingDialog(false)}>
+        <DialogTitle>Selected Cards</DialogTitle>
+        <TextField multiline value={missingTxt} onFocus={(e: any) => e.target.select()} />
       </Dialog>
     </Box>
   );
