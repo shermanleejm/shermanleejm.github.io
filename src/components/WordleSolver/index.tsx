@@ -78,6 +78,7 @@ const WordleSolver = () => {
     setWords(tmp);
   }
 
+  const ref0 = React.useRef<HTMLInputElement>();
   const ref1 = React.useRef<HTMLInputElement>();
   const ref2 = React.useRef<HTMLInputElement>();
   const ref3 = React.useRef<HTMLInputElement>();
@@ -134,13 +135,15 @@ const WordleSolver = () => {
         </Grid>
 
         <Grid item>
-          <Typography>TIP: best starting word is CRANE</Typography>
+          <Typography>TIP: best starting word is CRATE</Typography>
         </Grid>
 
         <Grid item xs={12}>
           <TextField
             style={{ width: '2.5rem' }}
+            inputRef={ref0}
             value={_1}
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_1(
                 e.target.value
@@ -155,6 +158,13 @@ const WordleSolver = () => {
             style={{ width: '2.5rem' }}
             value={_2}
             inputRef={ref1}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Backspace') {
+                set_2('');
+                ref0.current?.focus();
+              }
+            }}
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_2(
                 e.target.value
@@ -169,6 +179,13 @@ const WordleSolver = () => {
             style={{ width: '2.5rem' }}
             value={_3}
             inputRef={ref2}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Backspace') {
+                set_3('');
+                ref1.current?.focus();
+              }
+            }}
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_3(
                 e.target.value
@@ -183,6 +200,13 @@ const WordleSolver = () => {
             style={{ width: '2.5rem' }}
             value={_4}
             inputRef={ref3}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Backspace') {
+                set_4('');
+                ref2.current?.focus();
+              }
+            }}
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_4(
                 e.target.value
@@ -197,6 +221,13 @@ const WordleSolver = () => {
             style={{ width: '2.5rem' }}
             value={_5}
             inputRef={ref4}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Backspace') {
+                set_5('');
+                ref3.current?.focus();
+              }
+            }}
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_5(
                 e.target.value
@@ -214,9 +245,9 @@ const WordleSolver = () => {
             value={wrongGuesses}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setWrongGuesses(
-                Array.from(new Set(e.target.value.replace(/[^a-z]/, '').split(''))).join(
-                  ''
-                )
+                Array.from(
+                  new Set(e.target.value.replace(/[^a-zA-Z]/, '').split(''))
+                ).join('')
               )
             }
           />
@@ -229,7 +260,7 @@ const WordleSolver = () => {
                 label="incorrect (1)"
                 value={incorrect_1}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_1(e.target.value.replace(/[^a-z]/, ''));
+                  setIncorrect_1(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
               />
             </Grid>
@@ -238,7 +269,7 @@ const WordleSolver = () => {
                 label="incorrect (2)"
                 value={incorrect_2}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_2(e.target.value.replace(/[^a-z]/, ''));
+                  setIncorrect_2(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
               />
             </Grid>
@@ -247,7 +278,7 @@ const WordleSolver = () => {
                 label="incorrect (3)"
                 value={incorrect_3}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_3(e.target.value.replace(/[^a-z]/, ''));
+                  setIncorrect_3(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
               />
             </Grid>
@@ -256,7 +287,7 @@ const WordleSolver = () => {
                 label="incorrect (4)"
                 value={incorrect_4}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_4(e.target.value.replace(/[^a-z]/, ''));
+                  setIncorrect_4(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
               />
             </Grid>
@@ -265,7 +296,7 @@ const WordleSolver = () => {
                 label="incorrect (5)"
                 value={incorrect_5}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_5(e.target.value.replace(/[^a-z]/, ''));
+                  setIncorrect_5(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
               />
             </Grid>
