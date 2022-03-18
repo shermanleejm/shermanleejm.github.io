@@ -3,6 +3,8 @@ import {
   Button,
   CircularProgress,
   Dialog,
+  DialogActions,
+  DialogContent,
   DialogTitle,
   Grid,
   IconButton,
@@ -15,7 +17,7 @@ import {
 import axios, { AxiosResponse } from 'axios';
 import React, { useState } from 'react';
 import { ScryfallDataType, ScryfallSetType } from '../interfaces';
-import { MTGDBProps, ToasterSeverityEnum } from '..';
+import { MTGDBProps, storeCard, ToasterSeverityEnum } from '..';
 import SearchResultCard from './SearchResultCard';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useEffect } from 'react';
@@ -48,13 +50,16 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [setCodes, setSetCodes] = useState<SetSearchType[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>(SearchCardFilter.name);
   const [selectedSet, setSelectedSet] = useState<SetSearchType>();
-  const [isGeneratingMissing, setIsGeneratingMssing] = useState(false);
+  const [isGeneratingMissing, setIsGeneratingMissing] = useState(false);
   const [showMissingDialog, setShowMissingDialog] = useState(false);
   const [missingTxt, setMissingTxt] = useState('');
   const [infiniteData, setInfiniteData] = useState<ScryfallDataType[]>([]);
   const PER_PAGE = 12;
   const [endPage, setEndPage] = useState(PER_PAGE);
   const [showBottomSpinner, setShowBottomSpinner] = useState(false);
+  const [showAddConfirmation, setShowAddConfirmation] = useState(false);
+  const [isAddingAll, setIsAddingAll] = useState(false);
+  const [addingMessage, setAddingMessage] = useState('');
 
   const db = useSelector((state: State) => state.database);
 
@@ -231,12 +236,22 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     { slug: 'bulk', name: 'Bulk Entry' },
   ];
 
-  async function generateMissingTxt() {
+  async function generateMissingText(type = 'ck') {
     let missingCardsTxt: Set<string> = new Set();
     for (let c of searchResults) {
       let exists = await db.cards.where('name').equalsIgnoreCase(c.name).first();
       if (!exists) {
-        missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
+        switch (type) {
+          case 'ck':
+            missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
+            break;
+          case 'set':
+            missingCardsTxt.add(`${c.set}:${c.collector_number}`);
+            break;
+          default:
+            missingCardsTxt.add(`1 ${c.name.split(' // ')[0]}`);
+            break;
+        }
       }
     }
     navigator.clipboard
@@ -248,7 +263,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
           ToasterSeverityEnum.ERROR
         )
       );
-    setIsGeneratingMssing(false);
+    setIsGeneratingMissing(false);
     setMissingTxt(Array.from(missingCardsTxt).join('\n').substring(0, 99999));
     setShowMissingDialog(true);
     toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
@@ -322,6 +337,15 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
       default:
         return null;
     }
+  }
+
+  async function addAll() {
+    for (let i = 0; i < searchResults.length; i++) {
+      setAddingMessage(searchResults[i].name);
+      await storeCard(db, searchResults[i], [defaultTag]);
+    }
+    setIsAddingAll(false);
+    setShowAddConfirmation(false);
   }
 
   return isLoading ? (
@@ -404,19 +428,43 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
               )}
             </Grid>
             <Grid item>
-              {searchResults.length > 0 &&
-                (isGeneratingMissing ? (
-                  <CircularProgress />
-                ) : (
-                  <Button
-                    onClick={() => {
-                      setIsGeneratingMssing(true);
-                      generateMissingTxt();
-                    }}
-                  >
-                    copy missing to clipboard
-                  </Button>
-                ))}
+              <Grid container justifyContent={'space-between'}>
+                {searchResults.length > 0 &&
+                  (isGeneratingMissing ? (
+                    <Grid item>
+                      <CircularProgress />
+                    </Grid>
+                  ) : (
+                    <>
+                      <Grid item>
+                        <Button
+                          onClick={() => {
+                            setIsGeneratingMissing(true);
+                            generateMissingText();
+                          }}
+                        >
+                          copy missing (CardKingdom/TCGPlayer)
+                        </Button>
+                      </Grid>
+
+                      <Grid item>
+                        <Button
+                          onClick={() => {
+                            setIsGeneratingMissing(true);
+                            generateMissingText('set');
+                          }}
+                        >
+                          copy missing (set number)
+                        </Button>
+                      </Grid>
+                    </>
+                  ))}
+                {searchResults.length > 0 && (
+                  <Grid item>
+                    <Button onClick={() => setShowAddConfirmation(true)}>add all</Button>
+                  </Grid>
+                )}
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
@@ -450,6 +498,37 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
       <Dialog open={showMissingDialog} onClose={() => setShowMissingDialog(false)}>
         <DialogTitle>Missing Cards</DialogTitle>
         <TextField multiline value={missingTxt} onFocus={(e: any) => e.target.select()} />
+      </Dialog>
+
+      <Dialog open={showAddConfirmation} onClose={() => setShowAddConfirmation(false)}>
+        <DialogTitle>Confirm add all?</DialogTitle>
+        <DialogContent>
+          {isAddingAll ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <CircularProgress />
+              Adding {addingMessage} now...
+            </div>
+          ) : (
+            ''
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setIsAddingAll(true);
+              addAll();
+            }}
+          >
+            Confirm
+          </Button>
+          <Button onClick={() => setShowAddConfirmation(false)}>Cancel</Button>
+        </DialogActions>
       </Dialog>
     </div>
   );

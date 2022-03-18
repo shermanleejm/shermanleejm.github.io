@@ -191,7 +191,7 @@ export async function storeCard(
   let imgUris: CustomImageUris = { small: [], normal: [] };
   let oracleText = '';
   let typeLine = '';
-  tags = tags || [];
+  tags = tags?.filter((t) => t.length > 0) || [];
 
   const collision: CardsTableType | undefined = await db.cards
     .where('scryfall_id')
