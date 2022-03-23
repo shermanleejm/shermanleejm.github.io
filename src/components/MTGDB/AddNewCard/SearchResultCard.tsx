@@ -9,6 +9,7 @@ import {
   Chip,
   CircularProgress,
   Grid,
+  IconButton,
   MenuItem,
   TextField,
   Typography,
@@ -20,6 +21,7 @@ import { storeCard, ToasterSeverityEnum } from '..';
 import { CustomImageUris } from '../../../database';
 import { State } from '../../../state/reducers';
 import { ScryfallDataType } from '../interfaces';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 export type SearchResultCardType = {
   sr: ScryfallDataType;
@@ -41,12 +43,15 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
     normal: [],
   });
   const [showOverlay, setShowOverlay] = useState(false);
+  const [similarNameExists, setSimilarNameExists] = useState(false);
 
   const db = useSelector((state: State) => state.database);
 
   useEffect(() => {
     async function preCheck() {
       let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
+      let check1 = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
+      setSimilarNameExists(check1 !== undefined && check === undefined);
 
       let oldTags: string[] = [];
       if (defaultTag !== '') {
@@ -216,7 +221,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
             <Grid item>
               <Grid container>
                 <Grid item>
-                  <Button
+                  <IconButton
                     disabled={isClicked}
                     onClick={() => {
                       setIsClicked(true);
@@ -224,13 +229,20 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
                       toaster(`Added ${sr.name}!`, ToasterSeverityEnum.SUCCESS);
                     }}
                   >
-                    add card
-                  </Button>
+                    <AddCircleIcon />
+                  </IconButton>
                 </Grid>
                 <Grid item>
                   <Button disabled={!isClicked} onClick={() => removeCard()}>
                     undo
                   </Button>
+                </Grid>
+                <Grid item>
+                  {similarNameExists ? (
+                    <Typography>A card with the same name already exists</Typography>
+                  ) : (
+                    ''
+                  )}
                 </Grid>
               </Grid>
             </Grid>

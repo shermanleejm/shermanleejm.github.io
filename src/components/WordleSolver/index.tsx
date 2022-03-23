@@ -23,9 +23,9 @@ const WordleSolver = () => {
 
   const test =
     WORDS[
-      (Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) + 237) % WORDS.length
+      (Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) + 235) % WORDS.length
     ];
-
+  console.log(test);
   function solve() {
     setInitial(false);
 
