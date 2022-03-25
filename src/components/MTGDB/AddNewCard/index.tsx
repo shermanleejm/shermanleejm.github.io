@@ -11,6 +11,7 @@ import {
   InputAdornment,
   MenuItem,
   Select,
+  Stack,
   Switch,
   TextField,
   Typography,
@@ -466,17 +467,20 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                   </Grid>
                 </Grid>
                 <Grid item>
-                  <Switch
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                      // setSearchResults([]);
-                      // setInfiniteData([]);
-                      if (event.target.checked) {
-                        rootStore(missing);
-                      } else {
-                        rootStore(memo);
-                      }
-                    }}
-                  />
+                  <Stack direction="row" alignItems={'center'} spacing={1}>
+                    <Typography>Show missing</Typography>
+                    <Switch
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        // setSearchResults([]);
+                        // setInfiniteData([]);
+                        if (event.target.checked) {
+                          rootStore(missing);
+                        } else {
+                          rootStore(memo);
+                        }
+                      }}
+                    />
+                  </Stack>
                 </Grid>
               </>
             )}
