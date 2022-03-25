@@ -50,6 +50,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
   useEffect(() => {
     async function preCheck() {
       setIsLoading(true);
+      console.log(sr.id, sr.name);
       let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
       let check1 = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
       setSimilarNameExists(check1 !== undefined && check === undefined);
@@ -109,7 +110,8 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
     }
 
     preCheck();
-  }, [sr]);
+    console.log(isClicked, sr.name);
+  }, [sr, defaultTag]);
 
   const handleTagChange = (
     event: SyntheticEvent<Element, Event>,

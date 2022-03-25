@@ -16,7 +16,6 @@ const SearchResults = ({
   defaultTag,
   toaster,
 }: SearchResultsComponentProps) => {
-  const [isLoading, setIsLoading] = useState(true);
   const [infiniteData, setInfiniteData] = useState<ScryfallDataType[]>([]);
   const [_searchResults, set_searchResults] = useState<ScryfallDataType[]>([]);
   const PER_PAGE = 12;
@@ -27,7 +26,6 @@ const SearchResults = ({
     function init() {
       setInfiniteData(searchResults.slice(0, PER_PAGE));
       set_searchResults(searchResults);
-      setIsLoading(false);
     }
 
     init();
@@ -54,9 +52,7 @@ const SearchResults = ({
     );
   };
 
-  return isLoading ? (
-    <CircularProgress />
-  ) : (
+  return (
     <>
       {/* Search results */}
       <Grid item>
