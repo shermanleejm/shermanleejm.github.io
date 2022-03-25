@@ -11,6 +11,7 @@ import {
   InputAdornment,
   MenuItem,
   Select,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material';
@@ -25,6 +26,8 @@ import { useSelector } from 'react-redux';
 import { State } from '../../../state/reducers';
 import InfiniteScroll from './InfiniteScroll';
 import CardCropper from './CardCropper';
+import { CardsTableType } from '../../../database';
+import SearchResults from './SearchResults';
 
 interface SetSearchType {
   label: string;
@@ -46,6 +49,8 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [text, setText] = useState('');
   const [lastRequest, setLastRequest] = useState(Date.now());
   const [searchResults, setSearchResults] = useState<ScryfallDataType[]>([]);
+  const [memo, setMemo] = useState<ScryfallDataType[]>([]);
+  const [missing, setMissing] = useState<ScryfallDataType[]>([]);
   const [defaultTag, setDefaultTag] = useState('');
   const [setCodes, setSetCodes] = useState<SetSearchType[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>(SearchCardFilter.name);
@@ -53,10 +58,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [isGeneratingMissing, setIsGeneratingMissing] = useState(false);
   const [showMissingDialog, setShowMissingDialog] = useState(false);
   const [missingTxt, setMissingTxt] = useState('');
-  const [infiniteData, setInfiniteData] = useState<ScryfallDataType[]>([]);
-  const PER_PAGE = 12;
-  const [endPage, setEndPage] = useState(PER_PAGE);
-  const [showBottomSpinner, setShowBottomSpinner] = useState(false);
+
   const [showAddConfirmation, setShowAddConfirmation] = useState(false);
   const [isAddingAll, setIsAddingAll] = useState(false);
   const [addingMessage, setAddingMessage] = useState('');
@@ -90,19 +92,23 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
 
   function rootStore(arr: ScryfallDataType[]) {
     setSearchResults(arr);
-    setInfiniteData(arr.slice(0, endPage + PER_PAGE));
   }
 
-  const loadMoreCards = () => {
-    setShowBottomSpinner(true);
+  async function storeMemoAndMissing(arr: ScryfallDataType[]) {
+    setMemo(arr);
 
-    setTimeout(() => {
-      let newEndPage = endPage + PER_PAGE;
-      setInfiniteData(searchResults.slice(0, newEndPage));
-      setEndPage(newEndPage);
-      setShowBottomSpinner(false);
-    }, 100);
-  };
+    let _missing: ScryfallDataType[] = [];
+    for (let i = 0; i < arr.length; i++) {
+      let sr: ScryfallDataType = arr[i];
+      let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
+      let check1 = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
+
+      if (check1 === undefined && check === undefined) {
+        _missing.push(sr);
+      }
+    }
+    setMissing(_missing);
+  }
 
   interface multiScrySingleReturn {
     output: ScryfallDataType[];
@@ -174,7 +180,6 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
 
   async function searchCard(queryName: string) {
     setIsSearching(true);
-    rootStore([]);
     let queries = [];
     switch (selectedFilter) {
       case 'bulk':
@@ -190,6 +195,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         let res = await multiScry(queries);
         rootStore(res.arr);
         setText(res.errors);
+        storeMemoAndMissing(res.arr);
         setIsSearching(false);
         break;
       case 'name':
@@ -205,6 +211,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         let res1 = await multiScry(queries);
         rootStore(res1.arr);
         setText(res1.errors);
+        storeMemoAndMissing(res1.arr);
         setIsSearching(false);
         break;
       case 'set_name':
@@ -222,6 +229,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             uri = r.data.next_page;
           }
           rootStore(tmp);
+          storeMemoAndMissing(tmp);
         }
         setIsSearching(false);
         break;
@@ -270,16 +278,6 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     setShowMissingDialog(true);
     toaster('Copied to clipboard!', ToasterSeverityEnum.SUCCESS);
   }
-
-  const BottomSpinner = () => {
-    return infiniteData.length === searchResults.length ? (
-      <Grid item>
-        <Typography>You reached the bottom!</Typography>
-      </Grid>
-    ) : (
-      <CircularProgress />
-    );
-  };
 
   function FilterTextFields() {
     switch (selectedFilter) {
@@ -415,86 +413,81 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                 </Button>
               )}
             </Grid>
-            <Grid item>
-              {searchResults.length > 0 && (
-                <Button
-                  fullWidth
-                  onClick={() => {
-                    rootStore([]);
-                    setEndPage(PER_PAGE * 2);
-                    setText('');
-                  }}
-                >
-                  clear
-                </Button>
-              )}
-            </Grid>
-            <Grid item>
-              <Grid container justifyContent={'space-between'}>
-                {searchResults.length > 0 &&
-                  (isGeneratingMissing ? (
-                    <Grid item>
-                      <CircularProgress />
-                    </Grid>
-                  ) : (
-                    <>
+            {searchResults.length > 0 && (
+              <>
+                <Grid item>
+                  <Button
+                    fullWidth
+                    onClick={() => {
+                      rootStore([]);
+                      setText('');
+                    }}
+                  >
+                    clear
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Grid container justifyContent={'space-between'}>
+                    {isGeneratingMissing ? (
                       <Grid item>
-                        <Button
-                          onClick={() => {
-                            setIsGeneratingMissing(true);
-                            generateMissingText();
-                          }}
-                        >
-                          copy missing (CardKingdom/TCGPlayer)
-                        </Button>
+                        <CircularProgress />
                       </Grid>
+                    ) : (
+                      <>
+                        <Grid item>
+                          <Button
+                            onClick={() => {
+                              setIsGeneratingMissing(true);
+                              generateMissingText();
+                            }}
+                          >
+                            copy missing (CardKingdom/TCGPlayer)
+                          </Button>
+                        </Grid>
 
-                      <Grid item>
-                        <Button
-                          onClick={() => {
-                            setIsGeneratingMissing(true);
-                            generateMissingText('set');
-                          }}
-                        >
-                          copy missing (set number)
-                        </Button>
-                      </Grid>
-                    </>
-                  ))}
-                {searchResults.length > 0 && (
-                  <Grid item>
-                    <Button onClick={() => setShowAddConfirmation(true)}>add all</Button>
+                        <Grid item>
+                          <Button
+                            onClick={() => {
+                              setIsGeneratingMissing(true);
+                              generateMissingText('set');
+                            }}
+                          >
+                            copy missing (set number)
+                          </Button>
+                        </Grid>
+                      </>
+                    )}
+
+                    <Grid item>
+                      <Button onClick={() => setShowAddConfirmation(true)}>
+                        add all
+                      </Button>
+                    </Grid>
                   </Grid>
-                )}
-              </Grid>
-            </Grid>
+                </Grid>
+                <Grid item>
+                  <Switch
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      // setSearchResults([]);
+                      // setInfiniteData([]);
+                      if (event.target.checked) {
+                        rootStore(missing);
+                      } else {
+                        rootStore(memo);
+                      }
+                    }}
+                  />
+                </Grid>
+              </>
+            )}
           </Grid>
         </Grid>
 
-        {/* Search results */}
-        <Grid item>
-          <InfiniteScroll
-            hasMoreData={infiniteData.length < searchResults.length}
-            isLoading={showBottomSpinner}
-            onBottomHit={loadMoreCards}
-          >
-            <Grid
-              container
-              direction="row"
-              spacing={1}
-              justifyContent={'start'}
-              alignItems={'stretch'}
-              style={{ width: '80vw' }}
-            >
-              {infiniteData.map((sr: ScryfallDataType, i) => (
-                <Grid item xs={6} md={4} lg={3} key={i}>
-                  <SearchResultCard sr={sr} defaultTag={defaultTag} toaster={toaster} />
-                </Grid>
-              ))}
-            </Grid>
-          </InfiniteScroll>
-        </Grid>
-        {searchResults.length > 0 && <BottomSpinner />}
+        <SearchResults
+          searchResults={searchResults}
+          defaultTag={defaultTag}
+          toaster={toaster}
+        />
       </Grid>
 
       <Dialog open={showMissingDialog} onClose={() => setShowMissingDialog(false)}>

@@ -49,6 +49,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
 
   useEffect(() => {
     async function preCheck() {
+      setIsLoading(true);
       let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
       let check1 = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
       setSimilarNameExists(check1 !== undefined && check === undefined);
@@ -89,7 +90,6 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
       if (tmp.length > 0) {
         setPrice(tmp[0].money);
       }
-      setIsLoading(false);
 
       let imageUris: CustomImageUris = { small: [], normal: [] };
       if (sr.card_faces && 'image_uris' in sr.card_faces[0]) {
@@ -104,10 +104,12 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
         };
       }
       setImgUri(imageUris);
+
+      setIsLoading(false);
     }
 
     preCheck();
-  }, []);
+  }, [sr]);
 
   const handleTagChange = (
     event: SyntheticEvent<Element, Event>,
