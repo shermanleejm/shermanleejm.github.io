@@ -196,7 +196,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         let res = await multiScry(queries);
         rootStore(res.arr);
         setText(res.errors);
-        storeMemoAndMissing(res.arr);
+        await storeMemoAndMissing(res.arr);
         setIsSearching(false);
         break;
       case 'name':
@@ -212,7 +212,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         let res1 = await multiScry(queries);
         rootStore(res1.arr);
         setText(res1.errors);
-        storeMemoAndMissing(res1.arr);
+        await storeMemoAndMissing(res1.arr);
         setIsSearching(false);
         break;
       case 'set_name':
@@ -230,7 +230,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
             uri = r.data.next_page;
           }
           rootStore(tmp);
-          storeMemoAndMissing(tmp);
+          await storeMemoAndMissing(tmp);
         }
         setIsSearching(false);
         break;

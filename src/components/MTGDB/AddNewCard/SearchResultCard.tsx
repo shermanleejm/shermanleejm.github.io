@@ -27,6 +27,7 @@ export type SearchResultCardType = {
   sr: ScryfallDataType;
   defaultTag: string;
   toaster: (m: string, e: ToasterSeverityEnum) => void;
+  exists?: boolean;
 };
 
 const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => {
@@ -49,12 +50,10 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
 
   useEffect(() => {
     async function preCheck() {
-      setIsLoading(true);
-      console.log(sr.id, sr.name);
       let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
       let check1 = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
       setSimilarNameExists(check1 !== undefined && check === undefined);
-
+      console.log(check, check1);
       let oldTags: string[] = [];
       if (defaultTag !== '') {
         oldTags.push(defaultTag);
@@ -65,6 +64,8 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
         if (check.id) {
           await db.cards.update(check.id, { tags: Array.from(new Set(oldTags)) });
         }
+      } else {
+        setIsClicked(false);
       }
       setTags(Array.from(new Set(oldTags)));
 
@@ -110,8 +111,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
     }
 
     preCheck();
-    console.log(isClicked, sr.name);
-  }, [sr, defaultTag]);
+  }, [sr, defaultTag, isClicked, db.cards]);
 
   const handleTagChange = (
     event: SyntheticEvent<Element, Event>,
