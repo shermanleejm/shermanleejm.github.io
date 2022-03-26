@@ -20,14 +20,11 @@ import axios, { AxiosResponse } from 'axios';
 import React, { useState } from 'react';
 import { ScryfallDataType, ScryfallSetType } from '../interfaces';
 import { MTGDBProps, storeCard, ToasterSeverityEnum } from '..';
-import SearchResultCard from './SearchResultCard';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { State } from '../../../state/reducers';
-import InfiniteScroll from './InfiniteScroll';
 import CardCropper from './CardCropper';
-import { CardsTableType } from '../../../database';
 import SearchResults from './SearchResults';
 
 interface SetSearchType {
@@ -59,7 +56,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   const [isGeneratingMissing, setIsGeneratingMissing] = useState(false);
   const [showMissingDialog, setShowMissingDialog] = useState(false);
   const [missingTxt, setMissingTxt] = useState('');
-
+  const [showMissing, setShowMissing] = useState(false);
   const [showAddConfirmation, setShowAddConfirmation] = useState(false);
   const [isAddingAll, setIsAddingAll] = useState(false);
   const [addingMessage, setAddingMessage] = useState('');
@@ -104,7 +101,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
       let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
       let check1 = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
 
-      if (check1 === undefined && check === undefined) {
+      if (check1 === undefined || check === undefined) {
         _missing.push(sr);
       }
     }
@@ -181,6 +178,8 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
 
   async function searchCard(queryName: string) {
     setIsSearching(true);
+    setShowMissing(false);
+
     let queries = [];
     switch (selectedFilter) {
       case 'bulk':
@@ -414,7 +413,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                 </Button>
               )}
             </Grid>
-            {searchResults.length > 0 && (
+            {searchResults.length > 0 && !isSearching && (
               <>
                 <Grid item>
                   <Button
@@ -470,9 +469,9 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
                   <Stack direction="row" alignItems={'center'} spacing={1}>
                     <Typography>Show missing</Typography>
                     <Switch
+                      value={showMissing}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        // setSearchResults([]);
-                        // setInfiniteData([]);
+                        setShowMissing(event.target.checked);
                         if (event.target.checked) {
                           rootStore(missing);
                         } else {
@@ -487,11 +486,13 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
           </Grid>
         </Grid>
 
-        <SearchResults
-          searchResults={searchResults}
-          defaultTag={defaultTag}
-          toaster={toaster}
-        />
+        {!isSearching && (
+          <SearchResults
+            searchResults={searchResults}
+            defaultTag={defaultTag}
+            toaster={toaster}
+          />
+        )}
       </Grid>
 
       <Dialog open={showMissingDialog} onClose={() => setShowMissingDialog(false)}>
