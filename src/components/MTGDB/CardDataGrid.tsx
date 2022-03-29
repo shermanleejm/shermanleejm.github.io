@@ -582,28 +582,6 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
                 </Select>
               </Grid>
 
-              {selectedFilter === 'general' && (
-                <Grid item xs={5} sm={2.5} md={2} lg={1.2}>
-                  <div
-                    style={{
-                      flexDirection: 'row',
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginLeft: '1rem',
-                    }}
-                  >
-                    And
-                    <Switch
-                      checked={andOr}
-                      onChange={() => {
-                        setAndOr(!andOr);
-                      }}
-                    />
-                    Or
-                  </div>
-                </Grid>
-              )}
-
               <Grid
                 item
                 xs={selectedFilter === 'general' ? 7 : 12}
@@ -633,6 +611,28 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
                   renderInput={(params) => <TextField {...params} variant="outlined" />}
                 />
               </Grid>
+
+              {selectedFilter === 'general' && (
+                <Grid item xs={5} sm={2.5} md={2} lg={1.2}>
+                  <div
+                    style={{
+                      flexDirection: 'row',
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginLeft: '1rem',
+                    }}
+                  >
+                    And
+                    <Switch
+                      checked={andOr}
+                      onChange={() => {
+                        setAndOr(!andOr);
+                      }}
+                    />
+                    Or
+                  </div>
+                </Grid>
+              )}
             </Grid>
           </div>
         </Grid>
