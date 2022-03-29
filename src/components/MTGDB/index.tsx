@@ -204,7 +204,12 @@ export async function storeCard(
 
   if (card.card_faces) {
     for (let i = 0; i < 2; i++) {
-      colors = colors.concat(card.card_faces[i].colors);
+      let curr = card.card_faces[i];
+      if (curr.colors === undefined) {
+        colors = card.colors || [];
+      } else {
+        colors = colors.concat(card.card_faces[i].colors);
+      }
       oracleText += card.card_faces[i].oracle_text + ' ';
       typeLine += card.card_faces[i].type_line + ' ';
     }
@@ -212,16 +217,16 @@ export async function storeCard(
     colors = card.colors || [];
   }
 
-  if (card.card_faces) {
-    for (let i = 0; i < card.card_faces.length; i++) {
-      imgUris.small.push(card.card_faces[i].image_uris.small);
-      imgUris.normal.push(card.card_faces[i].image_uris.normal);
-    }
-  } else if (card.image_uris) {
+  if (card.image_uris) {
     imgUris = {
       small: [card.image_uris?.small],
       normal: [card.image_uris?.normal],
     };
+  } else if (card.card_faces) {
+    for (let i = 0; i < card.card_faces.length; i++) {
+      imgUris.small.push(card.card_faces[i].image_uris.small);
+      imgUris.normal.push(card.card_faces[i].image_uris.normal);
+    }
   }
 
   if (collision !== undefined) {

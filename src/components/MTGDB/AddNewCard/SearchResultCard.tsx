@@ -53,7 +53,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
       let check = await db.cards.where('scryfall_id').equalsIgnoreCase(sr.id).first();
       let check1 = await db.cards.where('name').equalsIgnoreCase(sr.name).first();
       setSimilarNameExists(check1 !== undefined && check === undefined);
-      console.log(check, check1);
+
       let oldTags: string[] = [];
       if (defaultTag !== '') {
         oldTags.push(defaultTag);

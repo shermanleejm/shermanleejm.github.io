@@ -340,9 +340,17 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
   }
 
   async function addAll() {
+    let tmp = [];
     for (let i = 0; i < searchResults.length; i++) {
       setAddingMessage(searchResults[i].name);
-      await storeCard(db, searchResults[i], [defaultTag]);
+      try {
+        await storeCard(db, searchResults[i], [defaultTag]);
+      } catch ($e) {
+        tmp.push(searchResults[i].name);
+      }
+    }
+    if (tmp.length > 0) {
+      console.error(tmp);
     }
     setIsAddingAll(false);
     setShowAddConfirmation(false);
@@ -520,6 +528,7 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
         </DialogContent>
         <DialogActions>
           <Button
+            disabled={isAddingAll}
             onClick={() => {
               setIsAddingAll(true);
               addAll();

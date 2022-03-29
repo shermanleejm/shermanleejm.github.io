@@ -87,7 +87,7 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
           setUniqueSets(Array.from(uSets));
           setUniqueTags(Array.from(uTags));
         })
-        .catch((err) => console.log(err))
+        .catch((err) => console.error(err))
         .finally(() => setIsLoading(false));
     }
 
@@ -408,7 +408,6 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
         setCards(memoCards.filter((c) => val.some((v) => c[k].includes(v))));
         break;
       case 'set_name':
-        console.log(val);
         setCards(memoCards.filter((c) => val.some((v) => c[k] === v)));
         break;
       case 'type_line':
