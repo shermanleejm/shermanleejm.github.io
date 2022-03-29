@@ -5,17 +5,17 @@ import {
   Grid,
   TextField,
   Typography,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { CardsTableType } from "../../../database";
-import { MTGTypesEnum } from "../interfaces";
-import DeckListItem from "./DeckListItem";
-import Category from "./Category";
-import ManaChart from "./ManaChart";
-import { useDrop } from "react-dnd";
-import { useSelector } from "react-redux";
-import { State } from "../../../state/reducers";
-import { getDeckCards } from "..";
+} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { CardsTableType } from '../../../database';
+import { MTGTypesEnum } from '../interfaces';
+import DeckListItem from './DeckListItem';
+import Category from './Category';
+import ManaChart from './ManaChart';
+import { useDrop } from 'react-dnd';
+import { useSelector } from 'react-redux';
+import { State } from '../../../state/reducers';
+import { getDeckCards } from '..';
 
 type DeckListProps = {
   cards: Set<CardsTableType>;
@@ -37,10 +37,10 @@ const DeckList = (props: DeckListProps) => {
   const [cards, setCards] = useState<CardsTableType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(true);
-  const [exportJson, setExportJson] = useState<string>("");
+  const [exportJson, setExportJson] = useState<string>('');
   const [manaData, setManaData] = useState<ManaDataInterface[]>([]);
   const [categories, setCategories] = useState<(string | undefined)[]>([]);
-  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState('');
   const [commanders, setCommanders] = useState<CardsTableType[]>([]);
 
   const db = useSelector((state: State) => state.database);
@@ -53,7 +53,7 @@ const DeckList = (props: DeckListProps) => {
       let manaDataTmp: ManaDataInterface[] = [];
       for (let i = 0; i < 12; i++) {
         manaDataTmp.push({
-          cmc: i === 10 ? "10+" : i === 11 ? "land" : `${i}`,
+          cmc: i === 10 ? '10+' : i === 11 ? 'land' : `${i}`,
           [MTGTypesEnum.CREATURE]: 0,
           [MTGTypesEnum.INSTANT]: 0,
           [MTGTypesEnum.SORCERY]: 0,
@@ -67,10 +67,12 @@ const DeckList = (props: DeckListProps) => {
         let card = cardArr[i];
         let pos = card.cmc > 10 ? 10 : card.cmc;
         let curr = card.type_line.toLowerCase();
-        if (curr.includes(MTGTypesEnum.ENCHANTMENT)) {
-          manaDataTmp[pos][MTGTypesEnum.ENCHANTMENT]++;
+        if (curr.includes('vehicle')) {
+          manaDataTmp[pos][MTGTypesEnum.ARTIFACT]++;
         } else if (curr.includes(MTGTypesEnum.CREATURE)) {
           manaDataTmp[pos][MTGTypesEnum.CREATURE]++;
+        } else if (curr.includes(MTGTypesEnum.ENCHANTMENT)) {
+          manaDataTmp[pos][MTGTypesEnum.ENCHANTMENT]++;
         } else if (curr.includes(MTGTypesEnum.ARTIFACT)) {
           manaDataTmp[pos][MTGTypesEnum.ARTIFACT]++;
         } else if (curr.includes(MTGTypesEnum.INSTANT)) {
@@ -85,13 +87,13 @@ const DeckList = (props: DeckListProps) => {
       }
 
       let _categories = await (
-        await db.decks.where("name").equals(props.deckName).toArray()
+        await db.decks.where('name').equals(props.deckName).toArray()
       )
         .map((d) => d.category)
         .filter((v, i, s) => s.indexOf(v) === i);
 
       if (_categories.length === 0) {
-        _categories.push("default");
+        _categories.push('default');
       }
 
       let _commandersDecks = (
@@ -141,36 +143,34 @@ const DeckList = (props: DeckListProps) => {
     <CircularProgress />
   ) : (
     <div style={{ marginTop: 20 }}>
-      <Grid container alignItems={"flex-start"} spacing={2}>
+      <Grid container alignItems={'flex-start'} spacing={2}>
         <Grid item xs={12}>
           <Grid
             container
             spacing={1}
-            direction='row'
-            justifyContent='flex-start'
-            alignItems='center'
+            direction="row"
+            justifyContent="flex-start"
+            alignItems="center"
           >
             <Grid item xs={2}>
-              <Typography variant='h4'>Cards: {cards.length}</Typography>
+              <Typography variant="h4">Cards: {cards.length}</Typography>
             </Grid>
             <Grid item xs={10}>
               <Autocomplete
                 fullWidth
                 multiple
-                id='tags-standard'
+                id="tags-standard"
                 options={cards.filter(
                   (c) =>
-                    c.type_line.toLowerCase().includes("legendary") &&
-                    (c.type_line.toLowerCase().includes("creature") ||
-                      c.oracle_text
-                        ?.toLowerCase()
-                        .includes("can be your commander"))
+                    c.type_line.toLowerCase().includes('legendary') &&
+                    (c.type_line.toLowerCase().includes('creature') ||
+                      c.oracle_text?.toLowerCase().includes('can be your commander'))
                 )}
                 getOptionLabel={(option) => option.name}
                 onChange={(e, v) => changeCommanders(v)}
                 value={commanders}
                 renderInput={(params) => (
-                  <TextField {...params} variant='outlined' label='Commander' />
+                  <TextField {...params} variant="outlined" label="Commander" />
                 )}
               />
             </Grid>
@@ -178,7 +178,7 @@ const DeckList = (props: DeckListProps) => {
         </Grid>
 
         <Grid item xs={12}>
-          <Grid container spacing={1} wrap='nowrap' sx={{ overflow: "auto" }}>
+          <Grid container spacing={1} wrap="nowrap" sx={{ overflow: 'auto' }}>
             {categories.map(
               (c) =>
                 c && (
@@ -197,16 +197,16 @@ const DeckList = (props: DeckListProps) => {
               <div style={{ width: 200 }}>
                 <TextField
                   fullWidth
-                  label='add new category'
+                  label="add new category"
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-                    if (e.key === "Enter") {
+                    if (e.key === 'Enter') {
                       setCategories((oldCategories) => [
                         ...oldCategories,
                         newCategoryName,
                       ]);
-                      setNewCategoryName("");
+                      setNewCategoryName('');
                     }
                   }}
                 />
@@ -218,9 +218,9 @@ const DeckList = (props: DeckListProps) => {
         <Grid item xs={12}>
           <TextField
             disabled
-            size='small'
+            size="small"
             fullWidth
-            label={"Deck Name"}
+            label={'Deck Name'}
             value={props.deckName}
             onChange={(
               e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -250,9 +250,7 @@ const DeckList = (props: DeckListProps) => {
             </Button>
           ) : (
             <Button
-              href={`data:text/json;charset=utf-8,${encodeURIComponent(
-                exportJson
-              )}`}
+              href={`data:text/json;charset=utf-8,${encodeURIComponent(exportJson)}`}
               download={`${props.deckName}_${Date.now()}.json`}
               onClick={() => setIsGenerating(true)}
             >
@@ -264,7 +262,7 @@ const DeckList = (props: DeckListProps) => {
             href={`data:application/octet-stream,${encodeURIComponent(
               Array.from(props.cards)
                 .map((c) => `1 ${c.name}`)
-                .join("\n")
+                .join('\n')
             )}`}
             download={`MTGDB_dump_${Date.now()}.txt`}
           >
