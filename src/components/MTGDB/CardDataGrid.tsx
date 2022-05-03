@@ -299,6 +299,42 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
                 );
               }
               return false;
+            case 'power':
+              let symbol = qq.toLowerCase()[0];
+              let value = qq.toLowerCase().substring(1);
+
+              if (!c.power) {
+                return false;
+              }
+
+              switch (symbol) {
+                case '>':
+                  return c.power >= value;
+                case '<':
+                  return c.power <= value;
+                case '=':
+                  return c.power === value;
+                default:
+                  return false;
+              }
+            case 'toughness':
+              let symbol_ = qq.toLowerCase()[0];
+              let value_ = qq.toLowerCase().substring(1);
+
+              if (!c.power) {
+                return false;
+              }
+
+              switch (symbol_) {
+                case '>':
+                  return c.power >= value_;
+                case '<':
+                  return c.power <= value_;
+                case '=':
+                  return c.power === value_;
+                default:
+                  return false;
+              }
             default:
               return false;
           }
@@ -376,6 +412,42 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
                 );
               }
               return false;
+            case 'power':
+              let symbol = qq.toLowerCase()[0];
+              let value = qq.toLowerCase().substring(1);
+
+              if (!c.power) {
+                return false;
+              }
+
+              switch (symbol) {
+                case '>':
+                  return c.power >= value;
+                case '<':
+                  return c.power <= value;
+                case '=':
+                  return c.power === value;
+                default:
+                  return false;
+              }
+            case 'toughness':
+              let symbol_ = qq.toLowerCase()[0];
+              let value_ = qq.toLowerCase().substring(1);
+
+              if (!c.power) {
+                return false;
+              }
+
+              switch (symbol_) {
+                case '>':
+                  return c.power >= value_;
+                case '<':
+                  return c.power <= value_;
+                case '=':
+                  return c.power === value_;
+                default:
+                  return false;
+              }
             default:
               return false;
           }

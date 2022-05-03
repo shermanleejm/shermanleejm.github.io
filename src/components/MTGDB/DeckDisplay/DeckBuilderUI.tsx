@@ -1,11 +1,11 @@
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import SentimentNeutralIcon from "@mui/icons-material/SentimentNeutral";
-import WhatshotIcon from "@mui/icons-material/Whatshot";
-import InvertColorsIcon from "@mui/icons-material/InvertColors";
-import ParkIcon from "@mui/icons-material/Park";
-import LandscapeIcon from "@mui/icons-material/Landscape";
-import LooksIcon from "@mui/icons-material/Looks";
-import BlockIcon from "@mui/icons-material/Block";
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import InvertColorsIcon from '@mui/icons-material/InvertColors';
+import ParkIcon from '@mui/icons-material/Park';
+import LandscapeIcon from '@mui/icons-material/Landscape';
+import LooksIcon from '@mui/icons-material/Looks';
+import BlockIcon from '@mui/icons-material/Block';
 import {
   TextField,
   IconButton,
@@ -20,79 +20,78 @@ import {
   ListItemText,
   CircularProgress,
   Autocomplete,
-} from "@mui/material";
-import Board from "./Board";
-import DeckList from "./DeckList";
-import { useEffect, useState } from "react";
-import { CardsTableType } from "../../../database";
-import { useSelector } from "react-redux";
-import { State } from "../../../state/reducers";
-import InfoIcon from "@mui/icons-material/Info";
+} from '@mui/material';
+import Board from './Board';
+import DeckList from './DeckList';
+import { useEffect, useState } from 'react';
+import { CardsTableType } from '../../../database';
+import { useSelector } from 'react-redux';
+import { State } from '../../../state/reducers';
+import InfoIcon from '@mui/icons-material/Info';
 
 export const infoHelper = [
   {
-    title: "General",
-    explanation: "Searches the whole card text for the word.",
-    example: "Goldspan Dragon, Tiamat, Land",
+    title: 'General',
+    explanation: 'Searches the whole card text for the word.',
+    example: 'Goldspan Dragon, Tiamat, Land',
   },
   {
-    title: "Card Types",
-    explanation: "Use t: in front of the type to search for.",
-    example: "t:legendary creature, t:human, t:artifact",
+    title: 'Card Types',
+    explanation: 'Use t: in front of the type to search for.',
+    example: 't:legendary creature, t:human, t:artifact',
   },
   {
-    title: "Set Names",
-    explanation: "Use s: in front of the set to search for.",
-    example: "set:kamigawa neon dynasty, set:innistrad",
+    title: 'Set Names',
+    explanation: 'Use s: in front of the set to search for.',
+    example: 'set:kamigawa neon dynasty, set:innistrad',
   },
   {
-    title: "Card Text (Oracle)",
-    explanation: "Use o: in front of the text to search for.",
-    example: "o:enters the battlefield, o:tap",
+    title: 'Card Text (Oracle)',
+    explanation: 'Use o: in front of the text to search for.',
+    example: 'o:enters the battlefield, o:tap',
   },
   {
-    title: "Price",
-    explanation: "Use p: in front of the text to search for.",
-    example:
-      "p:<3.0 returns all cards that cost less than $3. Works with < and > only.",
+    title: 'Price',
+    explanation: 'Use p: in front of the text to search for.',
+    example: 'p:<3.0 returns all cards that cost less than $3. Works with < and > only.',
   },
   {
-    title: "Rarity",
-    explanation: "Use r: in front of the text to search for.",
-    example: "r:r, r:M, r:uncommon",
+    title: 'Rarity',
+    explanation: 'Use r: in front of the text to search for.',
+    example: 'r:r, r:M, r:uncommon',
   },
   {
-    title: "Special",
-    explanation: "Shortcuts for easier searching.",
-    example: "s:commander, s:etb, s:tap",
+    title: 'Special',
+    explanation: 'Shortcuts for easier searching.',
+    example: 's:commander, s:etb, s:tap',
   },
 ];
 
 export enum colorSlug {
-  BLACK = "B",
-  WHITE = "W",
-  GREEN = "G",
-  BLUE = "U",
-  RED = "R",
+  BLACK = 'B',
+  WHITE = 'W',
+  GREEN = 'G',
+  BLUE = 'U',
+  RED = 'R',
 }
 
 enum numberSlug {
-  _1 = "1",
-  _2 = "2",
-  _3 = "3",
-  _4 = "4",
-  _5 = "5",
-  _6 = "6",
-  _7 = "7",
-  _8 = "8",
-  _9 = "9",
-  _10 = "10",
+  _1 = '1',
+  _2 = '2',
+  _3 = '3',
+  _4 = '4',
+  _5 = '5',
+  _6 = '6',
+  _7 = '7',
+  _8 = '8',
+  _9 = '9',
+  _10 = '10',
 }
 
 enum miscSlug {
-  LAND = "land",
-  RAINBOW = "rainbow",
-  COLORLESS = "C",
+  LAND = 'land',
+  RAINBOW = 'rainbow',
+  COLORLESS = 'C',
 }
 
 type combinedSlug = miscSlug | colorSlug | numberSlug;
@@ -119,10 +118,10 @@ const defaultFilterState = {
 };
 
 export enum rarityTypes {
-  RARE = "rare",
-  MYTHIC = "mythic",
-  UNCOMMON = "uncommon",
-  COMMON = "common",
+  RARE = 'rare',
+  MYTHIC = 'mythic',
+  UNCOMMON = 'uncommon',
+  COMMON = 'common',
 }
 
 interface DeckBuilderUIType {
@@ -144,17 +143,17 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
 
   const db = useSelector((state: State) => state.database);
 
-  function compare(a: any, b: any, type: keyof CardsTableType | "default") {
+  function compare(a: any, b: any, type: keyof CardsTableType | 'default') {
     switch (type) {
-      case "default":
-        if (a["colors"].length < b["colors"].length) return -1;
-        if (a["colors"].length > b["colors"].length) return 1;
-        if (a["colors"] > b["colors"]) return -1;
-        if (a["colors"] < b["colors"]) return 1;
-        if (a["cmc"] < b["cmc"]) return -1;
-        if (a["cmc"] > b["cmc"]) return 1;
+      case 'default':
+        if (a['colors'].length < b['colors'].length) return -1;
+        if (a['colors'].length > b['colors'].length) return 1;
+        if (a['colors'] > b['colors']) return -1;
+        if (a['colors'] < b['colors']) return 1;
+        if (a['cmc'] < b['cmc']) return -1;
+        if (a['cmc'] > b['cmc']) return 1;
         return 0;
-      case "colors":
+      case 'colors':
         if (a[type].length < b[type].length) return -1;
         if (a[type].length > b[type].length) return 1;
         if (a[type] < b[type]) return -1;
@@ -170,7 +169,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
   useEffect(() => {
     async function initialLoad() {
       const arr: CardsTableType[] = await db.cards.toArray();
-      setCardArr(arr.sort((a, b) => compare(a, b, "default")));
+      setCardArr(arr.sort((a, b) => compare(a, b, 'default')));
       setMemo(arr);
       setDecklist(new Set(currDeck));
       setIsLoading(false);
@@ -181,8 +180,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
 
   function filterCardArr(type?: combinedSlug, _searchQueries: string[] = []) {
     setColorFilters((prev) => {
-      let queries =
-        _searchQueries.length === 0 ? searchQueries : _searchQueries;
+      let queries = _searchQueries.length === 0 ? searchQueries : _searchQueries;
       let numberFilters: number[] = [];
       let colorFilters: string[] = [];
       let miscFilters: string[] = [];
@@ -223,9 +221,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                   return c.cmc >= f;
                 }
                 if (f === 1) {
-                  return (
-                    c.cmc <= f && !c.type_line.toLowerCase().includes("land")
-                  );
+                  return c.cmc <= f && !c.type_line.toLowerCase().includes('land');
                 }
                 return c.cmc === f;
               });
@@ -236,29 +232,27 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
             if (queries.length > 0) {
               return queries.every((q) => {
                 q = q.toLowerCase();
-                if (q.includes(":")) {
-                  let type = q.split(":")[0].trim();
-                  let qq = q.split(":")[1].trim();
+                if (q.includes(':')) {
+                  let type = q.split(':')[0].trim();
+                  let qq = q.split(':')[1].trim();
                   switch (type) {
-                    case "t":
+                    case 't':
                       return c.type_line.toLowerCase().includes(qq);
-                    case "o":
+                    case 'o':
                       return c.oracle_text?.toLowerCase().includes(qq);
-                    case "set":
+                    case 'set':
                       return c.set_name.toLowerCase().includes(qq);
-                    case "p":
-                      let currFloat: number = parseFloat(
-                        qq.match(/[0-9.]+/)![0]
-                      );
+                    case 'p':
+                      let currFloat: number = parseFloat(qq.match(/[0-9.]+/)![0]);
                       if (!isNaN(currFloat)) {
-                        if (qq.includes("<")) {
+                        if (qq.includes('<')) {
                           return c.price < currFloat;
-                        } else if (qq.includes(">")) {
+                        } else if (qq.includes('>')) {
                           return c.price > currFloat;
                         }
                       }
                       break;
-                    case "r":
+                    case 'r':
                       let rareType = qq.toLowerCase();
                       let rareTypes: { [key: string]: string } = {
                         r: rarityTypes.RARE,
@@ -271,29 +265,63 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                         common: rarityTypes.COMMON,
                       };
                       if (!Object.keys(rareTypes).includes(rareType)) {
-                        return c.rarity.includes("WRONG");
+                        return c.rarity.includes('WRONG');
                       }
                       return c.rarity === rareTypes[rareType];
-                    case "s":
-                      let specialQuery = qq.toLowerCase();
-                      if (specialQuery === "tap") {
-                        return c.oracle_text?.includes("{T}");
+                    case 'power':
+                      let symbol = qq.toLowerCase()[0];
+                      let value = qq.toLowerCase().substring(1);
+
+                      if (!c.power) {
+                        return false;
                       }
-                      if (specialQuery === "etb") {
+
+                      switch (symbol) {
+                        case '>':
+                          return c.power >= value;
+                        case '<':
+                          return c.power <= value;
+                        case '=':
+                          return c.power === value;
+                        default:
+                          return false;
+                      }
+                    case 'toughness':
+                      let symbol_ = qq.toLowerCase()[0];
+                      let value_ = qq.toLowerCase().substring(1);
+
+                      if (!c.power) {
+                        return false;
+                      }
+
+                      switch (symbol_) {
+                        case '>':
+                          return c.power >= value_;
+                        case '<':
+                          return c.power <= value_;
+                        case '=':
+                          return c.power === value_;
+                        default:
+                          return false;
+                      }
+                    case 's':
+                      let specialQuery = qq.toLowerCase();
+                      if (specialQuery === 'tap') {
+                        return c.oracle_text?.includes('{T}');
+                      }
+                      if (specialQuery === 'etb') {
                         return (
                           c.oracle_text &&
-                          c.oracle_text
-                            .toLowerCase()
-                            .includes("enters the battlefield")
+                          c.oracle_text.toLowerCase().includes('enters the battlefield')
                         );
                       }
-                      if (specialQuery === "commander") {
+                      if (specialQuery === 'commander') {
                         let _typeLine = c.type_line.toLowerCase();
                         let _oracleText = c.oracle_text?.toLowerCase();
                         return (
-                          _typeLine.includes("legendary") &&
-                          (_typeLine.includes("creature") ||
-                            _oracleText?.includes("can be your commander"))
+                          _typeLine.includes('legendary') &&
+                          (_typeLine.includes('creature') ||
+                            _oracleText?.includes('can be your commander'))
                         );
                       }
                       return false;
@@ -326,7 +354,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
             }
             return landCheck && rainbowCheck && colorlessCheck;
           })
-          .sort((a, b) => compare(a, b, "colors"))
+          .sort((a, b) => compare(a, b, 'colors'))
       );
       return curr;
     });
@@ -336,93 +364,77 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
     {
       icon: (
         <Brightness7Icon
-          style={{ color: colorFilters[colorSlug.WHITE] ? "yellow" : "" }}
+          style={{ color: colorFilters[colorSlug.WHITE] ? 'yellow' : '' }}
         />
       ),
       name: colorSlug.WHITE,
     },
     {
       icon: (
-        <InvertColorsIcon
-          style={{ color: colorFilters[colorSlug.BLUE] ? "blue" : "" }}
-        />
+        <InvertColorsIcon style={{ color: colorFilters[colorSlug.BLUE] ? 'blue' : '' }} />
       ),
       name: colorSlug.BLUE,
     },
     {
       icon: (
         <SentimentNeutralIcon
-          style={{ color: colorFilters[colorSlug.BLACK] ? "grey" : "" }}
+          style={{ color: colorFilters[colorSlug.BLACK] ? 'grey' : '' }}
         />
       ),
       name: colorSlug.BLACK,
     },
     {
-      icon: (
-        <WhatshotIcon
-          style={{ color: colorFilters[colorSlug.RED] ? "red" : "" }}
-        />
-      ),
+      icon: <WhatshotIcon style={{ color: colorFilters[colorSlug.RED] ? 'red' : '' }} />,
       name: colorSlug.RED,
     },
     {
-      icon: (
-        <ParkIcon
-          style={{ color: colorFilters[colorSlug.GREEN] ? "green" : "" }}
-        />
-      ),
+      icon: <ParkIcon style={{ color: colorFilters[colorSlug.GREEN] ? 'green' : '' }} />,
       name: colorSlug.GREEN,
     },
     {
       icon: (
-        <BlockIcon
-          style={{ color: colorFilters[miscSlug.COLORLESS] ? "brown" : "" }}
-        />
+        <BlockIcon style={{ color: colorFilters[miscSlug.COLORLESS] ? 'brown' : '' }} />
       ),
       name: miscSlug.COLORLESS,
     },
     {
       icon: (
-        <LandscapeIcon
-          style={{ color: colorFilters[miscSlug.LAND] ? "brown" : "" }}
-        />
+        <LandscapeIcon style={{ color: colorFilters[miscSlug.LAND] ? 'brown' : '' }} />
       ),
       name: miscSlug.LAND,
     },
     {
       icon: (
-        <LooksIcon
-          style={{ color: colorFilters[miscSlug.RAINBOW] ? "brown" : "" }}
-        />
+        <LooksIcon style={{ color: colorFilters[miscSlug.RAINBOW] ? 'brown' : '' }} />
       ),
       name: miscSlug.RAINBOW,
     },
   ];
 
-  async function modifyDecklist(c: CardsTableType, type: "delete" | "add") {
+  async function modifyDecklist(c: CardsTableType, type: 'delete' | 'add') {
     switch (type) {
-      case "delete":
+      case 'delete':
         let tmp1 = decklist;
         tmp1.delete(c);
         setDecklist(tmp1);
-        if (c.id !== undefined && deckName !== "") {
+        if (c.id !== undefined && deckName !== '') {
           await db.cards.update(c.id, {
             tags: c.tags.filter((t) => t !== deckName),
           });
         }
         break;
-      case "add":
+      case 'add':
         setShowDeckList(false);
         if (c.id) {
           let newEntry = {
             card_id: c.id,
             name: deckName,
-            format: "commander",
+            format: 'commander',
             is_commander: false,
-            category: "default",
+            category: 'default',
           };
           let collision = await db.decks
-            .where({ format: "commander", card_id: c.id, name: deckName })
+            .where({ format: 'commander', card_id: c.id, name: deckName })
             .first();
           if (!collision) {
             await db.decks.add(newEntry);
@@ -443,7 +455,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
           <List>
             <ListItem>
               <ListItemText>
-                <Typography variant='body1'>
+                <Typography variant="body1">
                   Seperate multiple queries with a comma.
                 </Typography>
               </ListItemText>
@@ -451,10 +463,10 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
             {infoHelper.map((ele) => (
               <ListItem>
                 <ListItemText>
-                  <Typography variant='body1'>{ele.title}</Typography>
-                  <Typography variant='body2'>{ele.explanation}</Typography>
+                  <Typography variant="body1">{ele.title}</Typography>
+                  <Typography variant="body2">{ele.explanation}</Typography>
 
-                  <Typography variant='body2' sx={{ fontFamily: "monospace" }}>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                     {ele.example}
                   </Typography>
                 </ListItemText>
@@ -462,7 +474,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
             ))}
             <ListItem>
               <ListItemText>
-                <Typography variant='h6'>Deckbuilding tips</Typography>
+                <Typography variant="h6">Deckbuilding tips</Typography>
                 <Typography>Ramp: 10-12</Typography>
                 <Typography>Card Draw: 10</Typography>
                 <Typography>Single Target Removal: 10-12</Typography>
@@ -472,12 +484,11 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                   Standalone (effective by themselves/with commander): 25
                 </Typography>
                 <Typography>
-                  Enhancers (cards that amplify or are amplified by standalones
-                  or commander): 10-12
+                  Enhancers (cards that amplify or are amplified by standalones or
+                  commander): 10-12
                 </Typography>
                 <Typography>
-                  Enablers (covers a weakness or fills a gap in your strategy):
-                  7-8
+                  Enablers (covers a weakness or fills a gap in your strategy): 7-8
                 </Typography>
                 <Typography>Cards on your theme: 30(ish)</Typography>
                 <Typography>Considerations:</Typography>
@@ -485,8 +496,8 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                   Overlaps (cards that count in multiple categories)
                 </Typography>
                 <Typography>
-                  Partials (cards that count as 'half' in a given category. E.g.
-                  scry 3 as half a card draw card)
+                  Partials (cards that count as 'half' in a given category. E.g. scry 3 as
+                  half a card draw card)
                 </Typography>
               </ListItemText>
             </ListItem>
@@ -508,18 +519,13 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Button fullWidth onClick={() => setShowCardSearch(!showCardSearch)}>
-            {showCardSearch ? "Hide" : "Show"} Card Search
+            {showCardSearch ? 'Hide' : 'Show'} Card Search
           </Button>
         </Grid>
 
         {showCardSearch && (
           <Grid item xs={12}>
-            <Grid
-              container
-              direction='row'
-              justifyContent='center'
-              alignItems='center'
-            >
+            <Grid container direction="row" justifyContent="center" alignItems="center">
               <Grid item xs={1}>
                 <IconButton onClick={() => setShowInfoDialog(true)}>
                   <InfoIcon />
@@ -530,7 +536,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                 <Autocomplete
                   multiple
                   freeSolo
-                  id='tags-standard'
+                  id="tags-standard"
                   options={[]}
                   value={searchQueries}
                   onChange={(_, v) => {
@@ -538,7 +544,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                     filterCardArr(undefined, v as string[]);
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} variant='outlined' label='Search' />
+                    <TextField {...params} variant="outlined" label="Search" />
                   )}
                 />
               </Grid>
@@ -551,10 +557,10 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                 ))}
 
                 <Button
-                  size='small'
-                  variant='text'
+                  size="small"
+                  variant="text"
                   onClick={() => {
-                    setCardArr(memo.sort((a, b) => compare(a, b, "default")));
+                    setCardArr(memo.sort((a, b) => compare(a, b, 'default')));
                     setSearchQueries([]);
                     setColorFilters(defaultFilterState);
                   }}
@@ -578,12 +584,12 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                 ].map((n) => (
                   <Button
                     style={{
-                      maxWidth: "30px",
-                      maxHeight: "30px",
-                      minWidth: "30px",
-                      minHeight: "30px",
+                      maxWidth: '30px',
+                      maxHeight: '30px',
+                      minWidth: '30px',
+                      minHeight: '30px',
                     }}
-                    variant={colorFilters[n] ? "contained" : undefined}
+                    variant={colorFilters[n] ? 'contained' : undefined}
                     onClick={() => filterCardArr(n)}
                   >
                     {n}
@@ -602,7 +608,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
               <Board
                 cardArr={cardArr}
                 decklist={decklist}
-                addToDeckList={(c: CardsTableType) => modifyDecklist(c, "add")}
+                addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
                 deckName={deckName}
                 refreshDeckList={() => refreshDeckList()}
               />
@@ -614,7 +620,7 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
           {showDeckList && (
             <DeckList
               cards={decklist}
-              addToDeckList={(c: CardsTableType) => modifyDecklist(c, "add")}
+              addToDeckList={(c: CardsTableType) => modifyDecklist(c, 'add')}
               deckName={deckName}
             />
           )}
