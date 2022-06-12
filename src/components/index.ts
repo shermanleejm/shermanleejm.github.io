@@ -10,13 +10,15 @@ import contactMe from '../assets/contactMe.png';
 import mtg from '../assets/mtg.png';
 import wordle from '../assets/wordle.jpg';
 import WordleSolver from './WordleSolver';
+import Tracetogether from './Tracetogether';
 
 export type PageType = {
   name: string;
   component: React.FC;
   link: string;
-  img: string;
+  img?: string;
   description: string;
+  disabled?: boolean;
 };
 
 export const Pages: PageType[] = [
@@ -63,5 +65,12 @@ export const Pages: PageType[] = [
     link: '/terminal',
     img: terminal,
     description: 'This is a pseudo terminal that tells jokes.',
+  },
+  {
+    name: 'Spoof Tracetogether',
+    component: Tracetogether,
+    link: '/tracetogether',
+    description: '',
+    disabled: true,
   },
 ];

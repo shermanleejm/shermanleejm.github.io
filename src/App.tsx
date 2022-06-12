@@ -13,6 +13,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 function App() {
   const { toggleDarkMode } = bindActionCreators(DarkModeActionCreators, useDispatch());
   const darkMode = useSelector((state: State) => state.darkMode);
+  const currentLocation = useLocation().pathname;
 
   return (
     <div className="App">
@@ -26,23 +27,24 @@ function App() {
         )}
       >
         <CssBaseline />
-        <Grid container direction="row" justifyContent="space-between">
-          <Grid item>
-            {useLocation().pathname !== '/' ? (
-              <Button component={Link} to="/">
-                <ArrowBackIcon /> Home
+        {!currentLocation.includes('tracetogether') &&
+          <Grid container direction="row" justifyContent="space-between">
+            <Grid item>
+              {currentLocation !== '/' ? (
+                <Button component={Link} to="/">
+                  <ArrowBackIcon /> Home
+                </Button>
+              ) : (
+                <div></div>
+              )}
+            </Grid>
+            <Grid item>
+              <Button onClick={() => toggleDarkMode()}>
+                {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
               </Button>
-            ) : (
-              <div></div>
-            )}
+            </Grid>
           </Grid>
-          <Grid item>
-            <Button onClick={() => toggleDarkMode()}>
-              {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
-            </Button>
-          </Grid>
-        </Grid>
-
+        }
         <Routes>
           {Pages.map((page) => {
             return <Route path={page.link} element={<page.component />} />;

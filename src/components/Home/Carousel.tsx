@@ -38,6 +38,9 @@ const Carousel = () => {
       style={{ margin: 'auto' }}
     >
       {Pages.map((p) => {
+        if (p.disabled) {
+          return;
+        }
         return (
           p.link !== '/' && (
             <Grid item md={4}>
