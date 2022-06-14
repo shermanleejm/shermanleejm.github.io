@@ -1,7 +1,10 @@
-import { Divider, Grid, Paper, Typography } from '@mui/material';
+import { Link, Grid, Paper, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import otter from './otter.gif';
+import logo from './mt carmel.png';
 import moment from 'moment';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 
 const Tracetogether = () => {
   const boldText = (text: string) => {
@@ -46,23 +49,59 @@ const Tracetogether = () => {
               height: 'auto',
             }}
           />
-          {/* <Divider style={{ color: 'white', width: '100%', paddingTop: '-20%' }} /> */}
-          {/* <hr style={{ color: 'white', width: '100%', marginTop: '-20%' }} /> */}
 
-          <Paper style={{ backgroundColor: 'white', color: 'black' }}>
+          <Paper style={{ backgroundColor: 'white', color: 'black', width: '199px' }}>
             <Grid
               container
               alignItems={'center'}
               justifyContent={'center'}
               direction="column"
               spacing={1}
-              padding={1}
             >
-              <Grid item>{boldText('GalaNight Check-in')}</Grid>
+              <Grid item>
+                <div
+                  style={{
+                    backgroundColor: '#a9dbc0',
+                    padding: '10px',
+                    borderRadius: '4px 4px 0px 0px',
+                  }}
+                >
+                  <Typography>
+                    <MeetingRoomIcon /> Gala
+                    <span style={{ fontWeight: 'bold' }}>Night Check-in</span>
+                  </Typography>
+                </div>
+              </Grid>
               <Grid item>{boldText(moment().format('DD MMM, hh.mmA'))}</Grid>
               <Grid item>{boldText('GALA NIGHT')}</Grid>
+              <Grid
+                item
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: '20px',
+                }}
+              >
+                <Box
+                  component="img"
+                  src={logo}
+                  sx={{
+                    width: '50%',
+                    height: 'auto',
+                    margin: 'auto',
+                  }}
+                />
+              </Grid>
             </Grid>
           </Paper>
+
+          <Typography style={{ color: 'white', paddingTop: '10px' }} variant="body2">
+            <Link>
+              <StarBorderIcon />
+              Save this memory
+            </Link>{' '}
+            to Favourites
+          </Typography>
         </Grid>
       </div>
     </div>
