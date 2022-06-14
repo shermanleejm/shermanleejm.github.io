@@ -27,8 +27,8 @@ const Tracetogether = () => {
           justifyContent: 'flex-start',
           flexDirection: 'column',
           borderRadius: '10px',
-          width: '200px',
-          height: '400px',
+          width: '300px',
+          height: '500px',
         }}
       >
         <Grid
