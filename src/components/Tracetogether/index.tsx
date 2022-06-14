@@ -50,7 +50,14 @@ const Tracetogether = () => {
             }}
           />
 
-          <Paper style={{ backgroundColor: 'white', color: 'black', width: '199px' }}>
+          <Paper
+            style={{
+              backgroundColor: 'white',
+              color: 'black',
+              width: '198px',
+              marginTop: '-20px',
+            }}
+          >
             <Grid
               container
               alignItems={'center'}
