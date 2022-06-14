@@ -1,7 +1,8 @@
 {
   "files": {
-    "main.js": "/static/js/main.d410d73f.js",
+    "main.js": "/static/js/main.06bba16a.js",
     "static/media/contactMe.png": "/static/media/contactMe.5d34d3218493bfca364d.png",
+    "static/media/mt carmel.png": "/static/media/mt carmel.3f66111049ece6951047.png",
     "static/media/tracker.jpg": "/static/media/tracker.55132aa7642e73f1e8e7.jpg",
     "static/media/Resume.pdf": "/static/media/Resume.cac81031f5756a2eab8d.pdf",
     "static/media/otter.gif": "/static/media/otter.bd4593da0f99f3dabaea.gif",
@@ -10,9 +11,9 @@
     "static/media/wordle.jpg": "/static/media/wordle.55f6810809445c5d2303.jpg",
     "static/media/addnewdeck.png": "/static/media/addnewdeck.b82b94317f9f4fae6516.png",
     "index.html": "/index.html",
-    "main.d410d73f.js.map": "/static/js/main.d410d73f.js.map"
+    "main.06bba16a.js.map": "/static/js/main.06bba16a.js.map"
   },
   "entrypoints": [
-    "static/js/main.d410d73f.js"
+    "static/js/main.06bba16a.js"
   ]
 }
