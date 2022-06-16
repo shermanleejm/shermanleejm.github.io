@@ -79,7 +79,7 @@ const Tracetogether = () => {
                   </Typography>
                 </div>
               </Grid>
-              <Grid item>{boldText(moment().format('DD MMM, hh.mmA'))}</Grid>
+              <Grid item>{boldText(moment().format('DD MMM, h.mmA'))}</Grid>
               <Grid item>{boldText('GALA NIGHT')}</Grid>
               <Grid
                 item
