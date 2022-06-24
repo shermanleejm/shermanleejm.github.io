@@ -1,6 +1,6 @@
 <template>
   <div id="preamble">
-    <div>Welcome to AB testing</div>
+    <div>Welcome to preference testing</div>
 
     <p>
       The purpose of this survey is to determine which layout for skills and
