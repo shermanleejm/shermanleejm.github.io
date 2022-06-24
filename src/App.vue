@@ -5,6 +5,16 @@
     <router-link to="/B">Screen B</router-link>
   </div>
   <router-view />
+
+  <iframe
+    src="https://docs.google.com/forms/d/e/1FAIpQLSeUoMM8yLnRkvl4TFFmQoIdfLhc1yH_X5rRBi4XIvexHudVzQ/viewform?embedded=true"
+    width="400px"
+    height="700px"
+    frameborder="0"
+    marginheight="0"
+    marginwidth="0"
+    >Loading…</iframe
+  >
 </template>
 
 <script>
