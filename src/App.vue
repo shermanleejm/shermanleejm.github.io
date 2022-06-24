@@ -11,8 +11,8 @@
     <div v-if="showForm">
       <iframe
         src="https://docs.google.com/forms/d/e/1FAIpQLSeUoMM8yLnRkvl4TFFmQoIdfLhc1yH_X5rRBi4XIvexHudVzQ/viewform?embedded=true"
-        width="600px"
-        height="900px"
+        width="auto"
+        height="600px"
         frameborder="0"
         marginheight="0"
         marginwidth="0"
