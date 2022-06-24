@@ -8,11 +8,11 @@
   <div id="content">
     <router-view />
     <hr />
-    <div v-if="showForm">
+    <div v-if="showForm" id="gform">
       <iframe
         src="https://docs.google.com/forms/d/e/1FAIpQLSeUoMM8yLnRkvl4TFFmQoIdfLhc1yH_X5rRBi4XIvexHudVzQ/viewform?embedded=true"
-        width="auto"
-        height="600px"
+        width="110%"
+        height="500px"
         frameborder="0"
         marginheight="0"
         marginwidth="0"
@@ -47,6 +47,11 @@ export default {
   justify-content: center;
   flex-direction: column;
   margin-top: 20px;
+}
+
+#gform {
+  max-width: 80%;
+  height: 500px;
 }
 
 #app {
