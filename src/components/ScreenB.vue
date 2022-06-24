@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%">
+  <div style="max-width: 90%">
     <DataTable :value="skills" stripedRows responsiveLayout="scroll">
       <template #header> Screen B </template>
       <Column field="name" header="TSC Title"></Column>
