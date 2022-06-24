@@ -7,7 +7,7 @@
 
   <div id="content">
     <router-view />
-
+    <hr />
     <div v-if="showForm">
       <iframe
         src="https://docs.google.com/forms/d/e/1FAIpQLSeUoMM8yLnRkvl4TFFmQoIdfLhc1yH_X5rRBi4XIvexHudVzQ/viewform?embedded=true"
