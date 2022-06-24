@@ -4,23 +4,34 @@
     <router-link to="/A">Screen A</router-link> |
     <router-link to="/B">Screen B</router-link>
   </div>
-  <router-view />
 
-  <iframe
-    src="https://docs.google.com/forms/d/e/1FAIpQLSeUoMM8yLnRkvl4TFFmQoIdfLhc1yH_X5rRBi4XIvexHudVzQ/viewform?embedded=true"
-    width="400px"
-    height="700px"
-    frameborder="0"
-    marginheight="0"
-    marginwidth="0"
-    >Loading…</iframe
-  >
+  <div id="content">
+    <router-view />
+
+    <div v-if="showForm">
+      <iframe
+        src="https://docs.google.com/forms/d/e/1FAIpQLSeUoMM8yLnRkvl4TFFmQoIdfLhc1yH_X5rRBi4XIvexHudVzQ/viewform?embedded=true"
+        width="600px"
+        height="900px"
+        frameborder="0"
+        marginheight="0"
+        marginwidth="0"
+        >Loading…</iframe
+      >
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
   name: "App",
   components: {},
+  computed: {
+    showForm() {
+      let currentRoute = this.$route.path;
+      return currentRoute !== "/";
+    },
+  },
 };
 </script>
 
@@ -30,12 +41,18 @@ export default {
   text-align: center;
 }
 
+#content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  /* color: #2c3e50; */
   margin-top: 60px;
 }
 </style>
