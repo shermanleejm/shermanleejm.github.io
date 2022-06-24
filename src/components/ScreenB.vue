@@ -1,7 +1,7 @@
 <template>
-  <div>
-    Screen B
+  <div style="width: 100%">
     <DataTable :value="skills" stripedRows responsiveLayout="scroll">
+      <template #header> Screen B </template>
       <Column field="name" header="TSC Title"></Column>
       <Column
         field="proficiencies"
