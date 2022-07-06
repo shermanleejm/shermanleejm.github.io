@@ -4,13 +4,18 @@ import ContactMe from './ContactMe';
 import Home from './Home';
 import MTGDB from './MTGDB/';
 import Terminal from './Terminal';
+import WordleSolver from './WordleSolver';
+import Tracetogether from './Tracetogether';
+import GIC from './GIC';
+import SelfDrivingCar from './SelfDrivingCar';
+
 import terminal from '../assets/terminal.png';
 import tracker from '../assets/tracker.jpg';
 import contactMe from '../assets/contactMe.png';
 import mtg from '../assets/mtg.png';
 import wordle from '../assets/wordle.jpg';
-import WordleSolver from './WordleSolver';
-import Tracetogether from './Tracetogether';
+import money from '../assets/money.jpg';
+import car from '../assets/car.jpg';
 
 export type PageType = {
   name: string;
@@ -28,6 +33,22 @@ export const Pages: PageType[] = [
     link: '/',
     img: '',
     description: 'This is just the home page. Nothing to see here',
+  },
+  {
+    name: 'Self Driving',
+    component: SelfDrivingCar,
+    link: '/car',
+    img: car,
+    description:
+      'Trying to implement a self driving car using basic genetic machine learning lol. Pure JS (no libraries)',
+  },
+  {
+    name: 'GIC Homework',
+    component: GIC,
+    link: '/gichomework',
+    img: money,
+    description:
+      'Stock picker and analyser. Using Python for calculation and data management. Enabled by the awesome invention of PyScript',
   },
   {
     name: 'MTG Database',

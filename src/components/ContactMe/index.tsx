@@ -13,13 +13,13 @@ const ContactMe = () => {
   function handleSubmit() {
     fetch(
       'https://docs.google.com/forms/d/e/1FAIpQLSeRk58rRnbE1XDd_6RZ6i9RIPTDPZT9YgsQ_4B7-Ff0mqQE3w/formResponse?usp=pp_url&entry.963742205=' +
-        state.name +
-        '&entry.1053435119=' +
-        state.email +
-        '&entry.1110637641=' +
-        state.contactNumber +
-        '&entry.63678808=' +
-        state.message
+      state.name +
+      '&entry.1053435119=' +
+      state.email +
+      '&entry.1110637641=' +
+      state.contactNumber +
+      '&entry.63678808=' +
+      state.message
     );
     setState({
       ...state,
