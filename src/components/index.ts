@@ -6,7 +6,6 @@ import MTGDB from './MTGDB/';
 import Terminal from './Terminal';
 import WordleSolver from './WordleSolver';
 import Tracetogether from './Tracetogether';
-import GIC from './GIC';
 import SelfDrivingCar from './SelfDrivingCar';
 
 import terminal from '../assets/terminal.png';
@@ -16,6 +15,7 @@ import mtg from '../assets/mtg.png';
 import wordle from '../assets/wordle.jpg';
 import money from '../assets/money.jpg';
 import car from '../assets/car.jpg';
+import ExpenditureTracker from './ExpenditureTracker';
 
 export type PageType = {
   name: string;
@@ -35,20 +35,12 @@ export const Pages: PageType[] = [
     description: 'This is just the home page. Nothing to see here',
   },
   {
-    name: 'Self Driving',
-    component: SelfDrivingCar,
-    link: '/car',
-    img: car,
-    description:
-      'Trying to implement a self driving car using basic genetic machine learning lol. Pure JS (no libraries)',
-  },
-  {
-    name: 'GIC Homework',
-    component: GIC,
-    link: '/gichomework',
+    name: 'Expenditure Tracker',
+    component: ExpenditureTracker,
+    link: '/expenditure_tracker',
     img: money,
     description:
-      'Stock picker and analyser. Using Python for calculation and data management. Enabled by the awesome invention of PyScript',
+      'To help me track my spending lol im broke',
   },
   {
     name: 'MTG Database',
@@ -93,5 +85,13 @@ export const Pages: PageType[] = [
     link: '/tracetogether',
     description: '',
     disabled: true,
+  },
+  {
+    name: '[WIP] Self Driving',
+    component: SelfDrivingCar,
+    link: '/car',
+    img: car,
+    description:
+      'Trying to implement a self driving car using basic genetic machine learning lol. Pure JS (no libraries)',
   },
 ];
