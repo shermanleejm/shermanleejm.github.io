@@ -70,15 +70,43 @@ export const DecksTableColumns = [
   'category',
 ];
 
+export enum FormCategories {
+  category = 'category',
+  name = 'name',
+  amount = 'amount',
+  datetime = 'datetime',
+  isCredit = 'is_credit',
+}
+
+export interface ExpenditureTableType {
+  id?: number;
+  [FormCategories.category]: string;
+  [FormCategories.name]: string;
+  [FormCategories.amount]: string;
+  [FormCategories.datetime]: Date;
+  [FormCategories.isCredit]: boolean;
+}
+
+export const ExpenditureTableColumns = [
+  'id',
+  'category',
+  'name',
+  'amount',
+  'datetime',
+  'is_credit',
+];
+
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
   public decks!: Table<DecksTableType, number>;
+  public expenditure!: Table<ExpenditureTableType, number>;
 
   public constructor() {
     super('mtgdb');
     this.version(3).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
+      expenditure: `++${ExpenditureTableColumns.join(',')}`,
     });
   }
 }

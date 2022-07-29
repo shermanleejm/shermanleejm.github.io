@@ -12,10 +12,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useEffect, useState } from 'react';
 import { CardsTableType } from '../../../database';
 import { useDrag } from 'react-dnd';
-import { DBCoreRangeType } from 'dexie';
 import { useSelector } from 'react-redux';
 import { State } from '../../../state/reducers';
-import { changeCategory } from '..';
 
 type DraggableCardType = {
   data: CardsTableType;
