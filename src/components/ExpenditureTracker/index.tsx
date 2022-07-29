@@ -1,11 +1,17 @@
-import { Alert, IconButton, Snackbar } from '@mui/material';
+import { Alert, Grid, IconButton, Snackbar } from '@mui/material';
 import React from 'react';
 import { useState } from 'react';
 import { ToasterSeverityEnum } from '../MTGDB';
 import Form from './Form';
 import CloseIcon from '@mui/icons-material/Close';
+import { useSelector } from 'react-redux';
+import { State } from '../../state/reducers';
+import dayjs from 'dayjs';
+import ExpenditureTable from './ExpenditureTable';
 
 const ExpenditureTracker = () => {
+  const db = useSelector((state: State) => state.database);
+
   const [showToaster, setShowToaster] = useState(false);
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
@@ -48,12 +54,24 @@ const ExpenditureTracker = () => {
       >
         <Alert severity={toasterSeverity}>{toasterMessage}</Alert>
       </Snackbar>
-
-      <Form
-        toaster={function (m: string, e: ToasterSeverityEnum): void {
-          openToaster(m, e);
-        }}
-      />
+      <Grid
+        container
+        justifyContent={'center'}
+        alignItems={'center'}
+        direction={'column'}
+        spacing={3}
+      >
+        <Grid item>
+          <Form
+            toaster={function (m: string, e: ToasterSeverityEnum): void {
+              openToaster(m, e);
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <ExpenditureTable />
+        </Grid>
+      </Grid>
     </div>
   );
 };

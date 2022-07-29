@@ -17,21 +17,24 @@ import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import { ExpenditureTableType, FormCategories } from '../../database';
 import { ToasterSeverityEnum } from '../MTGDB';
+import dayjs from 'dayjs';
 
 type FormProps = {
   toaster: (m: string, e: ToasterSeverityEnum) => void;
 };
 
+const emptyForm = {
+  [FormCategories.category]: '',
+  [FormCategories.name]: '',
+  [FormCategories.amount]: '',
+  [FormCategories.datetime]: dayjs().unix(),
+  [FormCategories.isCredit]: true,
+};
+
 const Form = ({ toaster }: FormProps) => {
   const db = useSelector((state: State) => state.database);
 
-  const [form, setForm] = useState<ExpenditureTableType>({
-    [FormCategories.category]: '',
-    [FormCategories.name]: '',
-    [FormCategories.amount]: '',
-    [FormCategories.datetime]: new Date(),
-    [FormCategories.isCredit]: true,
-  });
+  const [form, setForm] = useState<ExpenditureTableType>(emptyForm);
 
   function updateForm(type: FormCategories, value: any) {
     setForm({
@@ -41,6 +44,7 @@ const Form = ({ toaster }: FormProps) => {
   }
 
   function handleSubmit(type: boolean) {
+    console.log(form);
     let isFilled = !Object.values(form).some(
       (x) => x === '' || x === null || x === undefined
     );
@@ -50,13 +54,7 @@ const Form = ({ toaster }: FormProps) => {
     }
     db.expenditure.add(form);
     toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
-    setForm({
-      [FormCategories.category]: '',
-      [FormCategories.name]: '',
-      [FormCategories.amount]: '',
-      [FormCategories.datetime]: new Date(),
-      [FormCategories.isCredit]: true,
-    });
+    setForm(emptyForm);
   }
 
   const categories = ['Food', 'Insurance', 'Tithe', 'Misc'];
@@ -105,7 +103,10 @@ const Form = ({ toaster }: FormProps) => {
             style={{ width: '60vw' }}
             value={form[FormCategories.amount]}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              updateForm(FormCategories.amount, e.target.value.replace(/[^0-9.]/g, ''))
+              updateForm(
+                FormCategories.amount,
+                Number(e.target.value.replace(/[^0-9.]/g, ''))
+              )
             }
             prefix={'$'}
             thousandSeparator
@@ -118,7 +119,7 @@ const Form = ({ toaster }: FormProps) => {
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
               label="Date and Time"
-              value={form[FormCategories.datetime]}
+              value={dayjs.unix(form[FormCategories.datetime])}
               onChange={(newDate: Date | null) =>
                 updateForm(FormCategories.datetime, newDate)
               }

@@ -82,8 +82,8 @@ export interface ExpenditureTableType {
   id?: number;
   [FormCategories.category]: string;
   [FormCategories.name]: string;
-  [FormCategories.amount]: string;
-  [FormCategories.datetime]: Date;
+  [FormCategories.amount]: string | number;
+  [FormCategories.datetime]: number;
   [FormCategories.isCredit]: boolean;
 }
 
