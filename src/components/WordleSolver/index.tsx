@@ -1,6 +1,8 @@
 import { Button, Grid, TextField, Typography } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { changeManifest } from '..';
 import WORDS from './words';
 
 const WordleSolver = () => {
@@ -20,6 +22,12 @@ const WordleSolver = () => {
   const [showTest, setShowTest] = useState(false);
 
   const START_DATE = Date.parse('09 Feb 2022 00:00:00');
+
+  const location = useLocation();
+
+  useEffect(() => {
+    changeManifest(location);
+  }, [location]);
 
   const test =
     WORDS[

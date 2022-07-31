@@ -16,6 +16,8 @@ import NetExports from './NetExports';
 import DeckBuilder from './DeckDisplay';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { ScryfallDataType } from './interfaces';
+import { changeManifest } from '..';
+import { useLocation } from 'react-router-dom';
 
 export enum ToasterSeverityEnum {
   SUCCESS = 'success',
@@ -38,6 +40,7 @@ const MTGDB = () => {
   const [chosenTab, setChosenTab] = useState(0);
 
   const db = useSelector((state: State) => state.database);
+  const location = useLocation();
 
   const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -68,7 +71,8 @@ const MTGDB = () => {
     }
 
     getAllCards();
-  }, [isLoading]);
+    changeManifest(location);
+  }, [isLoading, location]);
 
   const toaster = (
     <React.Fragment>
