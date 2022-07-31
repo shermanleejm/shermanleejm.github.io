@@ -1,5 +1,5 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom';
-import { Pages } from './components';
+import { Pages, shortname } from './components';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button, ThemeProvider, CssBaseline, Grid } from '@mui/material';
 import { bindActionCreators } from 'redux';
@@ -15,15 +15,6 @@ function App() {
   const { toggleDarkMode } = bindActionCreators(DarkModeActionCreators, useDispatch());
   const darkMode = useSelector((state: State) => state.darkMode);
   const currentLocation = useLocation();
-
-  function shortname(location: string) {
-    return Pages.map((page) => {
-      if (page.link === location) {
-        return page.shortname;
-      }
-      return "Sherman's Portfolio";
-    });
-  }
 
   useEffect(() => {
     function changeManifest() {
@@ -57,7 +48,6 @@ function App() {
       const manifestURL = URL.createObjectURL(blob);
       document.querySelector('#manifest')?.setAttribute('href', manifestURL);
     }
-
     changeManifest();
   }, [currentLocation]);
 

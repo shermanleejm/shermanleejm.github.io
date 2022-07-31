@@ -105,3 +105,8 @@ export const Pages: PageType[] = [
     shortname: 'IM NOT READY YET'
   },
 ];
+
+export function shortname(location: string) {
+  let page = Pages.find((page) => page.link === location);
+  return page ? page.shortname : "Sherman's Portfolio";
+}
