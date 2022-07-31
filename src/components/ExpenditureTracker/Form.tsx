@@ -18,6 +18,7 @@ import { State } from '../../state/reducers';
 import { ExpenditureTableType, FormCategories } from '../../database';
 import { ToasterSeverityEnum } from '../MTGDB';
 import dayjs from 'dayjs';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 type FormProps = {
   toaster: (m: string, e: ToasterSeverityEnum) => void;
@@ -34,6 +35,13 @@ const emptyForm = {
 const Form = ({ toaster }: FormProps) => {
   const db = useSelector((state: State) => state.database);
 
+  const existingCategories = useLiveQuery(async () => {
+    const categories = await (
+      await db.expenditure.toArray()
+    ).map((val) => val[FormCategories.category]);
+
+    return [...new Set(categories)];
+  });
   const [form, setForm] = useState<ExpenditureTableType>(emptyForm);
 
   function updateForm(type: FormCategories, value: any) {
@@ -44,7 +52,6 @@ const Form = ({ toaster }: FormProps) => {
   }
 
   function handleSubmit(type: boolean) {
-    console.log(form);
     let isFilled = !Object.values(form).some(
       (x) => x === '' || x === null || x === undefined
     );
@@ -52,12 +59,12 @@ const Form = ({ toaster }: FormProps) => {
       toaster('Please fill in all fields first.', ToasterSeverityEnum.ERROR);
       return;
     }
-    db.expenditure.add(form);
-    toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
-    setForm(emptyForm);
-  }
 
-  const categories = ['Food', 'Insurance', 'Tithe', 'Misc'];
+    db.expenditure.add({ ...form, [FormCategories.isCredit]: type }).then(() => {
+      toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
+      setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
+    });
+  }
 
   return (
     <div style={{ paddingTop: '20px' }}>
@@ -72,8 +79,10 @@ const Form = ({ toaster }: FormProps) => {
           <Autocomplete
             clearOnEscape
             freeSolo
-            options={categories}
-            sx={{ width: '60vw' }}
+            autoSelect
+            autoComplete
+            options={existingCategories || []}
+            sx={{ width: '80vw' }}
             value={form[FormCategories.category]}
             onChange={(e, val) => updateForm(FormCategories.category, val)}
             renderInput={(params) => <TextField {...params} label="Categories" />}
@@ -82,7 +91,7 @@ const Form = ({ toaster }: FormProps) => {
         <Grid item>
           <TextField
             label={'Name'}
-            sx={{ width: '60vw' }}
+            sx={{ width: '80vw' }}
             value={form[FormCategories.name]}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               updateForm(FormCategories.name, e.target.value)
@@ -100,7 +109,7 @@ const Form = ({ toaster }: FormProps) => {
         </Grid>
         <Grid item>
           <NumberFormat
-            style={{ width: '60vw' }}
+            style={{ width: '80vw' }}
             value={form[FormCategories.amount]}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               updateForm(
@@ -123,7 +132,7 @@ const Form = ({ toaster }: FormProps) => {
               onChange={(newDate: Date | null) =>
                 updateForm(FormCategories.datetime, newDate)
               }
-              renderInput={(params) => <TextField sx={{ width: '60vw' }} {...params} />}
+              renderInput={(params) => <TextField sx={{ width: '80vw' }} {...params} />}
             />
           </LocalizationProvider>
         </Grid>

@@ -17,6 +17,10 @@ const ExpenditureTracker = () => {
     ToasterSeverityEnum.SUCCESS
   );
   const [toasterMessage, setToasterMessage] = useState('');
+  const [dateRange, setDateRange] = useState({
+    startDate: dayjs().startOf('month').unix(),
+    endDate: dayjs().unix(),
+  });
 
   const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -54,6 +58,7 @@ const ExpenditureTracker = () => {
       >
         <Alert severity={toasterSeverity}>{toasterMessage}</Alert>
       </Snackbar>
+
       <Grid
         container
         justifyContent={'center'}

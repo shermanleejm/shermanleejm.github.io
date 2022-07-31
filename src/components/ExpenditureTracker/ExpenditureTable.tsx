@@ -1,4 +1,4 @@
-import { Grid, IconButton } from '@mui/material';
+import { Box, Grid, IconButton } from '@mui/material';
 import {
   DataGrid,
   GridCellEditCommitParams,
@@ -6,22 +6,19 @@ import {
   GridValueGetterParams,
 } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { ExpenditureTableType } from '../../database';
 import { State } from '../../state/reducers';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { FormCategories } from '../../database';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [nonce, setNonce] = useState(0);
-  const [dateRange, setDateRange] = useState({
-    startDate: dayjs().startOf('month').unix(),
-    endDate: dayjs().unix(),
+  const data = useLiveQuery(async () => {
+    return db.expenditure.toArray();
   });
-  const [data, setData] = useState<Array<ExpenditureTableType>>([]);
 
   const handleRowEdit = useCallback((params: GridCellEditCommitParams) => {
     console.log(params);
@@ -40,7 +37,11 @@ const ExpenditureTable = () => {
       field: 'delete',
       renderCell: (params: GridValueGetterParams) => {
         return (
-          <IconButton>
+          <IconButton
+            onClick={async () => {
+              await db.expenditure.delete(params.row.id);
+            }}
+          >
             <DeleteForeverIcon />
           </IconButton>
         );
@@ -48,34 +49,28 @@ const ExpenditureTable = () => {
     },
   ];
 
-  useEffect(() => {
-    async function getData() {
-      let tmp = await db.expenditure
-        .where('datetime')
-        .between(dateRange.startDate, dateRange.endDate)
-        .toArray();
-      console.log(JSON.stringify(tmp));
-      setData(tmp);
-      setIsLoading(false);
-    }
-
-    getData();
-  }, []);
-
   return (
     <div>
       <Grid container justifyContent={'center'} alignItems={'center'}>
         <Grid item>
-          {!isLoading && (
-            <div style={{ width: '90vw', height: '35vh' }}>
-              <DataGrid
-                onCellEditCommit={handleRowEdit}
-                disableSelectionOnClick={true}
-                columns={columns}
-                rows={data}
-              />
-            </div>
-          )}
+          <Box
+            sx={{
+              width: '80vw',
+              height: '35vh',
+              '& .credit': { bgcolor: 'green' },
+              '& .debit': { bgcolor: 'red' },
+            }}
+          >
+            <DataGrid
+              onCellEditCommit={handleRowEdit}
+              disableSelectionOnClick={true}
+              columns={columns}
+              rows={data || []}
+              getRowClassName={(params) =>
+                params.row[FormCategories.isCredit] ? `credit` : `debit`
+              }
+            />
+          </Box>
         </Grid>
       </Grid>
     </div>
