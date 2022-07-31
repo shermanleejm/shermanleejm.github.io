@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 function App() {
   const { toggleDarkMode } = bindActionCreators(DarkModeActionCreators, useDispatch());
   const darkMode = useSelector((state: State) => state.darkMode);
-  const currentLocation = useLocation().pathname;
+  const currentLocation = useLocation();
 
   useEffect(() => {
     function changeManifest() {
@@ -38,7 +38,7 @@ function App() {
             sizes: '512x512',
           },
         ],
-        start_url: '.',
+        start_url: currentLocation.pathname,
         display: 'standalone',
         theme_color: '#000000',
         background_color: '#ffffff',
@@ -50,7 +50,7 @@ function App() {
     }
 
     changeManifest();
-  }, []);
+  }, [currentLocation]);
 
   return (
     <div className="App">
@@ -64,10 +64,10 @@ function App() {
         )}
       >
         <CssBaseline />
-        {!currentLocation.includes('tracetogether') && (
+        {!currentLocation.pathname.includes('tracetogether') && (
           <Grid container direction="row" justifyContent="space-between">
             <Grid item>
-              {currentLocation !== '/' ? (
+              {currentLocation.pathname !== '/' ? (
                 <Button component={Link} to="/">
                   <ArrowBackIcon /> Home
                 </Button>
