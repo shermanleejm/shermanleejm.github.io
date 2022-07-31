@@ -24,6 +24,7 @@ export type PageType = {
   img?: string;
   description: string;
   disabled?: boolean;
+  shortname: string;
 };
 
 export const Pages: PageType[] = [
@@ -33,6 +34,7 @@ export const Pages: PageType[] = [
     link: '/',
     img: '',
     description: 'This is just the home page. Nothing to see here',
+    shortname: 'SHERMAN ROX',
   },
   {
     name: 'Expenditure Tracker',
@@ -41,6 +43,7 @@ export const Pages: PageType[] = [
     img: money,
     description:
       'To help me track my spending lol im broke',
+    shortname: 'TRACK $$$',
   },
   {
     name: 'MTG Database',
@@ -49,6 +52,7 @@ export const Pages: PageType[] = [
     img: mtg,
     description:
       'Complete front-end application. OCR enabled collection tracker for Magic The Gathering Commander deck building. Using IndexedDB as a local storage.',
+    shortname: 'MTGDB'
   },
   {
     name: 'Asset Tracker',
@@ -56,6 +60,7 @@ export const Pages: PageType[] = [
     link: '/assettracker',
     img: tracker,
     description: 'DOGE COIN TO THE MOOOOOOOOOON!¡!¡!¡!¡!',
+    shortname: 'STONKS GO MOON'
   },
   {
     name: 'Wordle Solver',
@@ -64,6 +69,7 @@ export const Pages: PageType[] = [
     img: wordle,
     description:
       'Wordle solver. Just key in your guesses and it will search for you. Saves you some time lmao.',
+    shortname: 'SOLVE WORDLE'
   },
   {
     name: 'Contact Me',
@@ -71,6 +77,7 @@ export const Pages: PageType[] = [
     link: '/contactme',
     img: contactMe,
     description: "Hijacked google forms' exposed api for a contact me page.",
+    shortname: 'WHY DO YOU WANT TO SAVE THIS'
   },
   {
     name: 'Terminal',
@@ -78,6 +85,7 @@ export const Pages: PageType[] = [
     link: '/terminal',
     img: terminal,
     description: 'This is a pseudo terminal that tells jokes.',
+    shortname: 'THIS IS SHIT'
   },
   {
     name: 'Spoof Tracetogether',
@@ -85,6 +93,7 @@ export const Pages: PageType[] = [
     link: '/tracetogether',
     description: '',
     disabled: true,
+    shortname: 'HOW ARE YOU EVEN HERE'
   },
   {
     name: '[WIP] Self Driving',
@@ -93,5 +102,6 @@ export const Pages: PageType[] = [
     img: car,
     description:
       'Trying to implement a self driving car using basic genetic machine learning lol. Pure JS (no libraries)',
+    shortname: 'IM NOT READY YET'
   },
 ];

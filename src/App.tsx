@@ -16,10 +16,19 @@ function App() {
   const darkMode = useSelector((state: State) => state.darkMode);
   const currentLocation = useLocation();
 
+  function shortname(location: string) {
+    return Pages.map((page) => {
+      if (page.link === location) {
+        return page.shortname;
+      }
+      return "Sherman's Portfolio";
+    });
+  }
+
   useEffect(() => {
     function changeManifest() {
       let manifest = {
-        short_name: "Sherman's Portfolio",
+        short_name: shortname(currentLocation.pathname),
         name: 'shermanleejm',
         icons: [
           {
