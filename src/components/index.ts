@@ -107,6 +107,5 @@ export const Pages: PageType[] = [
 ];
 
 export function shortname(location: string) {
-  let page = Pages.find((page) => page.link === location);
-  return page ? page.shortname : "Sherman's Portfolio";
+  return Pages.find((page) => page.link === location)?.shortname || "Sherman's Portfolio";
 }
