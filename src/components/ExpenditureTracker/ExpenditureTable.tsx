@@ -6,7 +6,7 @@ import {
   GridValueGetterParams,
 } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
-import { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -15,6 +15,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
+  const [tableHeight, setTableHeight] = useState(300);
 
   const data = useLiveQuery(async () => {
     return db.expenditure.toArray();
@@ -56,7 +57,7 @@ const ExpenditureTable = () => {
           <Box
             sx={{
               width: '80vw',
-              height: '35vh',
+              height: tableHeight,
               '& .credit': { bgcolor: 'green' },
               '& .debit': { bgcolor: 'red' },
             }}

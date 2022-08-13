@@ -17,7 +17,7 @@ import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import { ExpenditureTableType, FormCategories } from '../../database';
 import { ToasterSeverityEnum } from '../MTGDB';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
 
 type FormProps = {
@@ -129,8 +129,8 @@ const Form = ({ toaster }: FormProps) => {
             <DateTimePicker
               label="Date and Time"
               value={dayjs.unix(form[FormCategories.datetime])}
-              onChange={(newDate: Date | null) =>
-                updateForm(FormCategories.datetime, newDate)
+              onChange={(newDate: Dayjs | null) =>
+                updateForm(FormCategories.datetime, newDate === null ? null : newDate.unix())
               }
               renderInput={(params) => <TextField sx={{ width: '80vw' }} {...params} />}
             />
@@ -144,7 +144,7 @@ const Form = ({ toaster }: FormProps) => {
             endIcon={<AddIcon />}
             onClick={() => handleSubmit(true)}
           >
-            credit
+            debit
           </Button>
           <Button
             variant="contained"
@@ -153,7 +153,7 @@ const Form = ({ toaster }: FormProps) => {
             endIcon={<RemoveIcon />}
             onClick={() => handleSubmit(false)}
           >
-            debit
+            credit
           </Button>
         </Grid>
       </Grid>
