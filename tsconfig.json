@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "typeRoots": ["./src/types", "src/components/MTGDB/interfaces"],
+    "typeRoots": ["./src/types", "./src/components/MTGDB/interfaces"],
     "downlevelIteration": true
   },
   "include": ["src"]

@@ -17,70 +17,49 @@ const WordleSolver = () => {
   const [incorrect_4, setIncorrect_4] = useState('');
   const [incorrect_5, setIncorrect_5] = useState('');
   const [wrongGuesses, setWrongGuesses] = useState('');
+  const [incorrect, setIncorrect] = useState('');
+  const [possible, setPossible] = useState<string[]>([]);
   const [words, setWords] = useState<string[]>([]);
   const [initial, setInitial] = useState<boolean>(true);
+  const [test, setTest] = useState('');
   const [showTest, setShowTest] = useState(false);
-
-  const START_DATE = Date.parse('09 Feb 2022 00:00:00');
-
   const location = useLocation();
 
   useEffect(() => {
+    setWords(WORDS);
+    setTest(WORDS[Math.floor(Math.random()) * WORDS.length]);
     changeManifest(location);
   }, [location]);
-
-  const test =
-    WORDS[
-      (Math.floor((Date.now() - START_DATE) / (1000 * 60 * 60 * 24)) + 235) % WORDS.length
-    ];
 
   function solve() {
     setInitial(false);
 
-    let wrongs = '';
-    let incorrects = [incorrect_1, incorrect_2, incorrect_3, incorrect_4, incorrect_5];
-    let incorrects_setters = [
-      setIncorrect_1,
-      setIncorrect_2,
-      setIncorrect_3,
-      setIncorrect_4,
-      setIncorrect_5,
-    ];
-    let guess_setters = [set_1, set_2, set_3, set_4, set_5];
-    let current = [_1, _2, _3, _4, _5];
-    let expression = '';
-
-    for (let i = 0; i < current.length; i++) {
-      let c = current[i];
-      if (!test.includes(c)) {
-        wrongs += c;
-        expression += '.';
-      } else if (test[i] !== c) {
-        incorrects[i] += c;
-        expression += '.';
-      } else {
-        expression += c;
-      }
-
-      if (c === test[i]) {
-        guess_setters[i](c);
-      } else {
-        guess_setters[i]('');
-      }
-    }
+    let expression =
+      (_1 === '' ? '.' : _1) +
+      (_2 === '' ? '.' : _2) +
+      (_3 === '' ? '.' : _3) +
+      (_4 === '' ? '.' : _4) +
+      (_5 === '' ? '.' : _5);
 
     const regex = new RegExp(expression);
-    let tmp = WORDS.filter((w) => regex.test(w));
-    for (let c of wrongGuesses + wrongs) {
+    let tmp = words.filter((w) => regex.test(w));
+    for (let c of wrongGuesses) {
       tmp = tmp.filter((w) => !w.includes(c));
     }
-    setWrongGuesses(wrongGuesses + wrongs);
-    for (let i = 0; i < incorrects.length; i++) {
-      let inc = incorrects[i];
-      for (let c of inc) {
-        tmp = tmp.filter((w) => w.includes(c) && w[i] !== c);
-      }
-      incorrects_setters[i](inc);
+    for (let c of incorrect_1) {
+      tmp = tmp.filter((w) => w.includes(c) && w[0] !== c);
+    }
+    for (let c of incorrect_2) {
+      tmp = tmp.filter((w) => w.includes(c) && w[1] !== c);
+    }
+    for (let c of incorrect_3) {
+      tmp = tmp.filter((w) => w.includes(c) && w[2] !== c);
+    }
+    for (let c of incorrect_4) {
+      tmp = tmp.filter((w) => w.includes(c) && w[3] !== c);
+    }
+    for (let c of incorrect_5) {
+      tmp = tmp.filter((w) => w.includes(c) && w[4] !== c);
     }
 
     setWords(tmp);
