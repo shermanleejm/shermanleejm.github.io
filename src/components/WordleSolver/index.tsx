@@ -17,8 +17,6 @@ const WordleSolver = () => {
   const [incorrect_4, setIncorrect_4] = useState('');
   const [incorrect_5, setIncorrect_5] = useState('');
   const [wrongGuesses, setWrongGuesses] = useState('');
-  const [incorrect, setIncorrect] = useState('');
-  const [possible, setPossible] = useState<string[]>([]);
   const [words, setWords] = useState<string[]>([]);
   const [initial, setInitial] = useState<boolean>(true);
   const [test, setTest] = useState('');
