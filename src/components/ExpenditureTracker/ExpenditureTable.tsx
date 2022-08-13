@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton } from '@mui/material';
+import { Box, Grid, IconButton, Typography } from '@mui/material';
 import {
   DataGrid,
   GridCellEditCommitParams,
@@ -12,6 +12,7 @@ import { State } from '../../state/reducers';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { FormCategories } from '../../database';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { Resizable } from 're-resizable';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
@@ -54,15 +55,20 @@ const ExpenditureTable = () => {
     <div>
       <Grid container justifyContent={'center'} alignItems={'center'}>
         <Grid item>
-          <Box
-            sx={{
-              width: '80vw',
-              height: tableHeight,
-              '& .credit': { bgcolor: 'green' },
-              '& .debit': { bgcolor: 'red' },
+          <Resizable
+            size={{ width: '80vw', height: tableHeight }}
+            onResizeStop={(e, direction, ref, d) => {
+              setTableHeight(tableHeight + d.height);
             }}
+            minWidth={'80vw'}
+            maxWidth={'80vw'}
+            minHeight={200}
           >
             <DataGrid
+              sx={{
+                '& .credit': { bgcolor: 'green' },
+                '& .debit': { bgcolor: 'red' },
+              }}
               onCellEditCommit={handleRowEdit}
               disableSelectionOnClick={true}
               columns={columns}
@@ -71,7 +77,8 @@ const ExpenditureTable = () => {
                 params.row[FormCategories.isCredit] ? `credit` : `debit`
               }
             />
-          </Box>
+          </Resizable>
+          <Typography variant="subtitle2">*psst this is resizable</Typography>
         </Grid>
       </Grid>
     </div>
