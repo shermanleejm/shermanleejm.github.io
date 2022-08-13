@@ -67,7 +67,7 @@ const Form = ({ toaster }: FormProps) => {
   }
 
   return (
-    <div style={{ paddingTop: '20px' }}>
+    <div>
       <Grid
         container
         justifyContent={'center'}
@@ -99,9 +99,11 @@ const Form = ({ toaster }: FormProps) => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => updateForm(FormCategories.name, '')}>
-                    <ClearIcon />
-                  </IconButton>
+                  {form.name !== '' && (
+                    <IconButton onClick={() => updateForm(FormCategories.name, '')}>
+                      <ClearIcon />
+                    </IconButton>
+                  )}
                 </InputAdornment>
               ),
             }}
@@ -130,7 +132,10 @@ const Form = ({ toaster }: FormProps) => {
               label="Date and Time"
               value={dayjs.unix(form[FormCategories.datetime])}
               onChange={(newDate: Dayjs | null) =>
-                updateForm(FormCategories.datetime, newDate === null ? null : newDate.unix())
+                updateForm(
+                  FormCategories.datetime,
+                  newDate === null ? null : newDate.unix()
+                )
               }
               renderInput={(params) => <TextField sx={{ width: '80vw' }} {...params} />}
             />

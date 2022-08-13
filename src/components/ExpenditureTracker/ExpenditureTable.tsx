@@ -18,7 +18,7 @@ import { Resizable } from 're-resizable';
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
   const tableWidth = '90vw';
-  const [tableHeight, setTableHeight] = useState(300);
+  const [tableHeight, setTableHeight] = useState(220);
 
   const data = useLiveQuery(async () => {
     return db.expenditure.toArray();
@@ -81,7 +81,7 @@ const ExpenditureTable = () => {
               // components={{ Toolbar: GridToolbar }}
             />
           </Resizable>
-          <Typography variant="subtitle2">*psst this is resizable</Typography>
+          <Typography variant="subtitle2">*psst this is resizable, just drag the bottom of the table</Typography>
         </Grid>
       </Grid>
     </div>
