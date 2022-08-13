@@ -100,7 +100,10 @@ const Form = ({ toaster }: FormProps) => {
               endAdornment: (
                 <InputAdornment position="end">
                   {form.name !== '' && (
-                    <IconButton onClick={() => updateForm(FormCategories.name, '')}>
+                    <IconButton
+                      size="small"
+                      onClick={() => updateForm(FormCategories.name, '')}
+                    >
                       <ClearIcon />
                     </IconButton>
                   )}

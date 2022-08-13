@@ -1,13 +1,12 @@
-import { Box, Grid, IconButton, Typography } from '@mui/material';
+import { Grid, IconButton, Typography } from '@mui/material';
 import {
   DataGrid,
   GridCellEditCommitParams,
   GridColDef,
-  GridToolbar,
   GridValueGetterParams,
 } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -78,12 +77,9 @@ const ExpenditureTable = () => {
               getRowClassName={(params) =>
                 params.row[FormCategories.isCredit] ? `credit` : `debit`
               }
-              // components={{ Toolbar: GridToolbar }}
             />
           </Resizable>
-          <Typography variant="subtitle2">
-            *psst this is resizable, just drag the bottom of the table
-          </Typography>
+          <Typography variant="subtitle2">*psst this table is resizable</Typography>
         </Grid>
       </Grid>
     </div>
