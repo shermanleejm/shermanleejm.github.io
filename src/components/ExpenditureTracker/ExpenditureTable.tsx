@@ -64,7 +64,7 @@ const ExpenditureTable = () => {
             }}
             minWidth={tableWidth}
             maxWidth={tableWidth}
-            minHeight={200}
+            minHeight={220}
           >
             <DataGrid
               sx={{
@@ -81,7 +81,9 @@ const ExpenditureTable = () => {
               // components={{ Toolbar: GridToolbar }}
             />
           </Resizable>
-          <Typography variant="subtitle2">*psst this is resizable, just drag the bottom of the table</Typography>
+          <Typography variant="subtitle2">
+            *psst this is resizable, just drag the bottom of the table
+          </Typography>
         </Grid>
       </Grid>
     </div>

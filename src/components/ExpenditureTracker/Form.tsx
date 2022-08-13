@@ -36,9 +36,9 @@ const Form = ({ toaster }: FormProps) => {
   const db = useSelector((state: State) => state.database);
 
   const existingCategories = useLiveQuery(async () => {
-    const categories = await (
-      await db.expenditure.toArray()
-    ).map((val) => val[FormCategories.category]);
+    const categories = (await db.expenditure.toArray()).map(
+      (val) => val[FormCategories.category]
+    );
 
     return [...new Set(categories)];
   });
@@ -51,7 +51,7 @@ const Form = ({ toaster }: FormProps) => {
     });
   }
 
-  function handleSubmit(type: boolean) {
+  async function handleSubmit(type: boolean) {
     let isFilled = !Object.values(form).some(
       (x) => x === '' || x === null || x === undefined
     );
@@ -60,7 +60,7 @@ const Form = ({ toaster }: FormProps) => {
       return;
     }
 
-    db.expenditure.add({ ...form, [FormCategories.isCredit]: type }).then(() => {
+    await db.expenditure.add({ ...form, [FormCategories.isCredit]: type }).then(() => {
       toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
       setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
     });
