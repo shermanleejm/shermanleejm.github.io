@@ -1,6 +1,5 @@
 import {
   Alert,
-  CircularProgress,
   Grid,
   IconButton,
   Snackbar,
@@ -20,7 +19,6 @@ import { changeManifest } from '..';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { KeyItem, KeyItemTitle } from './KeyItem';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { stringify } from 'querystring';
 
 const ExpenditureTracker = () => {
   const db = useSelector((state: State) => state.database);
