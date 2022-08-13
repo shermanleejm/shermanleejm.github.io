@@ -3,6 +3,7 @@ import {
   DataGrid,
   GridCellEditCommitParams,
   GridColDef,
+  GridToolbar,
   GridValueGetterParams,
 } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
@@ -16,6 +17,7 @@ import { Resizable } from 're-resizable';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
+  const tableWidth = '90vw';
   const [tableHeight, setTableHeight] = useState(300);
 
   const data = useLiveQuery(async () => {
@@ -56,12 +58,12 @@ const ExpenditureTable = () => {
       <Grid container justifyContent={'center'} alignItems={'center'}>
         <Grid item>
           <Resizable
-            size={{ width: '80vw', height: tableHeight }}
+            size={{ width: tableWidth, height: tableHeight }}
             onResizeStop={(e, direction, ref, d) => {
               setTableHeight(tableHeight + d.height);
             }}
-            minWidth={'80vw'}
-            maxWidth={'80vw'}
+            minWidth={tableWidth}
+            maxWidth={tableWidth}
             minHeight={200}
           >
             <DataGrid
@@ -76,6 +78,7 @@ const ExpenditureTable = () => {
               getRowClassName={(params) =>
                 params.row[FormCategories.isCredit] ? `credit` : `debit`
               }
+              // components={{ Toolbar: GridToolbar }}
             />
           </Resizable>
           <Typography variant="subtitle2">*psst this is resizable</Typography>
