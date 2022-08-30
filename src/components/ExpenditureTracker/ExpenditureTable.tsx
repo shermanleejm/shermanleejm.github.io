@@ -77,6 +77,16 @@ const ExpenditureTable = () => {
               getRowClassName={(params) =>
                 params.row[FormCategories.isCredit] ? `credit` : `debit`
               }
+              initialState={{
+                sorting: {
+                  sortModel: [
+                    {
+                      field: 'datetime',
+                      sort: 'desc'
+                    }
+                  ]
+                }
+              }}
             />
           </Resizable>
           <Typography variant="subtitle2">*psst this table is resizable</Typography>
