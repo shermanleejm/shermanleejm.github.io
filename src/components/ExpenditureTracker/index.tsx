@@ -1,89 +1,24 @@
-import { Alert, Grid, IconButton, Snackbar, TextField } from "@mui/material";
-import React, { ChangeEvent, useEffect } from "react";
-import { useState } from "react";
+import { Alert, Grid, IconButton, Snackbar } from "@mui/material";
+import React, { useState, useEffect } from "react";
 import { ToasterSeverityEnum } from "../MTGDB";
 import Form from "./Form";
 import CloseIcon from "@mui/icons-material/Close";
-import { useSelector } from "react-redux";
-import { State } from "../../state/reducers";
-import dayjs from "dayjs";
 import ExpenditureTable from "./ExpenditureTable";
 import { useLocation } from "react-router-dom";
 import { changeManifest } from "..";
-import { useLiveQuery } from "dexie-react-hooks";
-import { KeyItem, KeyItemTitle } from "./KeyItem";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import BigNumbers from "./BigNumbers";
 
 const ExpenditureTracker = () => {
-  const db = useSelector((state: State) => state.database);
   const location = useLocation();
-
-  const [isLoading, setIsLoading] = useState(true);
   const [showToaster, setShowToaster] = useState(false);
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
   const [toasterMessage, setToasterMessage] = useState("");
-  const [payday, setPayday] = useState(25);
-  const [dateRange, setDateRange] = useState({
-    startDate: dayjs().subtract(1, "months").date(payday).unix(),
-    endDate: dayjs().unix(),
-  });
-  const [showEditPayday, setShowEditPayday] = useState(false);
 
   useEffect(() => {
-    function getPayday() {
-      let payday = Number(window.localStorage.getItem("payday") || "15");
-      setPayday(payday);
-    }
-    function monitorLocalStorage() {
-      window.addEventListener("storage", () => {
-        getPayday();
-      });
-    }
     changeManifest(location);
-    getPayday();
-    monitorLocalStorage();
-  }, [location]);
-
-  const data = useLiveQuery(async () => {
-    let currentMonth = (await db.expenditure.toArray())
-      .filter(
-        (ex) =>
-          ex.datetime >= dateRange.startDate && ex.datetime <= dateRange.endDate
-      )
-      .reduce(
-        (total, { amount, is_credit }) =>
-          total + (is_credit ? Number(amount) : Number(amount) * -1),
-        0
-      );
-
-    let total = (await db.expenditure.toArray()).reduce(
-      (total, { amount, is_credit }) =>
-        total + (is_credit ? Number(amount) : Number(amount) * -1),
-      0
-    );
-
-    let saving = (await db.expenditure.toArray())
-      .filter((x) => x.datetime >= dayjs().date(payday).unix())
-      .reduce(
-        (total, { amount, is_credit }) =>
-          total + (is_credit ? Number(amount) : Number(amount) * -1),
-        0
-      );
-
-    let spending = (await db.expenditure.toArray())
-      .filter((x) => !x.is_credit && x.datetime >= dayjs().date(payday).unix())
-      .map((item) => item.amount)
-      .reduce((prev, next) => Number(prev) + Number(next), 0);
-
-    return {
-      currentMonth: currentMonth,
-      total: total,
-      spending: spending,
-      saving: saving,
-    };
-  }, [dateRange]);
+  });
 
   const handleCloseToaster = (
     _event: React.SyntheticEvent | Event,
@@ -115,7 +50,7 @@ const ExpenditureTracker = () => {
   );
 
   return (
-    <div style={{ marginBottom: "20px" }}>
+    <div>
       <Snackbar
         open={showToaster}
         autoHideDuration={3000}
@@ -133,77 +68,9 @@ const ExpenditureTracker = () => {
         spacing={3}
       >
         <Grid item>
-          <Grid container justifyContent={"center"} alignItems={"center"}>
-            <Grid item xs={6}>
-              <KeyItem
-                value={`$${data?.currentMonth.toLocaleString()}`}
-                title={"Available funds"}
-                color={
-                  Number(data?.currentMonth.toLocaleString()) < 0
-                    ? "red"
-                    : "green"
-                }
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <div>
-                {showEditPayday ? (
-                  <>
-                    <KeyItemTitle title="Pay day" />
-                    <div style={{ display: "flex", flexDirection: "row" }}>
-                      <TextField
-                        size="small"
-                        sx={{ width: 50 }}
-                        value={payday}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          setPayday(
-                            Math.min(
-                              Number(e.target.value.replace(/\D/g, "")),
-                              31
-                            )
-                          )
-                        }
-                      />
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setShowEditPayday(false);
-                          window.localStorage.setItem(
-                            "payday",
-                            payday.toString()
-                          );
-                          setIsLoading(true);
-                        }}
-                      >
-                        <CheckCircleIcon />
-                      </IconButton>
-                    </div>
-                  </>
-                ) : (
-                  <div onClick={() => setShowEditPayday(true)}>
-                    <KeyItem
-                      value={String(payday)}
-                      title={"Pay day"}
-                      color="orange"
-                    />
-                  </div>
-                )}
-              </div>
-            </Grid>
-            <Grid item xs={6}>
-              <KeyItem
-                title="Monthly Save"
-                value={`$${data?.saving.toLocaleString()}` || "$0"}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <KeyItem
-                title="Monthly Spend"
-                value={`$${data?.spending.toLocaleString()}` || "$0"}
-              />
-            </Grid>
-          </Grid>
+          <BigNumbers />
         </Grid>
+
         <Grid item>
           <Form
             toaster={function (m: string, e: ToasterSeverityEnum): void {
@@ -211,6 +78,7 @@ const ExpenditureTracker = () => {
             }}
           />
         </Grid>
+
         <Grid item>
           <ExpenditureTable />
         </Grid>
