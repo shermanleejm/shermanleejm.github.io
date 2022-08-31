@@ -15,11 +15,22 @@ const BigNumbers = () => {
     startDate: dayjs().subtract(1, "months").date(payday).unix(),
     endDate: dayjs().unix(),
   });
+  const [isLoading, setIsLoading] = useState(false);
+
+  function recordPayday() {
+    setShowEditPayday(false);
+    window.localStorage.setItem("payday", payday.toString());
+    setIsLoading(true);
+  }
 
   useEffect(() => {
     function getPayday() {
       let payday = Number(window.localStorage.getItem("payday") || "15");
       setPayday(payday);
+      setDateRange({
+        startDate: dayjs().subtract(1, "months").date(payday).unix(),
+        endDate: dayjs().unix(),
+      });
     }
     function monitorLocalStorage() {
       window.addEventListener("storage", () => {
@@ -28,7 +39,7 @@ const BigNumbers = () => {
     }
     getPayday();
     monitorLocalStorage();
-  }, [payday]);
+  }, [isLoading]);
 
   const data = useLiveQuery(async () => {
     let currentMonth = (await db.expenditure.toArray())
@@ -77,11 +88,12 @@ const BigNumbers = () => {
         alignItems={"center"}
         direction={"row"}
         style={{ textAlign: "center" }}
+        spacing={2}
       >
         <Grid item xs={6} md={3}>
           <KeyItem
             value={`$${data?.currentMonth.toLocaleString()}`}
-            title={"Available funds"}
+            title={"Total funds"}
             color={
               Number(data?.currentMonth.toLocaleString()) < 0 ? "red" : "green"
             }
@@ -95,21 +107,21 @@ const BigNumbers = () => {
                 <div style={{ display: "flex", flexDirection: "row" }}>
                   <TextField
                     size="small"
-                    sx={{ width: 50 }}
+                    // sx={{ width: 50 }}
                     value={payday}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setPayday(
                         Math.min(Number(e.target.value.replace(/\D/g, "")), 31)
                       )
                     }
-                  />
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      setShowEditPayday(false);
-                      window.localStorage.setItem("payday", payday.toString());
+                    onBlur={() => recordPayday()}
+                    onKeyPress={(event) => {
+                      if (event.key === "Enter") {
+                        recordPayday();
+                      }
                     }}
-                  >
+                  />
+                  <IconButton size="small" onClick={() => recordPayday()}>
                     <CheckCircleIcon />
                   </IconButton>
                 </div>
@@ -127,14 +139,14 @@ const BigNumbers = () => {
         </Grid>
         <Grid item xs={6} md={3}>
           <KeyItem
-            title="Monthly Save"
-            value={`$${data?.saving.toLocaleString()}` || "$0"}
+            title="Monthly Spend"
+            value={`$${data?.spending.toLocaleString()}` || "$0"}
           />
         </Grid>
         <Grid item xs={6} md={3}>
           <KeyItem
-            title="Monthly Spend"
-            value={`$${data?.spending.toLocaleString()}` || "$0"}
+            title="Monthly Save"
+            value={`$${data?.saving.toLocaleString()}` || "$0"}
           />
         </Grid>
       </Grid>

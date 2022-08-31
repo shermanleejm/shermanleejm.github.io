@@ -11,14 +11,14 @@ interface KeyItemTitleProps {
 }
 
 export const KeyItemTitle = ({ title }: KeyItemTitleProps) => {
-  return <Typography variant="h5">{title}</Typography>;
+  return <Typography variant="h6">{title}</Typography>;
 };
 
 export const KeyItem = ({ title, value, color }: KeyItemsProps) => {
   return (
     <div>
       <KeyItemTitle title={title} />
-      <Typography variant="h4" style={{ color: color }}>
+      <Typography variant="h5" style={{ color: color }}>
         {value}
       </Typography>
     </div>

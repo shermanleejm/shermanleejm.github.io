@@ -7,6 +7,7 @@ import ExpenditureTable from "./ExpenditureTable";
 import { useLocation } from "react-router-dom";
 import { changeManifest } from "..";
 import BigNumbers from "./BigNumbers";
+import CustomChart from "./CustomChart";
 
 const ExpenditureTracker = () => {
   const location = useLocation();
@@ -77,6 +78,10 @@ const ExpenditureTracker = () => {
               openToaster(m, e);
             }}
           />
+        </Grid>
+
+        <Grid item>
+          <CustomChart />
         </Grid>
 
         <Grid item>
