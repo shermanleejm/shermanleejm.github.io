@@ -99,31 +99,31 @@ const WordleSolver = () => {
                 style={{ width: "2.5rem" }}
                 value={test[0]}
                 type={_1 === test[0] ? "" : "password"}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
               <TextField
                 style={{ width: "2.5rem" }}
                 value={test[1]}
                 type={_2 === test[1] ? "" : "password"}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
               <TextField
                 style={{ width: "2.5rem" }}
                 value={test[2]}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
                 type={_3 === test[2] ? "" : "password"}
               />
               <TextField
                 style={{ width: "2.5rem" }}
                 value={test[3]}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
                 type={_4 === test[3] ? "" : "password"}
               />
               <TextField
                 style={{ width: "2.5rem" }}
                 value={test[4]}
                 type={_5 === test[4] ? "" : "password"}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
             </>
           )}
@@ -150,7 +150,7 @@ const WordleSolver = () => {
               );
               ref1.current?.focus();
             }}
-            autoCapitalize={"false"}
+            autoCapitalize={"none"}
           />
           <TextField
             style={{ width: "2.5rem" }}
@@ -174,7 +174,7 @@ const WordleSolver = () => {
               );
               ref2.current?.focus();
             }}
-            autoCapitalize={"false"}
+            autoCapitalize={"none"}
           />
           <TextField
             style={{ width: "2.5rem" }}
@@ -198,7 +198,7 @@ const WordleSolver = () => {
               );
               ref3.current?.focus();
             }}
-            autoCapitalize={"false"}
+            autoCapitalize={"none"}
           />
           <TextField
             style={{ width: "2.5rem" }}
@@ -222,7 +222,7 @@ const WordleSolver = () => {
               );
               ref4.current?.focus();
             }}
-            autoCapitalize={"false"}
+            autoCapitalize={"none"}
           />
           <TextField
             style={{ width: "2.5rem" }}
@@ -245,7 +245,7 @@ const WordleSolver = () => {
                   .toLowerCase()
               );
             }}
-            autoCapitalize={"false"}
+            autoCapitalize={"none"}
           />
         </Grid>
 
@@ -260,7 +260,7 @@ const WordleSolver = () => {
                 ).join("")
               )
             }
-            autoCapitalize={"false"}
+            autoCapitalize={"none"}
           />
         </Grid>
 
@@ -273,7 +273,7 @@ const WordleSolver = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setIncorrect_1(e.target.value.replace(/[^a-zA-Z]/, ""));
                 }}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
             </Grid>
             <Grid item xs={2}>
@@ -283,7 +283,7 @@ const WordleSolver = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setIncorrect_2(e.target.value.replace(/[^a-zA-Z]/, ""));
                 }}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
             </Grid>
             <Grid item xs={2}>
@@ -293,7 +293,7 @@ const WordleSolver = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setIncorrect_3(e.target.value.replace(/[^a-zA-Z]/, ""));
                 }}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
             </Grid>
             <Grid item xs={2}>
@@ -303,7 +303,7 @@ const WordleSolver = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setIncorrect_4(e.target.value.replace(/[^a-zA-Z]/, ""));
                 }}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
             </Grid>
             <Grid item xs={2}>
@@ -313,7 +313,7 @@ const WordleSolver = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setIncorrect_5(e.target.value.replace(/[^a-zA-Z]/, ""));
                 }}
-                autoCapitalize={"false"}
+                autoCapitalize={"none"}
               />
             </Grid>
           </Grid>

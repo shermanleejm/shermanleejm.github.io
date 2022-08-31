@@ -94,7 +94,7 @@ const Form = ({ toaster }: FormProps) => {
         </Grid>
         <Grid item>
           <TextField
-            autoCapitalize={'false'}
+            autoCapitalize={'none'}
             label={"Name"}
             sx={{ width: "80vw" }}
             value={form[FormCategories.name]}
