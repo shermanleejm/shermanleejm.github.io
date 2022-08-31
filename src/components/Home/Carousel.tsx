@@ -39,7 +39,6 @@ const Carousel = () => {
       justifyContent="flex-start"
       alignItems="flex-start"
       spacing={1}
-      style={{ margin: "auto" }}
     >
       {Pages.map((p) => {
         if (p.disabled) {
