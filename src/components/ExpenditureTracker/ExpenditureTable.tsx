@@ -10,7 +10,7 @@ import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { State } from "../../state/reducers";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { FormCategories } from "../../database";
+import { ExpenditureTableType, FormCategories } from "../../database";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Resizable } from "re-resizable";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -25,8 +25,11 @@ const ExpenditureTable = () => {
     return db.expenditure.toArray();
   });
 
-  const handleRowEdit = useCallback((params: GridCellEditCommitParams) => {
-    console.log(params);
+  const handleRowEdit = useCallback((params: any) => {
+    let id = params.row.id;
+    let field = params.field;
+    let newValue = params.value;
+    db.expenditure.update(id, { [field]: newValue }).then().finally();
   }, []);
 
   const columns: GridColDef[] = [
@@ -36,8 +39,8 @@ const ExpenditureTable = () => {
         `${dayjs.unix(params.row.datetime).format("YYYY MMM DD")}`,
     },
     { field: "category", editable: true },
-    { field: "name" },
-    { field: "amount" },
+    { field: "name", editable: true },
+    { field: "amount", editable: true },
     {
       field: "delete",
       renderCell: (params: GridValueGetterParams) => {
