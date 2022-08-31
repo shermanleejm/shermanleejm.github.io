@@ -1,7 +1,6 @@
 import { Button, Grid, IconButton, Typography } from "@mui/material";
 import {
   DataGrid,
-  GridCellEditCommitParams,
   GridColDef,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
@@ -10,7 +9,7 @@ import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { State } from "../../state/reducers";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { ExpenditureTableType, FormCategories } from "../../database";
+import { FormCategories } from "../../database";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Resizable } from "re-resizable";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
