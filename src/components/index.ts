@@ -111,7 +111,6 @@ export function shortname(location: string) {
 }
 
 export function changeManifest(currentLocation: any) {
-  console.log(document.location.href);
   let manifest = {
     short_name: shortname(currentLocation.pathname),
     name: 'shermanleejm',
