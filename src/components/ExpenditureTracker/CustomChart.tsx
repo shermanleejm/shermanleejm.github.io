@@ -3,8 +3,9 @@ import { useSelector } from "react-redux";
 import { State } from "../../state/reducers";
 import { ResponsiveSunburst } from "@nivo/sunburst";
 import { BasicTooltip } from "@nivo/tooltip";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
+import dayjs from "dayjs";
 
 interface Inner {
   name: string;
@@ -16,6 +17,30 @@ const CustomChart = () => {
   const darkMode = useSelector((state: State) => state.darkMode);
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [payday, setPayday] = useState(25);
+  const [dateRange, setDateRange] = useState({
+    startDate: dayjs().subtract(1, "months").date(payday).unix(),
+    endDate: dayjs().unix(),
+  });
+  const [totalSpending, setTotalSpending] = useState(1);
+
+  useEffect(() => {
+    function getPayday() {
+      let payday = Number(window.localStorage.getItem("payday") || "15");
+      setPayday(payday);
+      setDateRange({
+        startDate: dayjs().subtract(1, "months").date(payday).unix(),
+        endDate: dayjs().unix(),
+      });
+    }
+    function monitorLocalStorage() {
+      window.addEventListener("storage", () => {
+        getPayday();
+      });
+    }
+    getPayday();
+    monitorLocalStorage();
+  }, [isLoading]);
 
   useLiveQuery(async () => {
     let _data = await db.expenditure.toArray();
@@ -45,6 +70,13 @@ const CustomChart = () => {
           return a;
         }, []),
     }));
+
+    let spending = (await db.expenditure.toArray())
+      .filter((x) => !x.is_credit && x.datetime >= dateRange.startDate)
+      .map((item) => item.amount)
+      .reduce((prev, next) => Number(prev) + Number(next), 0);
+
+    setTotalSpending(Number(spending));
     setData({ name: "total", children: res });
     setIsLoading(false);
   });
@@ -60,7 +92,6 @@ const CustomChart = () => {
       style={{
         height: "300px",
         width: "300px",
-        color: darkMode ? "#fff" : "#000",
       }}
     >
       <ResponsiveSunburst
@@ -71,19 +102,24 @@ const CustomChart = () => {
         cornerRadius={2}
         borderColor={{ theme: "background" }}
         colors={{ scheme: "nivo" }}
-        // childColor={{
-        //   from: "color",
-        //   modifiers: [["brighter", 0.1]],
-        // }}
+        childColor={{
+          from: "color",
+          modifiers: [["darker", 0.5]],
+        }}
         enableArcLabels={true}
         arcLabelsSkipAngle={10}
-        arcLabel={(e) => `${e.id} ${e.value}`}
+        arcLabel={(e) => `${e.id} $${e.value}`}
         arcLabelsTextColor={darkMode ? "#fff" : "#000"}
-        // tooltip={(e) => (
-        //   <div style={{background: 'red'}}>
-        //     <BasicTooltip id={e.id} value={e.value} color={"#f50a16"} />
-        //   </div>
-        // )}
+        tooltip={(e) => (
+          <div
+            style={{
+              backgroundColor: darkMode ? "#000" : "#fff",
+              color: darkMode ? "#fff" : "#000",
+              padding: "4px",
+              borderRadius: "25px",
+            }}
+          >{`${e.id} ${(e.value / totalSpending * 100).toFixed(2)}%`}</div>
+        )}
       />
     </div>
   );
