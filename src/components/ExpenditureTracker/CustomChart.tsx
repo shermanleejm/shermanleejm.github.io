@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { State } from "../../state/reducers";
 import { ResponsiveSunburst } from "@nivo/sunburst";
 import { BasicTooltip } from "@nivo/tooltip";
+import { useState } from "react";
+import { CircularProgress } from "@mui/material";
 
 interface Inner {
   name: string;
@@ -12,7 +14,10 @@ interface Inner {
 const CustomChart = () => {
   const db = useSelector((state: State) => state.database);
   const darkMode = useSelector((state: State) => state.darkMode);
-  const data = useLiveQuery(async () => {
+  const [data, setData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useLiveQuery(async () => {
     let _data = await db.expenditure.toArray();
     let res = [
       ...new Set(
@@ -40,13 +45,17 @@ const CustomChart = () => {
           return a;
         }, []),
     }));
-
-    return { name: "total", children: res };
+    setData({ name: "total", children: res });
+    setIsLoading(false);
   });
 
   // const totalAmount = useLiveQuery(async)
 
-  return (
+  return isLoading ? (
+    <div>
+      <CircularProgress />
+    </div>
+  ) : (
     <div
       style={{
         height: "300px",
