@@ -38,7 +38,6 @@ const NetExports = (props: MTGDBProps) => {
       } catch (err) {
         json = ee.target.result;
       }
-      console.log(json);
     };
   };
 

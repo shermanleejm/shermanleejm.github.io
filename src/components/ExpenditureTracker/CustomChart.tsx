@@ -38,7 +38,7 @@ const CustomChart = () => {
           return a;
         }, []),
     }));
-    console.log(JSON.stringify(res));
+
     return res;
   });
 

@@ -42,7 +42,7 @@ const BigNumbers = () => {
   }, [isLoading]);
 
   const data = useLiveQuery(async () => {
-    let currentMonth = (await db.expenditure.toArray())
+    let saving = (await db.expenditure.toArray())
       .filter(
         (ex) =>
           ex.datetime >= dateRange.startDate && ex.datetime <= dateRange.endDate
@@ -59,21 +59,12 @@ const BigNumbers = () => {
       0
     );
 
-    let saving = (await db.expenditure.toArray())
-      .filter((x) => x.datetime >= dayjs().date(payday).unix())
-      .reduce(
-        (total, { amount, is_credit }) =>
-          total + (is_credit ? Number(amount) : Number(amount) * -1),
-        0
-      );
-
     let spending = (await db.expenditure.toArray())
-      .filter((x) => !x.is_credit && x.datetime >= dayjs().date(payday).unix())
+      .filter((x) => !x.is_credit && x.datetime >= dateRange.startDate)
       .map((item) => item.amount)
       .reduce((prev, next) => Number(prev) + Number(next), 0);
 
     return {
-      currentMonth: currentMonth,
       total: total,
       spending: spending,
       saving: saving,
@@ -92,10 +83,10 @@ const BigNumbers = () => {
       >
         <Grid item xs={6} md={3}>
           <KeyItem
-            value={`$${data?.currentMonth.toLocaleString()}`}
+            value={`$${data?.total.toLocaleString()}`}
             title={"Total funds"}
             color={
-              Number(data?.currentMonth.toLocaleString()) < 0 ? "red" : "green"
+              Number(data?.total.toLocaleString()) < 0 ? "red" : "green"
             }
           />
         </Grid>

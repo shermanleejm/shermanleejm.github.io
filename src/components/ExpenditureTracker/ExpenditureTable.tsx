@@ -34,8 +34,9 @@ const ExpenditureTable = () => {
   const columns: GridColDef[] = [
     {
       field: "datetime",
-      valueGetter: (params: GridValueGetterParams) =>
-        `${dayjs.unix(params.row.datetime).format("YYYY MMM DD")}`,
+      renderCell: (params: GridValueGetterParams) => {
+        return `${dayjs.unix(params.row.datetime).format("YYYY MMM DD")}`
+      }
     },
     { field: "category", editable: true },
     { field: "name", editable: true },

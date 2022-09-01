@@ -80,9 +80,9 @@ const ExpenditureTracker = () => {
           />
         </Grid>
 
-        <Grid item>
+        {/* <Grid item>
           <CustomChart />
-        </Grid>
+        </Grid> */}
 
         <Grid item>
           <ExpenditureTable />
