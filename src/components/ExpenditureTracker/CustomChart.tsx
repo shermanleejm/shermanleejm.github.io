@@ -90,8 +90,8 @@ const CustomChart = () => {
   ) : (
     <div
       style={{
-        height: "300px",
-        width: "300px",
+        height: "40vh",
+        width: "80vw",
       }}
     >
       <ResponsiveSunburst
@@ -101,10 +101,10 @@ const CustomChart = () => {
         value="amount"
         cornerRadius={2}
         borderColor={{ theme: "background" }}
-        colors={{ scheme: "nivo" }}
+        colors={{ scheme: "dark2" }}
         childColor={{
           from: "color",
-          modifiers: [["darker", 0.5]],
+          modifiers: [["brighter", 1]],
         }}
         enableArcLabels={true}
         arcLabelsSkipAngle={10}
@@ -115,10 +115,10 @@ const CustomChart = () => {
             style={{
               backgroundColor: darkMode ? "#000" : "#fff",
               color: darkMode ? "#fff" : "#000",
-              padding: "4px",
+              padding: "5px 10px 5px 10px",
               borderRadius: "25px",
             }}
-          >{`${e.id} ${(e.value / totalSpending * 100).toFixed(2)}%`}</div>
+          >{`${e.id} ${((e.value / totalSpending) * 100).toFixed(2)}%`}</div>
         )}
       />
     </div>

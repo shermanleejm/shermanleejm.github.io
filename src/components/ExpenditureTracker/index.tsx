@@ -51,7 +51,7 @@ const ExpenditureTracker = () => {
   );
 
   return (
-    <div>
+    <div style={{marginBottom: '10vh'}}>
       <Snackbar
         open={showToaster}
         autoHideDuration={3000}
