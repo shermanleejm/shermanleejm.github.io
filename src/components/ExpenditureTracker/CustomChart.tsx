@@ -1,11 +1,10 @@
-import { useLiveQuery } from "dexie-react-hooks";
-import { useSelector } from "react-redux";
-import { State } from "../../state/reducers";
-import { ResponsiveSunburst } from "@nivo/sunburst";
-import { BasicTooltip } from "@nivo/tooltip";
-import { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
-import dayjs from "dayjs";
+import { useLiveQuery } from 'dexie-react-hooks';
+import { useSelector } from 'react-redux';
+import { State } from '../../state/reducers';
+import { ResponsiveSunburst } from '@nivo/sunburst';
+import { useEffect, useState } from 'react';
+import { CircularProgress } from '@mui/material';
+import dayjs from 'dayjs';
 
 interface Inner {
   name: string;
@@ -19,22 +18,22 @@ const CustomChart = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [payday, setPayday] = useState(25);
   const [dateRange, setDateRange] = useState({
-    startDate: dayjs().subtract(1, "months").date(payday).unix(),
+    startDate: dayjs().subtract(1, 'months').date(payday).unix(),
     endDate: dayjs().unix(),
   });
   const [totalSpending, setTotalSpending] = useState(1);
 
   useEffect(() => {
     function getPayday() {
-      let payday = Number(window.localStorage.getItem("payday") || "15");
+      let payday = Number(window.localStorage.getItem('payday') || '15');
       setPayday(payday);
       setDateRange({
-        startDate: dayjs().subtract(1, "months").date(payday).unix(),
+        startDate: dayjs().subtract(1, 'months').date(payday).unix(),
         endDate: dayjs().unix(),
       });
     }
     function monitorLocalStorage() {
-      window.addEventListener("storage", () => {
+      window.addEventListener('storage', () => {
         getPayday();
       });
     }
@@ -45,9 +44,7 @@ const CustomChart = () => {
   useLiveQuery(async () => {
     let _data = await db.expenditure.toArray();
     let res = [
-      ...new Set(
-        _data.filter((item) => !item.is_credit).map((item) => item.category)
-      ),
+      ...new Set(_data.filter((item) => !item.is_credit).map((item) => item.category)),
     ].map((val) => ({
       name: val,
       children: _data
@@ -77,11 +74,9 @@ const CustomChart = () => {
       .reduce((prev, next) => Number(prev) + Number(next), 0);
 
     setTotalSpending(Number(spending));
-    setData({ name: "total", children: res });
+    setData({ name: 'total', children: res });
     setIsLoading(false);
   });
-
-  // const totalAmount = useLiveQuery(async)
 
   return isLoading ? (
     <div>
@@ -90,8 +85,8 @@ const CustomChart = () => {
   ) : (
     <div
       style={{
-        height: "40vh",
-        width: "80vw",
+        height: '40vh',
+        width: '80vw',
       }}
     >
       <ResponsiveSunburst
@@ -100,23 +95,23 @@ const CustomChart = () => {
         id="name"
         value="amount"
         cornerRadius={2}
-        borderColor={{ theme: "background" }}
-        colors={{ scheme: "dark2" }}
+        borderColor={{ theme: 'background' }}
+        colors={{ scheme: 'dark2' }}
         childColor={{
-          from: "color",
-          modifiers: [["brighter", 1]],
+          from: 'color',
+          modifiers: [['brighter', 1]],
         }}
         enableArcLabels={true}
         arcLabelsSkipAngle={10}
         arcLabel={(e) => `${e.id} $${e.value}`}
-        arcLabelsTextColor={darkMode ? "#fff" : "#000"}
+        arcLabelsTextColor={darkMode ? '#fff' : '#000'}
         tooltip={(e) => (
           <div
             style={{
-              backgroundColor: darkMode ? "#000" : "#fff",
-              color: darkMode ? "#fff" : "#000",
-              padding: "5px 10px 5px 10px",
-              borderRadius: "25px",
+              backgroundColor: darkMode ? '#000' : '#fff',
+              color: darkMode ? '#fff' : '#000',
+              padding: '5px 10px 5px 10px',
+              borderRadius: '25px',
             }}
           >{`${e.id} ${((e.value / totalSpending) * 100).toFixed(2)}%`}</div>
         )}

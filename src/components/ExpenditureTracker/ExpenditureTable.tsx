@@ -1,23 +1,19 @@
-import { Button, Grid, IconButton, Typography } from "@mui/material";
-import {
-  DataGrid,
-  GridColDef,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import dayjs from "dayjs";
-import { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
-import { State } from "../../state/reducers";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { FormCategories } from "../../database";
-import { useLiveQuery } from "dexie-react-hooks";
-import { Resizable } from "re-resizable";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import { downloadFile } from "../Helpers";
+import { Button, Grid, IconButton, Typography } from '@mui/material';
+import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import dayjs from 'dayjs';
+import { useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { State } from '../../state/reducers';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { FormCategories } from '../../database';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { Resizable } from 're-resizable';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import { downloadFile } from '../Helpers';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
-  const tableWidth = "90vw";
+  const tableWidth = '90vw';
   const [tableHeight, setTableHeight] = useState(220);
 
   const data = useLiveQuery(async () => {
@@ -28,21 +24,24 @@ const ExpenditureTable = () => {
     let id = params.row.id;
     let field = params.field;
     let newValue = params.value;
-    db.expenditure.update(id, { [field]: newValue }).then().finally();
+    db.expenditure
+      .update(id, { [field]: field === 'amount' ? parseFloat(newValue) : newValue })
+      .then()
+      .finally();
   }, []);
 
   const columns: GridColDef[] = [
     {
-      field: "datetime",
+      field: 'datetime',
       renderCell: (params: GridValueGetterParams) => {
-        return `${dayjs.unix(params.row.datetime).format("YYYY MMM DD")}`
-      }
+        return `${dayjs.unix(params.row.datetime).format('YYYY MMM DD')}`;
+      },
     },
-    { field: "category", editable: true },
-    { field: "name", editable: true },
-    { field: "amount", editable: true },
+    { field: 'category', editable: true },
+    { field: 'name', editable: true },
+    { field: 'amount', editable: true },
     {
-      field: "delete",
+      field: 'delete',
       renderCell: (params: GridValueGetterParams) => {
         return (
           <IconButton
@@ -70,8 +69,8 @@ const ExpenditureTable = () => {
       >
         <DataGrid
           sx={{
-            "& .credit": { bgcolor: "green" },
-            "& .debit": { bgcolor: "red" },
+            '& .credit': { bgcolor: 'green' },
+            '& .debit': { bgcolor: 'red' },
           }}
           onCellEditCommit={handleRowEdit}
           disableSelectionOnClick={true}
@@ -84,8 +83,8 @@ const ExpenditureTable = () => {
             sorting: {
               sortModel: [
                 {
-                  field: "datetime",
-                  sort: "desc",
+                  field: 'datetime',
+                  sort: 'desc',
                 },
               ],
             },
@@ -94,16 +93,14 @@ const ExpenditureTable = () => {
       </Resizable>
 
       <Grid
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         container
         direction="row"
         justifyContent="space-between"
         alignItems="flex-start"
       >
         <Grid item>
-          <Typography variant="subtitle2">
-            *psst this table is resizable
-          </Typography>
+          <Typography variant="subtitle2">*psst this table is resizable</Typography>
         </Grid>
         <Grid item>
           <Button
