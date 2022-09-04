@@ -76,7 +76,7 @@ const CustomChart = () => {
     setTotalSpending(Number(spending));
     setData({ name: 'total', children: res });
     setIsLoading(false);
-  });
+  }, [dateRange]);
 
   return isLoading ? (
     <div>

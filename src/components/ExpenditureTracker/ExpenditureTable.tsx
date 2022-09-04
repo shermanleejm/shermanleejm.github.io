@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { FormCategories } from '../../database';
+import { ExpenditureTableType, FormCategories } from '../../database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Resizable } from 're-resizable';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -15,6 +15,8 @@ const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
   const tableWidth = '90vw';
   const [tableHeight, setTableHeight] = useState(220);
+  const [easterEggCounter, setEasterEggCounter] = useState(11);
+  const [uploadedFile, setUploadedFile] = useState<string>('');
 
   const data = useLiveQuery(async () => {
     return db.expenditure.toArray();
@@ -100,7 +102,12 @@ const ExpenditureTable = () => {
         alignItems="flex-start"
       >
         <Grid item>
-          <Typography variant="subtitle2">*psst this table is resizable</Typography>
+          <Typography
+            variant="subtitle2"
+            onClick={() => setEasterEggCounter(easterEggCounter + 1)}
+          >
+            *psst this table is resizable
+          </Typography>
         </Grid>
         <Grid item>
           <Button
@@ -110,6 +117,32 @@ const ExpenditureTable = () => {
           >
             export
           </Button>
+          {easterEggCounter > 10 && (
+            <>
+              <Button
+                onClick={() => {
+                  db.expenditure.clear().then(() => {
+                    db.expenditure.bulkAdd(JSON.parse(uploadedFile));
+                  });
+                }}
+              >
+                upload
+              </Button>
+              <input
+                type="file"
+                accept="application/json"
+                onChange={(e) => {
+                  let fileReader = new FileReader();
+                  if (e.target.files !== null) {
+                    fileReader.readAsText(e.target.files[0], 'UTF-8');
+                    fileReader.onload = (e: any) => {
+                      setUploadedFile(e.target?.result);
+                    };
+                  }
+                }}
+              />
+            </>
+          )}
         </Grid>
       </Grid>
     </div>
