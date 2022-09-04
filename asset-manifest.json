@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.438c41fe.css",
-    "main.js": "/static/js/main.284d55e7.js",
+    "main.js": "/static/js/main.72a361ec.js",
     "static/media/contactMe.png": "/static/media/contactMe.5d34d3218493bfca364d.png",
     "static/media/mt carmel.png": "/static/media/mt carmel.3f66111049ece6951047.png",
     "static/media/tracker.jpg": "/static/media/tracker.55132aa7642e73f1e8e7.jpg",
@@ -13,10 +13,10 @@
     "static/media/addnewdeck.png": "/static/media/addnewdeck.b82b94317f9f4fae6516.png",
     "index.html": "/index.html",
     "main.438c41fe.css.map": "/static/css/main.438c41fe.css.map",
-    "main.284d55e7.js.map": "/static/js/main.284d55e7.js.map"
+    "main.72a361ec.js.map": "/static/js/main.72a361ec.js.map"
   },
   "entrypoints": [
     "static/css/main.438c41fe.css",
-    "static/js/main.284d55e7.js"
+    "static/js/main.72a361ec.js"
   ]
 }
