@@ -15,7 +15,7 @@ const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
   const tableWidth = '90vw';
   const [tableHeight, setTableHeight] = useState(220);
-  const [easterEggCounter, setEasterEggCounter] = useState(11);
+  const [easterEggCounter, setEasterEggCounter] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<string>('');
 
   const data = useLiveQuery(async () => {

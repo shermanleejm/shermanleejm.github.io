@@ -62,7 +62,7 @@ const BigNumbers = () => {
       .filter((x) => !x.is_credit && x.datetime >= dateRange.startDate)
       .map((item) => item.amount)
       .reduce((prev, next) => Number(prev) + Number(next), 0);
-    console.log('big num', spending);
+
     return {
       total: total,
       spending: spending,
