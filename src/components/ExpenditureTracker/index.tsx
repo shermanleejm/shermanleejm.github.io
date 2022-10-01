@@ -1,13 +1,26 @@
-import { Alert, Grid, IconButton, Snackbar } from "@mui/material";
-import React, { useState, useEffect } from "react";
-import { ToasterSeverityEnum } from "../MTGDB";
-import Form from "./Form";
-import CloseIcon from "@mui/icons-material/Close";
-import ExpenditureTable from "./ExpenditureTable";
-import { useLocation } from "react-router-dom";
-import { changeManifest } from "..";
-import BigNumbers from "./BigNumbers";
-import CustomChart from "./CustomChart";
+import { Alert, Grid, IconButton, Snackbar } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { ToasterSeverityEnum } from '../MTGDB';
+import Form from './Form';
+import CloseIcon from '@mui/icons-material/Close';
+import ExpenditureTable from './ExpenditureTable';
+import { useLocation } from 'react-router-dom';
+import { changeManifest } from '..';
+import BigNumbers from './BigNumbers';
+import CustomChart from './CustomChart';
+import dayjs from 'dayjs';
+
+export function getDateRange() {
+  let payday = Number(window.localStorage.getItem('payday') || '15');
+  let lastMonth = dayjs().subtract(1, 'months').date(payday).unix();
+  let currMonth = dayjs().date(payday).unix();
+  let curr = dayjs().unix();
+
+  return {
+    startDate: curr < currMonth ? lastMonth : currMonth,
+    endDate: curr,
+  };
+}
 
 const ExpenditureTracker = () => {
   const location = useLocation();
@@ -15,17 +28,14 @@ const ExpenditureTracker = () => {
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
     ToasterSeverityEnum.SUCCESS
   );
-  const [toasterMessage, setToasterMessage] = useState("");
+  const [toasterMessage, setToasterMessage] = useState('');
 
   useEffect(() => {
     changeManifest(location);
   });
 
-  const handleCloseToaster = (
-    _event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
+  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
       return;
     }
     setShowToaster(false);
@@ -51,7 +61,7 @@ const ExpenditureTracker = () => {
   );
 
   return (
-    <div style={{marginBottom: '10vh'}}>
+    <div style={{ marginBottom: '10vh' }}>
       <Snackbar
         open={showToaster}
         autoHideDuration={3000}
@@ -63,9 +73,9 @@ const ExpenditureTracker = () => {
 
       <Grid
         container
-        justifyContent={"center"}
-        alignItems={"center"}
-        direction={"column"}
+        justifyContent={'center'}
+        alignItems={'center'}
+        direction={'column'}
         spacing={3}
       >
         <Grid item>

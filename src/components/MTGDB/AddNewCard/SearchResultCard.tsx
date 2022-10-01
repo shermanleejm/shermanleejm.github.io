@@ -214,7 +214,7 @@ const SearchResultCard = ({ sr, defaultTag, toaster }: SearchResultCardType) => 
                 options={[]}
                 onChange={handleTagChange}
                 value={tags}
-                renderTags={(value: readonly string[], getTagProps) =>
+                renderTags={(value: any, getTagProps) =>
                   value.map((option: string, index: number) => (
                     <Chip variant="outlined" label={option} {...getTagProps({ index })} />
                   ))

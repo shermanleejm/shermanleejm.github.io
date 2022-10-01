@@ -190,13 +190,13 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
             fullWidth
             multiple
             id="tags-standard"
-            options={data.tags || []}
+            options={data.tags as any || []}
             defaultValue={data.tags || []}
             freeSolo
             onChange={(_, values) => {
-              updateTags(data.id || 0, values);
+              updateTags(data.id || 0, values as any);
             }}
-            renderTags={(value: readonly string[], getTagProps) =>
+            renderTags={(value: any, getTagProps) =>
               value.map((option: string, index: number) => (
                 <Chip variant="outlined" label={option} {...getTagProps({ index })} />
               ))
@@ -671,7 +671,7 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
                     filterCardArr(selectedFilter, v);
                     setSearchQueries(v);
                   }}
-                  renderTags={(value: readonly string[], getTagProps) =>
+                  renderTags={(value: any, getTagProps) =>
                     value.map((option: string, index: number) => (
                       <Chip
                         variant="outlined"

@@ -1,5 +1,4 @@
-import { Link, Grid, Paper, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Link, Grid, Paper, Typography, Box } from '@mui/material';
 import otter from './otter.gif';
 import logo from './mt carmel.png';
 import moment from 'moment';

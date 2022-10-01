@@ -6,15 +6,13 @@ import dayjs from 'dayjs';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
+import { getDateRange } from '.';
 
 const BigNumbers = () => {
   const db = useSelector((state: State) => state.database);
   const [showEditPayday, setShowEditPayday] = useState(false);
   const [payday, setPayday] = useState(25);
-  const [dateRange, setDateRange] = useState({
-    startDate: dayjs().subtract(1, 'months').date(payday).unix(),
-    endDate: dayjs().unix(),
-  });
+  const [dateRange, setDateRange] = useState(getDateRange());
   const [isLoading, setIsLoading] = useState(false);
 
   function recordPayday() {
@@ -27,10 +25,7 @@ const BigNumbers = () => {
     function getPayday() {
       let payday = Number(window.localStorage.getItem('payday') || '15');
       setPayday(payday);
-      setDateRange({
-        startDate: dayjs().subtract(1, 'months').date(payday).unix(),
-        endDate: dayjs().unix(),
-      });
+      setDateRange(getDateRange());
     }
     function monitorLocalStorage() {
       window.addEventListener('storage', () => {

@@ -5,6 +5,7 @@ import { ResponsiveSunburst } from '@nivo/sunburst';
 import { useEffect, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import dayjs from 'dayjs';
+import { getDateRange } from '.';
 
 interface Inner {
   name: string;
@@ -17,20 +18,14 @@ const CustomChart = () => {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [payday, setPayday] = useState(25);
-  const [dateRange, setDateRange] = useState({
-    startDate: dayjs().subtract(1, 'months').date(payday).unix(),
-    endDate: dayjs().unix(),
-  });
+  const [dateRange, setDateRange] = useState(getDateRange());
   const [totalSpending, setTotalSpending] = useState(1);
 
   useEffect(() => {
     function getPayday() {
       let payday = Number(window.localStorage.getItem('payday') || '15');
       setPayday(payday);
-      setDateRange({
-        startDate: dayjs().subtract(1, 'months').date(payday).unix(),
-        endDate: dayjs().unix(),
-      });
+      setDateRange(getDateRange());
     }
     function monitorLocalStorage() {
       window.addEventListener('storage', () => {
