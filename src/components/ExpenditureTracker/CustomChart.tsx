@@ -43,7 +43,7 @@ const CustomChart = () => {
     ].map((val) => ({
       name: val,
       children: _data
-        .filter((item) => item.category === val)
+        .filter((item) => item.category === val && item.datetime >= dateRange.startDate)
         .map((item) => {
           return {
             name: item.name,
