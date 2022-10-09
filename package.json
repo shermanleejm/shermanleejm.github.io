@@ -43,7 +43,7 @@
     "react-easy-crop": "^4.0.1",
     "react-number-format": "^4.9.3",
     "react-redux": "^7.2.0",
-    "react-router-dom": "^6.2.1",
+    "react-router-dom": "^6.4.2",
     "recharts": "^2.1.8",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
@@ -53,7 +53,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "serve": "vite preview",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -82,9 +82,5 @@
     "vite": "^3.1.6",
     "vite-plugin-svgr": "^2.2.1",
     "vite-tsconfig-paths": "^3.5.1"
-  },
-  "resolutions": {
-    "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2"
   }
 }
