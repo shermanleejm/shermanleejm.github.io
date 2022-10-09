@@ -5,9 +5,14 @@ import svgrPlugin from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), viteTsconfigPaths(), svgrPlugin()],
+  plugins: [react({
+    include: "**/*.tsx"
+  }), viteTsconfigPaths(), svgrPlugin()],
   server: {
     port: 3000,
+    watch: {
+      ignored: ['!**/node_modules/@mui/**']
+    }
   },
   build: {
     outDir: 'build',

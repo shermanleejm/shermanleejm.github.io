@@ -133,7 +133,7 @@ const Form = ({ toaster }: FormProps) => {
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              inputFormat="DD/MMM/YYYY"
+              inputFormat="DD MMM YYYY"
               label="Date"
               value={dayjs.unix(form[FormCategories.datetime])}
               onChange={(newDate: Dayjs | null) =>

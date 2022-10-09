@@ -8,7 +8,11 @@ import { useLocation } from 'react-router-dom';
 import { changeManifest } from '..';
 import BigNumbers from './BigNumbers';
 import CustomChart from './CustomChart';
+import Toolbar from './Toolbar';
 import dayjs from 'dayjs';
+import { useSelector } from 'react-redux';
+import { State } from '../../state/reducers';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 export function getDateRange() {
   let payday = Number(window.localStorage.getItem('payday') || '15');
@@ -23,6 +27,15 @@ export function getDateRange() {
 }
 
 const ExpenditureTracker = () => {
+  const db = useSelector((state: State) => state.database);
+  const totalMonths = useLiveQuery(async () => {
+    const firstDate = (await db.expenditure.orderBy('datetime').first())?.datetime;
+    const lastDate = (await db.expenditure.orderBy('datetime').last())?.datetime;
+    return firstDate && lastDate
+      ? Math.ceil(dayjs.unix(lastDate).diff(dayjs.unix(firstDate), 'month', true))
+      : 0;
+  });
+
   const location = useLocation();
   const [showToaster, setShowToaster] = useState(false);
   const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
@@ -88,6 +101,10 @@ const ExpenditureTracker = () => {
               openToaster(m, e);
             }}
           />
+        </Grid>
+
+        <Grid item>
+          <Toolbar />
         </Grid>
 
         <Grid item>
