@@ -5,13 +5,17 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
-import { getDateRange } from '.';
+import { getDateRange, monthOffsetAtom } from '.';
+import { useAtom } from 'jotai';
 
 const BigNumbers = () => {
   const db = useSelector((state: State) => state.database);
+  const [monthOffset] = useAtom(monthOffsetAtom);
+  const originalDateRange = getDateRange();
+
   const [showEditPayday, setShowEditPayday] = useState(false);
   const [payday, setPayday] = useState(25);
-  const [dateRange, setDateRange] = useState(getDateRange());
+  const [dateRange, setDateRange] = useState(originalDateRange);
   const [isLoading, setIsLoading] = useState(false);
 
   function recordPayday() {
@@ -24,7 +28,7 @@ const BigNumbers = () => {
     function getPayday() {
       let payday = Number(window.localStorage.getItem('payday') || '15');
       setPayday(payday);
-      setDateRange(getDateRange());
+      setDateRange(originalDateRange);
     }
     function monitorLocalStorage() {
       window.addEventListener('storage', () => {
@@ -33,7 +37,7 @@ const BigNumbers = () => {
     }
     getPayday();
     monitorLocalStorage();
-  }, [isLoading]);
+  }, [isLoading, monthOffset]);
 
   const data = useLiveQuery(async () => {
     let saving = (await db.expenditure.toArray())

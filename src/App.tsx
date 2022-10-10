@@ -16,7 +16,7 @@ function App() {
   const currentLocation = useLocation();
 
   return (
-    <div className="App">
+    <div>
       <ThemeProvider
         theme={responsiveFontSizes(
           createTheme({

@@ -5,7 +5,8 @@ import { ResponsiveSunburst } from '@nivo/sunburst';
 import { useEffect, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import dayjs from 'dayjs';
-import { getDateRange } from '.';
+import { getDateRange, monthOffsetAtom } from '.';
+import { useAtom } from 'jotai';
 
 interface Inner {
   name: string;
@@ -14,18 +15,21 @@ interface Inner {
 
 const CustomChart = () => {
   const db = useSelector((state: State) => state.database);
+  const originalDateRange = getDateRange();
+  const [monthOffset] = useAtom(monthOffsetAtom);
   const darkMode = useSelector((state: State) => state.darkMode);
+
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [payday, setPayday] = useState(25);
-  const [dateRange, setDateRange] = useState(getDateRange());
+  const [dateRange, setDateRange] = useState(originalDateRange);
   const [totalSpending, setTotalSpending] = useState(1);
 
   useEffect(() => {
     function getPayday() {
       let payday = Number(window.localStorage.getItem('payday') || '15');
       setPayday(payday);
-      setDateRange(getDateRange());
+      setDateRange(originalDateRange);
     }
     function monitorLocalStorage() {
       window.addEventListener('storage', () => {
@@ -34,7 +38,7 @@ const CustomChart = () => {
     }
     getPayday();
     monitorLocalStorage();
-  }, [isLoading]);
+  }, [isLoading, monthOffset]);
 
   useLiveQuery(async () => {
     let _data = await db.expenditure.toArray();
