@@ -1,5 +1,5 @@
 import { Button, Grid, IconButton, Typography } from '@mui/material';
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';

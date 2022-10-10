@@ -4,7 +4,6 @@ import { State } from '../../state/reducers';
 import { ResponsiveSunburst } from '@nivo/sunburst';
 import { useEffect, useState } from 'react';
 import { CircularProgress } from '@mui/material';
-import dayjs from 'dayjs';
 import { getDateRange, monthOffsetAtom } from '.';
 import { useAtom } from 'jotai';
 

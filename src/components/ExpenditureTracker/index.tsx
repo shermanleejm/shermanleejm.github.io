@@ -107,10 +107,13 @@ const ExpenditureTracker = () => {
         direction={'column'}
         spacing={3}
       >
+        <Grid item xs={12}>
+          <Toolbar />
+        </Grid>
+
         <Grid item>
           <BigNumbers />
         </Grid>
-
         <Grid item>
           <Form
             toaster={function (m: string, e: ToasterSeverityEnum): void {
@@ -118,15 +121,9 @@ const ExpenditureTracker = () => {
             }}
           />
         </Grid>
-
-        <Grid item xs={12}>
-          <Toolbar />
-        </Grid>
-
         <Grid item>
           <CustomChart />
         </Grid>
-
         <Grid item>
           <ExpenditureTable />
         </Grid>
