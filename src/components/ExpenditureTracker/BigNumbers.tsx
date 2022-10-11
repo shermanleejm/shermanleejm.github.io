@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import { getDateRange, monthOffsetAtom } from '.';
 import { useAtom } from 'jotai';
+import { TransactionTypes } from '../../database';
 
 const BigNumbers = () => {
   const db = useSelector((state: State) => state.database);
@@ -45,19 +46,27 @@ const BigNumbers = () => {
         (ex) => ex.datetime >= dateRange.startDate && ex.datetime <= dateRange.endDate
       )
       .reduce(
-        (total, { amount, is_credit }) =>
-          total + (is_credit ? Number(amount) : Number(amount) * -1),
+        (total, { amount, txn_type }) =>
+          total +
+          ([TransactionTypes.CREDIT, TransactionTypes.RECURRING].includes(txn_type)
+            ? Number(amount) * -1
+            : Number(amount)),
         0
       );
 
     let total = (await db.expenditure.toArray()).reduce(
-      (total, { amount, is_credit }) =>
-        total + (is_credit ? Number(amount) : Number(amount) * -1),
+      (total, { amount, txn_type }) =>
+        total +
+        ([TransactionTypes.CREDIT, TransactionTypes.RECURRING].includes(txn_type)
+          ? Number(amount) * -1
+          : Number(amount)),
       0
     );
 
     let spending = (await db.expenditure.toArray())
-      .filter((x) => !x.is_credit && x.datetime >= dateRange.startDate)
+      .filter(
+        (x) => x.txn_type === TransactionTypes.CREDIT && x.datetime >= dateRange.startDate
+      )
       .map((item) => item.amount)
       .reduce((prev, next) => Number(prev) + Number(next), 0);
 

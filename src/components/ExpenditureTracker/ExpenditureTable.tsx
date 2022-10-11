@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { FormCategories } from '../../database';
+import { FormCategories, TransactionTypes } from '../../database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Resizable } from 're-resizable';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -71,16 +71,16 @@ const ExpenditureTable = () => {
       >
         <DataGrid
           sx={{
-            '& .credit': { bgcolor: 'green' },
-            '& .debit': { bgcolor: 'red' },
+            [`& .${TransactionTypes.DEBIT}`]: { bgcolor: 'green' },
+            [`& .${TransactionTypes.CREDIT}`]: { bgcolor: 'red' },
+            [`& .${TransactionTypes.SALARY}`]: { bgcolor: 'blue' },
+            [`& .${TransactionTypes.RECURRING}`]: { bgcolor: 'yellow' },
           }}
           onCellEditCommit={handleRowEdit}
           disableSelectionOnClick={true}
           columns={columns}
           rows={data || []}
-          getRowClassName={(params) =>
-            params.row[FormCategories.isCredit] ? `credit` : `debit`
-          }
+          getRowClassName={(params) => params.row[FormCategories.transactionType]}
           initialState={{
             sorting: {
               sortModel: [

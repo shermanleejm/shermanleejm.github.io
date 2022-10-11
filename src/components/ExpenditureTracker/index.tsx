@@ -14,6 +14,7 @@ import { atom, useAtom } from 'jotai';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { TransactionTypes } from '../../database';
 
 export const monthOffsetAtom = atom(0);
 
@@ -35,20 +36,22 @@ export function getDateRange() {
 
 export function getDateNumbers() {
   const db = useSelector((state: State) => state.database);
+  const [monthOffset] = useAtom(monthOffsetAtom);
 
   const minDate = useLiveQuery(async () => {
     return (await db.expenditure.orderBy('datetime').last())?.datetime;
   });
 
-  const totalMonths = useLiveQuery(async () => {
-    const firstDate = (await db.expenditure.orderBy('datetime').first())?.datetime;
-    const lastDate = (await db.expenditure.orderBy('datetime').last())?.datetime;
-    return firstDate && lastDate
-      ? Math.floor(dayjs.unix(lastDate).diff(dayjs.unix(firstDate), 'month', true))
-      : 0;
+  const paydays = useLiveQuery(async () => {
+    return (await db.expenditure.where({ txn_type: TransactionTypes.SALARY })).toArray();
   });
 
-  return { minDate, totalMonths };
+  const totalMonths = paydays?.length || 0;
+
+  const startDate = paydays ? paydays[totalMonths - 2 - monthOffset] : minDate;
+  const endDate = paydays ? 0 : dayjs().unix();
+
+  return { minDate, totalMonths, paydays };
 }
 
 const ExpenditureTracker = () => {

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { getDateRange, monthOffsetAtom } from '.';
 import { useAtom } from 'jotai';
+import { TransactionTypes } from '../../database';
 
 interface Inner {
   name: string;
@@ -20,14 +21,11 @@ const CustomChart = () => {
 
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [payday, setPayday] = useState(25);
   const [dateRange, setDateRange] = useState(originalDateRange);
   const [totalSpending, setTotalSpending] = useState(1);
 
   useEffect(() => {
     function getPayday() {
-      let payday = Number(window.localStorage.getItem('payday') || '15');
-      setPayday(payday);
       setDateRange(originalDateRange);
     }
     function monitorLocalStorage() {
@@ -42,7 +40,11 @@ const CustomChart = () => {
   useLiveQuery(async () => {
     let _data = await db.expenditure.toArray();
     let res = [
-      ...new Set(_data.filter((item) => !item.is_credit).map((item) => item.category)),
+      ...new Set(
+        _data
+          .filter((item) => item.txn_type === TransactionTypes.CREDIT)
+          .map((item) => item.category)
+      ),
     ].map((val) => ({
       name: val,
       children: _data
@@ -67,7 +69,10 @@ const CustomChart = () => {
     }));
 
     let spending = (await db.expenditure.toArray())
-      .filter((x) => !x.is_credit && x.datetime >= dateRange.startDate)
+      .filter(
+        (x) =>
+          x.txn_type === TransactionTypes.CREDIT && x.datetime >= dateRange.startDate
+      )
       .map((item) => item.amount)
       .reduce((prev, next) => Number(prev) + Number(next), 0);
 

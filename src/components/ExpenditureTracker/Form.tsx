@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   Button,
+  createTheme,
   Grid,
   IconButton,
   InputAdornment,
@@ -10,15 +11,14 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ChangeEvent, useState } from 'react';
 import NumberFormat from 'react-number-format';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ClearIcon from '@mui/icons-material/Clear';
+import { Add, Remove, Clear, HourglassEmpty, Paid } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
-import { ExpenditureTableType, FormCategories } from '../../database';
+import { ExpenditureTableType, FormCategories, TransactionTypes } from '../../database';
 import { ToasterSeverityEnum } from '../MTGDB';
 import dayjs, { Dayjs } from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { blue } from '@mui/material/colors';
 
 type FormProps = {
   toaster: (m: string, e: ToasterSeverityEnum) => void;
@@ -29,7 +29,7 @@ const emptyForm = {
   [FormCategories.name]: '',
   [FormCategories.amount]: '',
   [FormCategories.datetime]: dayjs().unix(),
-  [FormCategories.isCredit]: true,
+  [FormCategories.transactionType]: TransactionTypes.CREDIT,
 };
 
 const Form = ({ toaster }: FormProps) => {
@@ -51,7 +51,7 @@ const Form = ({ toaster }: FormProps) => {
     });
   }
 
-  async function handleSubmit(type: boolean) {
+  async function handleSubmit(type: TransactionTypes) {
     let isFilled = !Object.values(form).some(
       (x) => x === '' || x === null || x === undefined
     );
@@ -60,11 +60,41 @@ const Form = ({ toaster }: FormProps) => {
       return;
     }
 
-    await db.expenditure.add({ ...form, [FormCategories.isCredit]: type }).then(() => {
-      toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
-      setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
-    });
+    await db.expenditure
+      .add({ ...form, [FormCategories.transactionType]: type })
+      .then(() => {
+        toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
+        setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
+      });
   }
+
+  type TxnButtonsType = {
+    endIcon: JSX.Element;
+    type: TransactionTypes;
+    color: 'success' | 'error' | 'warning' | 'info';
+  };
+  const TxnButtons: TxnButtonsType[] = [
+    {
+      endIcon: <Paid />,
+      type: TransactionTypes.SALARY,
+      color: 'info',
+    },
+    {
+      endIcon: <Add />,
+      type: TransactionTypes.DEBIT,
+      color: 'success',
+    },
+    {
+      endIcon: <HourglassEmpty />,
+      type: TransactionTypes.RECURRING,
+      color: 'warning',
+    },
+    {
+      endIcon: <Remove />,
+      type: TransactionTypes.CREDIT,
+      color: 'error',
+    },
+  ];
 
   return (
     <div>
@@ -105,7 +135,7 @@ const Form = ({ toaster }: FormProps) => {
                       size="small"
                       onClick={() => updateForm(FormCategories.name, '')}
                     >
-                      <ClearIcon />
+                      <Clear />
                     </IconButton>
                   )}
                 </InputAdornment>
@@ -147,24 +177,26 @@ const Form = ({ toaster }: FormProps) => {
           </LocalizationProvider>
         </Grid>
         <Grid item>
-          <Button
-            variant="contained"
-            color="success"
-            sx={{ width: '27.5vw', marginRight: '5vw' }}
-            endIcon={<AddIcon />}
-            onClick={() => handleSubmit(true)}
+          <Grid
+            container
+            direction={'row'}
+            justifyContent={'space-between'}
+            alignItems={'center'}
+            spacing={2}
           >
-            debit
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            sx={{ width: '27.5vw' }}
-            endIcon={<RemoveIcon />}
-            onClick={() => handleSubmit(false)}
-          >
-            credit
-          </Button>
+            {TxnButtons.map((btn) => (
+              <Grid item>
+                <Button
+                  variant="contained"
+                  color={btn.color}
+                  endIcon={btn.endIcon}
+                  onClick={() => handleSubmit(btn.type)}
+                >
+                  {btn.type}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
         </Grid>
       </Grid>
     </div>

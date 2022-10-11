@@ -75,7 +75,14 @@ export enum FormCategories {
   name = 'name',
   amount = 'amount',
   datetime = 'datetime',
-  isCredit = 'is_credit',
+  transactionType = 'txn_type',
+}
+
+export enum TransactionTypes {
+  SALARY = 'salary',
+  CREDIT = 'credit',
+  DEBIT = 'debit',
+  RECURRING = 'recurring',
 }
 
 export interface ExpenditureTableType {
@@ -84,7 +91,7 @@ export interface ExpenditureTableType {
   [FormCategories.name]: string;
   [FormCategories.amount]: string | number;
   [FormCategories.datetime]: number;
-  [FormCategories.isCredit]: boolean;
+  [FormCategories.transactionType]: TransactionTypes;
 }
 
 export const ExpenditureTableColumns = [
@@ -93,7 +100,7 @@ export const ExpenditureTableColumns = [
   'name',
   'amount',
   'datetime',
-  'is_credit',
+  'txn_type',
 ];
 
 export class MTGDatabase extends Dexie {
@@ -103,7 +110,7 @@ export class MTGDatabase extends Dexie {
 
   public constructor() {
     super('mtgdb');
-    this.version(3).stores({
+    this.version(4).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
       expenditure: `++${ExpenditureTableColumns.join(',')}`,
