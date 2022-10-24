@@ -18,40 +18,28 @@ import { TransactionTypes } from '../../database';
 
 export const monthOffsetAtom = atom(0);
 
-export function getDateRange() {
-  const [monthOffset] = useAtom(monthOffsetAtom);
-  let payday = Number(window.localStorage.getItem('payday') || '15');
-  let lastMonth = dayjs()
-    .subtract(1 + monthOffset, 'month')
-    .date(payday)
-    .unix();
-  let currMonth = dayjs().subtract(monthOffset, 'month').date(payday).unix();
-  let curr = dayjs().subtract(monthOffset, 'month').unix();
-
-  return {
-    startDate: curr < currMonth ? lastMonth : currMonth,
-    endDate: curr,
-  };
-}
-
 export function getDateNumbers() {
   const db = useSelector((state: State) => state.database);
   const [monthOffset] = useAtom(monthOffsetAtom);
 
-  const minDate = useLiveQuery(async () => {
-    return (await db.expenditure.orderBy('datetime').last())?.datetime;
-  });
+  const minDate =
+    useLiveQuery(async () => {
+      return (await db.expenditure.orderBy('datetime').last())?.datetime;
+    }) ?? 0;
 
-  const paydays = useLiveQuery(async () => {
-    return (await db.expenditure.where({ txn_type: TransactionTypes.SALARY })).toArray();
-  });
+  const paydays =
+    useLiveQuery(async () => {
+      return (
+        await db.expenditure.where({ txn_type: TransactionTypes.SALARY })
+      ).toArray();
+    }) ?? [];
 
-  const totalMonths = paydays?.length || 0;
+  const totalMonths = paydays.length || 0;
+  const startDate = paydays[totalMonths - monthOffset - 1]?.datetime ?? minDate;
+  const endDate =
+    monthOffset === 0 ? dayjs().unix() : paydays[totalMonths - monthOffset]?.datetime;
 
-  const startDate = paydays ? paydays[totalMonths - 2 - monthOffset] : minDate;
-  const endDate = paydays ? 0 : dayjs().unix();
-
-  return { minDate, totalMonths, paydays };
+  return { minDate, totalMonths, paydays, startDate, endDate };
 }
 
 const ExpenditureTracker = () => {

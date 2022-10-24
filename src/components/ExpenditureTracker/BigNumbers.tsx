@@ -1,60 +1,33 @@
-import { ChangeEvent, useState, useEffect } from 'react';
-import { Grid, IconButton, TextField } from '@mui/material';
-import { KeyItem, KeyItemTitle } from './KeyItem';
+import { Grid } from '@mui/material';
+import { KeyItem } from './KeyItem';
 import { useLiveQuery } from 'dexie-react-hooks';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
-import { getDateRange, monthOffsetAtom } from '.';
-import { useAtom } from 'jotai';
-import { TransactionTypes } from '../../database';
+import { getDateNumbers } from '.';
+import { negativeTypes, positiveTypes, TransactionTypes } from '../../database';
+import dayjs from 'dayjs';
 
 const BigNumbers = () => {
   const db = useSelector((state: State) => state.database);
-  const [monthOffset] = useAtom(monthOffsetAtom);
-  const originalDateRange = getDateRange();
-
-  const [showEditPayday, setShowEditPayday] = useState(false);
-  const [payday, setPayday] = useState(25);
-  const [dateRange, setDateRange] = useState(originalDateRange);
-  const [isLoading, setIsLoading] = useState(false);
-
-  function recordPayday() {
-    setShowEditPayday(false);
-    window.localStorage.setItem('payday', payday.toString());
-    setIsLoading(true);
-  }
-
-  useEffect(() => {
-    function getPayday() {
-      let payday = Number(window.localStorage.getItem('payday') || '15');
-      setPayday(payday);
-      setDateRange(originalDateRange);
-    }
-    function monitorLocalStorage() {
-      window.addEventListener('storage', () => {
-        getPayday();
-      });
-    }
-    getPayday();
-    monitorLocalStorage();
-  }, [isLoading, monthOffset]);
+  const { startDate, endDate } = getDateNumbers();
 
   const data = useLiveQuery(async () => {
-    let saving = (await db.expenditure.toArray())
-      .filter(
-        (ex) => ex.datetime >= dateRange.startDate && ex.datetime <= dateRange.endDate
-      )
-      .reduce(
-        (total, { amount, txn_type }) =>
-          total +
-          ([TransactionTypes.CREDIT, TransactionTypes.RECURRING].includes(txn_type)
-            ? Number(amount) * -1
-            : Number(amount)),
-        0
-      );
+    const wholeEx = await db.expenditure.toArray();
+    const currentMonth = wholeEx.filter(
+      (ex) => ex.datetime >= startDate && ex.datetime < endDate
+    );
 
-    let total = (await db.expenditure.toArray()).reduce(
+    let saving = currentMonth.reduce(
+      (prev, next) =>
+        prev + Number(next.amount) * (positiveTypes.includes(next.txn_type) ? 1 : -1),
+      0
+    );
+
+    let spending = currentMonth
+      .filter((ex) => negativeTypes.includes(ex.txn_type))
+      .reduce((prev, next) => prev + Number(next.amount), 0);
+
+    let total = wholeEx.reduce(
       (total, { amount, txn_type }) =>
         total +
         ([TransactionTypes.CREDIT, TransactionTypes.RECURRING].includes(txn_type)
@@ -63,19 +36,12 @@ const BigNumbers = () => {
       0
     );
 
-    let spending = (await db.expenditure.toArray())
-      .filter(
-        (x) => x.txn_type === TransactionTypes.CREDIT && x.datetime >= dateRange.startDate
-      )
-      .map((item) => item.amount)
-      .reduce((prev, next) => Number(prev) + Number(next), 0);
-
     return {
       total: total,
       spending: spending,
       saving: saving,
     };
-  }, [dateRange]);
+  }, [startDate, endDate]);
 
   return (
     <div>
@@ -95,36 +61,11 @@ const BigNumbers = () => {
           />
         </Grid>
         <Grid item xs={6} md={3}>
-          <div>
-            {showEditPayday ? (
-              <>
-                <KeyItemTitle title="Pay day" />
-                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                  <TextField
-                    size="small"
-                    // sx={{ width: 50 }}
-                    value={payday}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                      setPayday(Math.min(Number(e.target.value.replace(/\D/g, '')), 31))
-                    }
-                    onBlur={() => recordPayday()}
-                    onKeyPress={(event) => {
-                      if (event.key === 'Enter') {
-                        recordPayday();
-                      }
-                    }}
-                  />
-                  <IconButton size="small" onClick={() => recordPayday()}>
-                    <CheckCircleIcon />
-                  </IconButton>
-                </div>
-              </>
-            ) : (
-              <div onClick={() => setShowEditPayday(true)}>
-                <KeyItem value={String(payday)} title={'Pay day'} color="orange" />
-              </div>
-            )}
-          </div>
+          <KeyItem
+            value={dayjs.unix(startDate).format('DD MMM')}
+            title={'Pay day'}
+            color="orange"
+          />
         </Grid>
         <Grid item xs={6} md={3}>
           <KeyItem

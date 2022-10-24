@@ -85,6 +85,9 @@ export enum TransactionTypes {
   RECURRING = 'recurring',
 }
 
+export const negativeTypes = [TransactionTypes.CREDIT, TransactionTypes.RECURRING];
+export const positiveTypes = [TransactionTypes.DEBIT, TransactionTypes.SALARY];
+
 export interface ExpenditureTableType {
   id?: number;
   [FormCategories.category]: string;

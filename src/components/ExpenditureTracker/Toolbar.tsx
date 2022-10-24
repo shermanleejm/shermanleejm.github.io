@@ -19,7 +19,7 @@ export default function Toolbar() {
     >
       <Grid item>
         <IconButton
-          onClick={() => setMonthOffset(Math.min(totalMonths ?? 0, monthOffset + 1))}
+          onClick={() => setMonthOffset(Math.min(totalMonths - 1 ?? 0, monthOffset + 1))}
         >
           <ArrowBack />
         </IconButton>

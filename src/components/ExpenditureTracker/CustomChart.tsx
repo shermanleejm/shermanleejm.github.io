@@ -2,10 +2,9 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useSelector } from 'react-redux';
 import { State } from '../../state/reducers';
 import { ResponsiveSunburst } from '@nivo/sunburst';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CircularProgress } from '@mui/material';
-import { getDateRange, monthOffsetAtom } from '.';
-import { useAtom } from 'jotai';
+import { getDateNumbers } from '.';
 import { TransactionTypes } from '../../database';
 
 interface Inner {
@@ -15,27 +14,12 @@ interface Inner {
 
 const CustomChart = () => {
   const db = useSelector((state: State) => state.database);
-  const originalDateRange = getDateRange();
-  const [monthOffset] = useAtom(monthOffsetAtom);
+  const { startDate, endDate } = getDateNumbers();
   const darkMode = useSelector((state: State) => state.darkMode);
 
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [dateRange, setDateRange] = useState(originalDateRange);
   const [totalSpending, setTotalSpending] = useState(1);
-
-  useEffect(() => {
-    function getPayday() {
-      setDateRange(originalDateRange);
-    }
-    function monitorLocalStorage() {
-      window.addEventListener('storage', () => {
-        getPayday();
-      });
-    }
-    getPayday();
-    monitorLocalStorage();
-  }, [isLoading, monthOffset]);
 
   useLiveQuery(async () => {
     let _data = await db.expenditure.toArray();
@@ -48,7 +32,7 @@ const CustomChart = () => {
     ].map((val) => ({
       name: val,
       children: _data
-        .filter((item) => item.category === val && item.datetime >= dateRange.startDate)
+        .filter((item) => item.category === val && item.datetime >= startDate)
         .map((item) => {
           return {
             name: item.name,
@@ -69,17 +53,14 @@ const CustomChart = () => {
     }));
 
     let spending = (await db.expenditure.toArray())
-      .filter(
-        (x) =>
-          x.txn_type === TransactionTypes.CREDIT && x.datetime >= dateRange.startDate
-      )
+      .filter((x) => x.txn_type === TransactionTypes.CREDIT && x.datetime >= startDate)
       .map((item) => item.amount)
       .reduce((prev, next) => Number(prev) + Number(next), 0);
 
     setTotalSpending(Number(spending));
     setData({ name: 'total', children: res });
     setIsLoading(false);
-  }, [dateRange]);
+  }, [startDate, endDate]);
 
   return isLoading ? (
     <div>
@@ -116,7 +97,11 @@ const CustomChart = () => {
               padding: '5px 10px 5px 10px',
               borderRadius: '25px',
             }}
-          >{`${e.id} ${((e.value / totalSpending) * 100).toFixed(2)}%`}</div>
+          >
+            {`${e.id} ${((e.value / totalSpending) * 100).toFixed(2)}% $${e.value.toFixed(
+              2
+            )}`}
+          </div>
         )}
       />
     </div>
