@@ -191,7 +191,6 @@ const Form = ({ toaster }: FormProps) => {
                   color={btn.color}
                   endIcon={btn.endIcon}
                   onClick={() => handleSubmit(btn.type)}
-                  disabled={btn.type === TransactionTypes.RECURRING}
                 >
                   {btn.type}
                 </Button>
