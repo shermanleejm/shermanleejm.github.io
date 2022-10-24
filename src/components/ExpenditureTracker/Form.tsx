@@ -180,17 +180,18 @@ const Form = ({ toaster }: FormProps) => {
           <Grid
             container
             direction={'row'}
-            justifyContent={'space-between'}
+            justifyContent={'center'}
             alignItems={'center'}
-            spacing={2}
+            spacing={1}
           >
             {TxnButtons.map((btn) => (
-              <Grid item>
+              <Grid item xs={6} style={{ textAlign: 'center' }}>
                 <Button
                   variant="contained"
                   color={btn.color}
                   endIcon={btn.endIcon}
                   onClick={() => handleSubmit(btn.type)}
+                  disabled={btn.type === TransactionTypes.RECURRING}
                 >
                   {btn.type}
                 </Button>
