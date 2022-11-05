@@ -27,7 +27,8 @@
       "./src/types",
       "./src/components/MTGDB/interfaces"
     ],
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "useDefineForClassFields": false
   },
   "include": [
     "src"

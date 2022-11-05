@@ -1,7 +1,6 @@
 import {
   Autocomplete,
   Button,
-  createTheme,
   Grid,
   IconButton,
   InputAdornment,
@@ -18,7 +17,6 @@ import { ExpenditureTableType, FormCategories, TransactionTypes } from '../../da
 import { ToasterSeverityEnum } from '../MTGDB';
 import dayjs, { Dayjs } from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { blue } from '@mui/material/colors';
 
 type FormProps = {
   toaster: (m: string, e: ToasterSeverityEnum) => void;
@@ -182,18 +180,27 @@ const Form = ({ toaster }: FormProps) => {
             direction={'row'}
             justifyContent={'center'}
             alignItems={'center'}
-            spacing={1}
+            spacing={2}
           >
             {TxnButtons.map((btn) => (
-              <Grid item xs={6} style={{ textAlign: 'center' }}>
-                <Button
-                  variant="contained"
-                  color={btn.color}
-                  endIcon={btn.endIcon}
-                  onClick={() => handleSubmit(btn.type)}
+              <Grid item xs={6}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  {btn.type}
-                </Button>
+                  <Button
+                    variant="contained"
+                    color={btn.color}
+                    endIcon={btn.endIcon}
+                    size={'small'}
+                    onClick={() => handleSubmit(btn.type)}
+                  >
+                    {btn.type}
+                  </Button>
+                </div>
               </Grid>
             ))}
           </Grid>
