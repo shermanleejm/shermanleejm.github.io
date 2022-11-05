@@ -5,7 +5,7 @@ import { ResponsiveSunburst } from '@nivo/sunburst';
 import { useState } from 'react';
 import { CircularProgress } from '@mui/material';
 import { getDateNumbers } from '.';
-import { TransactionTypes } from '../../database';
+import { negativeTypes } from '../../database';
 
 interface Inner {
   name: string;
@@ -22,17 +22,20 @@ const CustomChart = () => {
   const [totalSpending, setTotalSpending] = useState(1);
 
   useLiveQuery(async () => {
-    let _data = await db.expenditure.toArray();
+    const currentMonth = (await db.expenditure.toArray()).filter(
+      (ex) => ex.datetime >= startDate && ex.datetime < endDate
+    );
+
     let res = [
       ...new Set(
-        _data
-          .filter((item) => item.txn_type === TransactionTypes.CREDIT)
+        currentMonth
+          .filter((item) => negativeTypes.includes(item.txn_type))
           .map((item) => item.category)
       ),
     ].map((val) => ({
       name: val,
-      children: _data
-        .filter((item) => item.category === val && item.datetime >= startDate)
+      children: currentMonth
+        .filter((item) => item.category === val)
         .map((item) => {
           return {
             name: item.name,
@@ -52,12 +55,11 @@ const CustomChart = () => {
         }, []),
     }));
 
-    let spending = (await db.expenditure.toArray())
-      .filter((x) => x.txn_type === TransactionTypes.CREDIT && x.datetime >= startDate)
-      .map((item) => item.amount)
-      .reduce((prev, next) => Number(prev) + Number(next), 0);
+    let spending = currentMonth
+      .filter((ex) => negativeTypes.includes(ex.txn_type))
+      .reduce((prev, next) => prev + Number(next.amount), 0);
 
-    setTotalSpending(Number(spending));
+    setTotalSpending(spending);
     setData({ name: 'total', children: res });
     setIsLoading(false);
   }, [startDate, endDate]);
