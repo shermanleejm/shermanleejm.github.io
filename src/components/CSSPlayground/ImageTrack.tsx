@@ -13,8 +13,7 @@ export default function ImageTrack() {
     const currWidth = trackRef.current?.scrollLeft || 0;
     const percentage = Math.round((currWidth / maxWidth) * 100);
     imgRef.current.map(
-      (el, idx) =>
-        (el.style.objectPosition = `${100 - Math.min(percentage, 100)}% center`)
+      (el) => (el.style.objectPosition = `${100 - Math.min(percentage, 100)}% center`)
     );
   }
 
@@ -46,7 +45,7 @@ export default function ImageTrack() {
 
   return (
     <BackgroundDiv>
-      <SmallImageTrack ref={trackRef} onScroll={_.throttle(handleScroll)}>
+      <SmallImageTrack ref={trackRef} onScroll={_.throttle(handleScroll, 5)}>
         {images.map((path, index) => (
           <CustomImg
             src={path}
