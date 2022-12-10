@@ -11,8 +11,11 @@ export default function ImageTrack() {
     const maxWidth =
       (trackRef.current?.scrollWidth || 0) - (trackRef.current?.offsetWidth || 0);
     const currWidth = trackRef.current?.scrollLeft || 0;
-    const percentage = Math.min(Math.round((currWidth / maxWidth) * 100) * 1.1, 100);
-    imgRef.current.map((el) => (el.style.objectPosition = `${percentage}% center`));
+    const percentage = Math.round((currWidth / maxWidth) * 100);
+    imgRef.current.map(
+      (el, idx) =>
+        (el.style.objectPosition = `${100 - Math.min(percentage, 100)}% center`)
+    );
   }
 
   const BackgroundDiv = styled.div`
@@ -29,6 +32,7 @@ export default function ImageTrack() {
     // left: 100%;
     top: 50%;
     transform: translate(0%, -50%);
+    animation: transform 1200 forwards;
     overflow-x: scroll;
     user-select: none;
   `;
@@ -36,7 +40,8 @@ export default function ImageTrack() {
     width: 40vmin;
     height: 56vmin;
     object-fit: cover;
-    object-position: 0% center;
+    object-position: 100% center;
+    animation: object-position 1200 forwards;
   `;
 
   return (
