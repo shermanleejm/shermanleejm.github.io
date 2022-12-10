@@ -10,7 +10,7 @@ import { State } from './state/reducers';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 
-function App() {
+export default function App() {
   const { toggleDarkMode } = bindActionCreators(DarkModeActionCreators, useDispatch());
   const darkMode = useSelector((state: State) => state.darkMode);
   const currentLocation = useLocation();
@@ -46,13 +46,11 @@ function App() {
           </Grid>
         )}
         <Routes>
-          {Pages.map((page) => {
-            return <Route path={page.link} element={<page.component />} />;
+          {Pages.map((page, index) => {
+            return <Route key={index} path={page.link} element={<page.component />} />;
           })}
         </Routes>
       </ThemeProvider>
     </div>
   );
 }
-
-export default App;

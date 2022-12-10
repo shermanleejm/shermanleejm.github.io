@@ -10,9 +10,6 @@ export default defineConfig({
   }), viteTsconfigPaths(), svgrPlugin()],
   server: {
     port: 3000,
-    watch: {
-      ignored: ['!**/node_modules/**']
-    }
   },
   build: {
     outDir: 'build',

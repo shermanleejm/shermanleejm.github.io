@@ -41,6 +41,7 @@ const Form = ({ toaster }: FormProps) => {
     return [...new Set(categories)];
   });
   const [form, setForm] = useState<ExpenditureTableType>(emptyForm);
+  const [isRecurring, setIsRecurring] = useState(false);
 
   function updateForm(type: FormCategories, value: any) {
     setForm({

@@ -7,6 +7,8 @@ import Terminal from './Terminal';
 import WordleSolver from './WordleSolver';
 import Tracetogether from './Tracetogether';
 import SelfDrivingCar from './SelfDrivingCar';
+import ExpenditureTracker from './ExpenditureTracker';
+import CSSPlayground from './CSSPlayground';
 
 import terminal from '../assets/terminal.png';
 import tracker from '../assets/tracker.jpg';
@@ -15,7 +17,7 @@ import mtg from '../assets/mtg.png';
 import wordle from '../assets/wordle.jpg';
 import money from '../assets/money.jpg';
 import car from '../assets/car.jpg';
-import ExpenditureTracker from './ExpenditureTracker';
+import css from '../assets/css.jpg';
 
 export type PageType = {
   name: string;
@@ -41,9 +43,16 @@ export const Pages: PageType[] = [
     component: ExpenditureTracker,
     link: '/expenditure_tracker',
     img: money,
-    description:
-      'To help me track my spending lol im broke',
+    description: 'To help me track my spending lol im broke',
     shortname: 'TRACK $$$',
+  },
+  {
+    name: 'CSS Playground',
+    component: CSSPlayground,
+    link: '/css',
+    img: css,
+    description: 'For me to play around with cool css',
+    shortname: 'CSS Stuff',
   },
   {
     name: 'MTG Database',
@@ -52,7 +61,7 @@ export const Pages: PageType[] = [
     img: mtg,
     description:
       'Complete front-end application. OCR enabled collection tracker for Magic The Gathering Commander deck building. Using IndexedDB as a local storage.',
-    shortname: 'MTGDB'
+    shortname: 'MTGDB',
   },
   {
     name: 'Asset Tracker',
@@ -60,7 +69,7 @@ export const Pages: PageType[] = [
     link: '/assettracker',
     img: tracker,
     description: 'DOGE COIN TO THE MOOOOOOOOOON!¡!¡!¡!¡!',
-    shortname: 'STONKS GO MOON'
+    shortname: 'STONKS GO MOON',
   },
   {
     name: 'Wordle Solver',
@@ -69,7 +78,7 @@ export const Pages: PageType[] = [
     img: wordle,
     description:
       'Wordle solver. Just key in your guesses and it will search for you. Saves you some time lmao.',
-    shortname: 'SOLVE WORDLE'
+    shortname: 'SOLVE WORDLE',
   },
   {
     name: 'Contact Me',
@@ -77,7 +86,7 @@ export const Pages: PageType[] = [
     link: '/contactme',
     img: contactMe,
     description: "Hijacked google forms' exposed api for a contact me page.",
-    shortname: 'WHY DO YOU WANT TO SAVE THIS'
+    shortname: 'WHY DO YOU WANT TO SAVE THIS',
   },
   {
     name: 'Terminal',
@@ -85,7 +94,7 @@ export const Pages: PageType[] = [
     link: '/terminal',
     img: terminal,
     description: 'This is a pseudo terminal that tells jokes.',
-    shortname: 'THIS IS SHIT'
+    shortname: 'THIS IS SHIT',
   },
   {
     name: 'Spoof Tracetogether',
@@ -93,17 +102,17 @@ export const Pages: PageType[] = [
     link: '/tracetogether',
     description: '',
     disabled: true,
-    shortname: 'HOW ARE YOU EVEN HERE'
+    shortname: 'HOW ARE YOU EVEN HERE',
   },
-  {
-    name: '[WIP] Self Driving',
-    component: SelfDrivingCar,
-    link: '/car',
-    img: car,
-    description:
-      'Trying to implement a self driving car using basic genetic machine learning lol. Pure JS (no libraries)',
-    shortname: 'IM NOT READY YET'
-  },
+  // {
+  //   name: '[WIP] Self Driving',
+  //   component: SelfDrivingCar,
+  //   link: '/car',
+  //   img: car,
+  //   description:
+  //     'Trying to implement a self driving car using basic genetic machine learning lol. Pure JS (no libraries)',
+  //   shortname: 'IM NOT READY YET'
+  // },
 ];
 
 export function shortname(location: string) {

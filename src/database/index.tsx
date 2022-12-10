@@ -106,6 +106,13 @@ export const ExpenditureTableColumns = [
   'txn_type',
 ];
 
+export const RecurringTableColumns = [
+  'id',
+  'name',
+  'amount',
+  'cron', // * * * * * --> min hour day mon weekday
+];
+
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
   public decks!: Table<DecksTableType, number>;
@@ -117,6 +124,7 @@ export class MTGDatabase extends Dexie {
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
       expenditure: `++${ExpenditureTableColumns.join(',')}`,
+      recurring: `++${RecurringTableColumns.join(',')}`,
     });
   }
 }
