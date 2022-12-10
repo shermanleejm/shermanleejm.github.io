@@ -38,7 +38,9 @@ export default function ImageTrack() {
     object-position: 0% center;
   `;
 
-  const imagePaths = Object.keys(import.meta.glob('/src/assets/imageTrack/*'));
+  const imagePaths = Object.keys(import.meta.glob('/src/assets/imageTrack/*.jpg')).map(
+    (path) => new URL(path, import.meta.url).href
+  );
 
   return (
     <BackgroundDiv>
