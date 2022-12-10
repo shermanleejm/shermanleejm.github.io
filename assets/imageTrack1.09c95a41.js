@@ -1,1 +1,1 @@
-const a="/#/assets/imageTrack1.585fe5aa.jpg";export{a as default};
+const a=""+new URL("imageTrack1.585fe5aa.jpg",import.meta.url).href;export{a as default};
