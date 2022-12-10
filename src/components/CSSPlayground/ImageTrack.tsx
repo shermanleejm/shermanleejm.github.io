@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { useRef } from 'react';
 import _ from 'lodash';
+import images from './imageTrackImages';
 
 export default function ImageTrack() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -38,14 +39,10 @@ export default function ImageTrack() {
     object-position: 0% center;
   `;
 
-  const imagePaths = Object.keys(import.meta.glob('/src/assets/imageTrack/*.jpg')).map(
-    (path) => new URL(path, import.meta.url).href
-  );
-
   return (
     <BackgroundDiv>
       <SmallImageTrack ref={trackRef} onScroll={_.throttle(handleScroll)}>
-        {imagePaths.map((path, index) => (
+        {images.map((path, index) => (
           <CustomImg
             src={path}
             key={index}
