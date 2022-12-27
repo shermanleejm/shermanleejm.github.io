@@ -9,6 +9,7 @@ import Tracetogether from './Tracetogether';
 import SelfDrivingCar from './SelfDrivingCar';
 import ExpenditureTracker from './ExpenditureTracker';
 import CSSPlayground from './CSSPlayground';
+import Pokemon from './Pokemon';
 
 import terminal from '../assets/terminal.png';
 import tracker from '../assets/tracker.jpg';
@@ -18,6 +19,7 @@ import wordle from '../assets/wordle.jpg';
 import money from '../assets/money.jpg';
 import car from '../assets/car.jpg';
 import css from '../assets/css.jpg';
+import pokemon from '../assets/pokemon.png';
 
 export type PageType = {
   name: string;
@@ -62,6 +64,14 @@ export const Pages: PageType[] = [
     description:
       'Complete front-end application. OCR enabled collection tracker for Magic The Gathering Commander deck building. Using IndexedDB as a local storage.',
     shortname: 'MTGDB',
+  },
+  {
+    name: 'Pokemon',
+    component: Pokemon,
+    link: '/pokemon',
+    img: pokemon,
+    description: 'small tools for me to play pokemon like a boss',
+    shortname: 'pokemon gotta catch em all',
   },
   {
     name: 'Asset Tracker',
