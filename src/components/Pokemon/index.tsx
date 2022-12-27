@@ -1,5 +1,6 @@
 import {
   Autocomplete,
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -29,7 +30,7 @@ export default () => {
     '4': { number: -1, name: null, types: [], sprite: null, generation: -1 },
     '5': { number: -1, name: null, types: [], sprite: null, generation: -1 },
   };
-  const { pokeNames, pokeTypes } = usePokeData();
+  const { pokeNames } = usePokeData();
   const [selection, setSelection] =
     useState<Record<string, SelectedPokemon>>(defaultSelection);
   const [_remainingTypes, setRemainingTypes] = useState<PokemonTypes[]>([]);
@@ -129,6 +130,10 @@ export default () => {
         ))}
       </Grid>
 
+      <Button fullWidth onClick={() => setSelection(defaultSelection)}>
+        reset
+      </Button>
+
       {_remainingTypes.length !== 0 && _recommendedPokemon.length > 0 && (
         <InfiniteScroll
           hasMoreData={pageNum < _recommendedPokemon.length}
@@ -149,6 +154,7 @@ export default () => {
         <>
           <Confetti
             recycle={false}
+            tweenDuration={10000}
             drawShape={(context) => {
               context.lineWidth = 2.5;
               //set white as the fill color
