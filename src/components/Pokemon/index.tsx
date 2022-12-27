@@ -1,11 +1,14 @@
+import styled from '@emotion/styled';
 import {
   Autocomplete,
+  Box,
   Button,
   Card,
   CardActions,
   CardContent,
   CardMedia,
   Grid,
+  Modal,
   TextField,
   Typography,
 } from '@mui/material';
@@ -20,6 +23,7 @@ import {
   usePokeData,
   useRecommended,
 } from './hooks';
+import PokeballConfetti from './PokeballConfetti';
 
 export default () => {
   const defaultSelection = {
@@ -39,6 +43,7 @@ export default () => {
   ]);
   const [pokeWindow, setPokeWindow] = useState<SelectedPokemon[]>([]);
   const [pageNum, setPageNum] = useState(0);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const { recommendedPokemon, remainingTypes } = useRecommended(selection);
@@ -58,6 +63,15 @@ export default () => {
     setPokeWindow([...pokeWindow, ...newPage]);
     setPageNum(newPageNum);
   };
+
+  const StyledBox = styled.div`
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    backgroundcolor: 'black';
+    border: 2px solid #000;
+  `;
 
   const TypeSelector = ({ cardIndex }: { cardIndex: string }) => {
     return (
@@ -113,7 +127,7 @@ export default () => {
   };
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Grid container>
         {Object.keys(defaultSelection).map((i) => (
           <Grid item xs={4} key={i}>
@@ -130,9 +144,47 @@ export default () => {
         ))}
       </Grid>
 
-      <Button fullWidth onClick={() => setSelection(defaultSelection)}>
+      <Button fullWidth onClick={() => setShowModal(true)}>
         reset
       </Button>
+
+      <Modal open={showModal} onClose={() => setShowModal(false)}>
+        <Box
+          sx={{
+            position: 'absolute' as 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            pt: 2,
+            px: 4,
+            pb: 3,
+          }}
+        >
+          <Typography>Confirm reset?</Typography>
+          <Button
+            onClick={() => {
+              setSelection(defaultSelection);
+              setShowModal(false);
+            }}
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => {
+              setRemainingTypes([]);
+              setShowModal(false);
+              setTimeout(() => {
+                setSelection(defaultSelection);
+              }, 5000);
+            }}
+          >
+            Yes but louder
+          </Button>
+        </Box>
+      </Modal>
 
       {_remainingTypes.length !== 0 && _recommendedPokemon.length > 0 && (
         <InfiniteScroll
@@ -152,52 +204,7 @@ export default () => {
 
       {_remainingTypes.length === 0 && (
         <>
-          <Confetti
-            recycle={false}
-            tweenDuration={10000}
-            drawShape={(context) => {
-              context.lineWidth = 2.5;
-              //set white as the fill color
-              context.fillStyle = 'white';
-
-              //draw arc from 0 to 1*PI
-              context.beginPath();
-              context.arc(100, 100, 30, 0, 1 * Math.PI);
-              context.closePath();
-
-              //stroke outline with default black
-              context.stroke();
-              //fill with white
-              context.fill();
-
-              //set red as the fill color
-              context.fillStyle = 'rgb(150,0,0)';
-
-              //draw arc from 1*PI to 0
-              context.beginPath();
-              context.arc(100, 100, 30, 1 * Math.PI, 0);
-              context.closePath();
-
-              //stroke outline with default black
-              context.stroke();
-              //fill with red
-              context.fill();
-
-              context.beginPath();
-              context.arc(100, 100, 10, 0, 2 * Math.PI);
-              context.fillStyle = 'white';
-              context.closePath();
-
-              context.stroke();
-              context.fill();
-
-              context.beginPath();
-              context.arc(100, 100, 9, 0, 2 * Math.PI);
-              context.fillStyle = 'rgba(24,23,24, .8)';
-              context.closePath();
-              context.stroke();
-            }}
-          />
+          <PokeballConfetti />
         </>
       )}
     </div>
