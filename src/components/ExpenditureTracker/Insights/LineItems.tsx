@@ -1,13 +1,14 @@
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
 import { ChartData, Inner } from '@/components/ExpenditureTracker/Insights';
 import { State } from '@/state/reducers';
+import { ExpandMore } from '@mui/icons-material';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
-  Collapse,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
+  Grid,
+  Typography,
 } from '@mui/material';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { round } from 'lodash';
@@ -65,36 +66,24 @@ export default () => {
   }, [startDate, endDate]);
 
   return (
-    <Box>
-      <List sx={{ width: '80vw' }}>
-        {items.map((i: ChartData, idx: number) => (
-          <>
-            <ListItemButton
-              onClick={() => {
-                let newValue = !listStates[i.name];
-                let newRecord = listStates;
-                newRecord[i.name] = newValue;
-                setListStates(newRecord);
-                console.log(listStates);
-              }}
-            >
-              <ListItemText primary={i.name} />
-            </ListItemButton>
-            <div style={{ display: listStates[i.name] ? 'block' : 'none' }}>
-              {i.children.map((c: Inner) => (
-                <List>
-                  <ListItemButton>
-                    <ListItemText
-                      sx={{ pl: 4 }}
-                      primary={`${c.name} - $${round(c.amount, 2)}`}
-                    />
-                  </ListItemButton>
-                </List>
-              ))}
-            </div>
-          </>
-        ))}
-      </List>
+    <Box sx={{ margin: '20px 0px' }}>
+      {items.map((i: ChartData, idx: number) => (
+        <Accordion sx={{ width: '80vw' }}>
+          <AccordionSummary key={idx} expandIcon={<ExpandMore />}>
+            <Typography>{i.name}</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {i.children.map((c: Inner, idx: number) => (
+              <Grid key={idx} container direction="row" justifyContent="space-between">
+                <Typography>{c.name}</Typography>
+                <Typography>
+                  <strong>${round(c.amount, 2)}</strong>
+                </Typography>
+              </Grid>
+            ))}
+          </AccordionDetails>
+        </Accordion>
+      ))}
     </Box>
   );
 };
