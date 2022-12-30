@@ -1,5 +1,6 @@
-import ExpenditureInput from '@/components/ExpenditureTracker/Input';
-import ExpenditureInsights from '@/components/ExpenditureTracker/Insights';
+import Goals from '@/components/ExpenditureTracker/Goals';
+import SpecialInput from '@/components/ExpenditureTracker/Input';
+import Insights from '@/components/ExpenditureTracker/Insights';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 import Toolbar from './Toolbar';
@@ -8,15 +9,15 @@ export default () => {
   const ExpenditureTabs = [
     {
       name: 'Input',
-      component: <ExpenditureInput />,
+      component: <SpecialInput />,
     },
     {
       name: 'Insights',
-      component: <ExpenditureInsights />,
+      component: <Insights />,
     },
     {
       name: 'Goals',
-      component: <div></div>,
+      component: <Goals />,
     },
   ];
   const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);

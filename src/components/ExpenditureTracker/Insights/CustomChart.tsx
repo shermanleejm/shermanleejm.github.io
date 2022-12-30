@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { State } from '@/state/reducers';
 import { ResponsiveSunburst } from '@nivo/sunburst';
 import { useState } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { negativeTypes } from '@/database';
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
 import { ChartData, Inner } from '@/components/ExpenditureTracker/Insights';
@@ -66,9 +66,9 @@ export default () => {
   }, [startDate, endDate]);
 
   return isLoading ? (
-    <div>
-      <CircularProgress />
-    </div>
+    <CircularProgress />
+  ) : data.children.length === 0 ? (
+    <Typography>Your chart is empty 🪹, please input some data first 🍆</Typography>
   ) : (
     <div
       style={{

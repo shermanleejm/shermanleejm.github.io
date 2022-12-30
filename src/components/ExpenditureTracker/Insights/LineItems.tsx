@@ -64,6 +64,8 @@ export default () => {
 
   return isLoading ? (
     <CircularProgress />
+  ) : items.length === 0 ? (
+    <Typography>No data to show 😭</Typography>
   ) : (
     <Box sx={{ margin: '20px 0px' }}>
       {items.map((i: ChartData, idx: number) => (
