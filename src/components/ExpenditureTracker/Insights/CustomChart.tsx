@@ -60,7 +60,9 @@ export default () => {
 
     setTotalSpending(spending);
     setData({ name: 'total', children: res });
-    setIsLoading(false);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
   }, [startDate, endDate]);
 
   return isLoading ? (

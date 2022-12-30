@@ -7,6 +7,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  CircularProgress,
+  Divider,
   Grid,
   Typography,
 } from '@mui/material';
@@ -19,6 +21,7 @@ export default () => {
   const db = useSelector((state: State) => state.database);
   const { startDate, endDate } = getDateNumbers();
   const [items, setItems] = useState<ChartData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useLiveQuery(async () => {
     const currentMonth = (await db.expenditure.toArray()).filter(
@@ -56,9 +59,12 @@ export default () => {
       );
 
     setItems(_items);
+    setTimeout(() => setIsLoading(false), 1000);
   }, [startDate, endDate]);
 
-  return (
+  return isLoading ? (
+    <CircularProgress />
+  ) : (
     <Box sx={{ margin: '20px 0px' }}>
       {items.map((i: ChartData, idx: number) => (
         <Accordion sx={{ width: '80vw' }}>
@@ -67,12 +73,19 @@ export default () => {
           </AccordionSummary>
           <AccordionDetails>
             {i.children.map((c: Inner, idx: number) => (
-              <Grid key={idx} container direction="row" justifyContent="space-between">
-                <Typography>{c.name}</Typography>
-                <Typography>
-                  <strong>${round(c.amount, 2)}</strong>
-                </Typography>
-              </Grid>
+              <>
+                {idx !== 0 && <Divider />}
+                <Grid key={idx} container direction="row" justifyContent="space-between">
+                  <Grid item>
+                    <Typography>{c.name}</Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography>
+                      <strong>${round(c.amount, 2)}</strong>
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </>
             ))}
           </AccordionDetails>
         </Accordion>
