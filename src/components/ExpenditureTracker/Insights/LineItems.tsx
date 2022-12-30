@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux';
 export default () => {
   const db = useSelector((state: State) => state.database);
   const { startDate, endDate } = getDateNumbers();
-  const [listStates, setListStates] = useState<Record<string, boolean>>({});
   const [items, setItems] = useState<ChartData[]>([]);
 
   useLiveQuery(async () => {
@@ -56,13 +55,7 @@ export default () => {
           a.children.reduce((t, c) => (t += c.amount), 0)
       );
 
-    let _listStates = _items.reduce((res, i) => {
-      res[i.name] = true;
-      return res;
-    }, {} as Record<string, boolean>);
-
     setItems(_items);
-    setListStates(_listStates);
   }, [startDate, endDate]);
 
   return (

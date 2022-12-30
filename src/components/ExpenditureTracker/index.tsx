@@ -19,7 +19,7 @@ export default () => {
       component: <div></div>,
     },
   ];
-  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[1].name);
+  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);
 
   return (
     <Box
