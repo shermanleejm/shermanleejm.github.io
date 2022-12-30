@@ -2,9 +2,9 @@ import { Grid } from '@mui/material';
 import { KeyItem } from './KeyItem';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useSelector } from 'react-redux';
-import { State } from '../../state/reducers';
+import { State } from '@/state/reducers';
 import { getDateNumbers } from '.';
-import { negativeTypes, positiveTypes, TransactionTypes } from '../../database';
+import { negativeTypes, positiveTypes, TransactionTypes } from '@/database';
 import dayjs from 'dayjs';
 
 const BigNumbers = () => {

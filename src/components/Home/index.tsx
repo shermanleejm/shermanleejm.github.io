@@ -1,10 +1,10 @@
-import { Grid } from "@mui/material";
-import Carousel from "./Carousel";
-import Intro from "./Intro";
+import { Box, Grid } from '@mui/material';
+import Carousel from './Carousel';
+import Intro from './Intro';
 
-const Home = () => {
+export default () => {
   return (
-    <div style={{ padding: 40 }}>
+    <Box sx={{ p: 1 }}>
       <Grid container direction="column" spacing={4}>
         <Grid item>
           <Intro />
@@ -14,8 +14,6 @@ const Home = () => {
           <Carousel />
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
-
-export default Home;

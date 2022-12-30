@@ -12,9 +12,9 @@ import { ChangeEvent, useState } from 'react';
 import NumberFormat from 'react-number-format';
 import { Add, Remove, Clear, HourglassEmpty, Paid } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
-import { State } from '../../state/reducers';
-import { ExpenditureTableType, FormCategories, TransactionTypes } from '../../database';
-import { ToasterSeverityEnum } from '../MTGDB';
+import { State } from '@/state/reducers';
+import { ExpenditureTableType, FormCategories, TransactionTypes } from '@/database';
+import { ToasterSeverityEnum } from '@/components/MTGDB';
 import dayjs, { Dayjs } from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
 

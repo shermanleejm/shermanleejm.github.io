@@ -3,13 +3,13 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { State } from '../../state/reducers';
+import { State } from '@/state/reducers';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { FormCategories, TransactionTypes } from '../../database';
+import { FormCategories, TransactionTypes } from '@/database';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Resizable } from 're-resizable';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { downloadFile } from '../Helpers';
+import { downloadFile } from '@/components/Helpers';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
@@ -102,14 +102,6 @@ const ExpenditureTable = () => {
         alignItems="flex-start"
       >
         <Grid item>
-          <Typography
-            variant="subtitle2"
-            onClick={() => setEasterEggCounter(easterEggCounter + 1)}
-          >
-            *psst this table is resizable
-          </Typography>
-        </Grid>
-        <Grid item>
           <Button
             variant="contained"
             startIcon={<FileDownloadIcon />}
@@ -117,34 +109,44 @@ const ExpenditureTable = () => {
           >
             export
           </Button>
-          {easterEggCounter > 10 && (
-            <>
-              <Button
-                onClick={() => {
-                  db.expenditure.clear().then(() => {
-                    db.expenditure.bulkAdd(JSON.parse(uploadedFile));
-                  });
-                }}
-              >
-                upload
-              </Button>
-              <input
-                type="file"
-                accept="application/json"
-                onChange={(e) => {
-                  let fileReader = new FileReader();
-                  if (e.target.files !== null) {
-                    fileReader.readAsText(e.target.files[0], 'UTF-8');
-                    fileReader.onload = (e: any) => {
-                      setUploadedFile(e.target?.result);
-                    };
-                  }
-                }}
-              />
-            </>
-          )}
+        </Grid>
+        <Grid item>
+          <Typography
+            variant="subtitle2"
+            onClick={() => setEasterEggCounter(easterEggCounter + 1)}
+          >
+            *psst this table is resizable
+          </Typography>
         </Grid>
       </Grid>
+
+      {easterEggCounter >= 10 && (
+        <div>
+          <Button
+            size="small"
+            onClick={() => {
+              db.expenditure.clear().then(() => {
+                db.expenditure.bulkAdd(JSON.parse(uploadedFile));
+              });
+            }}
+          >
+            upload
+          </Button>
+          <input
+            type="file"
+            accept="application/json"
+            onChange={(e) => {
+              let fileReader = new FileReader();
+              if (e.target.files !== null) {
+                fileReader.readAsText(e.target.files[0], 'UTF-8');
+                fileReader.onload = (e: any) => {
+                  setUploadedFile(e.target?.result);
+                };
+              }
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

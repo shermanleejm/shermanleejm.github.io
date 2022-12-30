@@ -1,126 +1,53 @@
-import { Alert, Grid, IconButton, Snackbar } from '@mui/material';
-import React, { useState, useEffect } from 'react';
-import { ToasterSeverityEnum } from '../MTGDB';
-import Form from './Form';
-import CloseIcon from '@mui/icons-material/Close';
-import ExpenditureTable from './ExpenditureTable';
-import { useLocation } from 'react-router-dom';
-import { changeManifest } from '..';
-import BigNumbers from './BigNumbers';
-import CustomChart from './CustomChart';
+import ExpenditureInput from '@/components/ExpenditureTracker/Input';
+import ExpenditureInsights from '@/components/ExpenditureTracker/Insights';
+import { Box, Tab, Tabs } from '@mui/material';
+import { useState } from 'react';
 import Toolbar from './Toolbar';
-import dayjs from 'dayjs';
-import { atom, useAtom } from 'jotai';
-import { useSelector } from 'react-redux';
-import { State } from '../../state/reducers';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { TransactionTypes } from '../../database';
 
-export const monthOffsetAtom = atom(0);
-
-export function getDateNumbers() {
-  const db = useSelector((state: State) => state.database);
-  const [monthOffset] = useAtom(monthOffsetAtom);
-
-  const minDate =
-    useLiveQuery(async () => {
-      return (await db.expenditure.orderBy('datetime').last())?.datetime;
-    }) ?? 0;
-
-  const paydays =
-    useLiveQuery(async () => {
-      return (
-        await db.expenditure.where({ txn_type: TransactionTypes.SALARY })
-      ).toArray();
-    }) ?? [];
-
-  const totalMonths = paydays.length || 0;
-  const startDate = paydays[totalMonths - monthOffset - 1]?.datetime ?? minDate;
-  const endDate =
-    monthOffset === 0 ? dayjs().unix() : paydays[totalMonths - monthOffset]?.datetime;
-
-  return { minDate, totalMonths, paydays, startDate, endDate };
-}
-
-const ExpenditureTracker = () => {
-  const location = useLocation();
-  const [showToaster, setShowToaster] = useState(false);
-  const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
-    ToasterSeverityEnum.SUCCESS
-  );
-  const [toasterMessage, setToasterMessage] = useState('');
-
-  useEffect(() => {
-    changeManifest(location);
-  });
-
-  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowToaster(false);
-  };
-
-  function openToaster(message: string, severity: ToasterSeverityEnum) {
-    setToasterMessage(message);
-    setToasterSeverity(severity);
-    setShowToaster(true);
-  }
-
-  const toaster = (
-    <React.Fragment>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleCloseToaster}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  );
+export default () => {
+  const ExpenditureTabs = [
+    {
+      name: 'Input',
+      component: <ExpenditureInput />,
+    },
+    {
+      name: 'Insights',
+      component: <ExpenditureInsights />,
+    },
+    {
+      name: 'Goals',
+      component: <div></div>,
+    },
+  ];
+  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[1].name);
 
   return (
-    <div style={{ marginBottom: '10vh' }}>
-      <Snackbar
-        open={showToaster}
-        autoHideDuration={3000}
-        onClose={handleCloseToaster}
-        action={toaster}
-      >
-        <Alert severity={toasterSeverity}>{toasterMessage}</Alert>
-      </Snackbar>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+      }}
+    >
+      <Toolbar />
 
-      <Grid
-        container
-        justifyContent={'center'}
-        alignItems={'center'}
-        direction={'column'}
-        spacing={3}
+      <Tabs
+        value={chosenTab}
+        onChange={(e: any, newValue: string) => setChosenTab(newValue)}
       >
-        <Grid item xs={12}>
-          <Toolbar />
-        </Grid>
+        {ExpenditureTabs.map((t, i) => (
+          <Tab label={t.name} key={i} value={t.name} />
+        ))}
+      </Tabs>
 
-        <Grid item>
-          <BigNumbers />
-        </Grid>
-        <Grid item>
-          <Form
-            toaster={function (m: string, e: ToasterSeverityEnum): void {
-              openToaster(m, e);
-            }}
-          />
-        </Grid>
-        <Grid item>
-          <CustomChart />
-        </Grid>
-        <Grid item>
-          <ExpenditureTable />
-        </Grid>
-      </Grid>
-    </div>
+      <Box sx={{ mt: 2, mb: 6 }}>
+        {ExpenditureTabs.map((t, i) => {
+          if (chosenTab === t.name) {
+            return t.component;
+          }
+        })}
+      </Box>
+    </Box>
   );
 };
-
-export default ExpenditureTracker;

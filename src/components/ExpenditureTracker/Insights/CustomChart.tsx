@@ -1,23 +1,22 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useSelector } from 'react-redux';
-import { State } from '../../state/reducers';
+import { State } from '@/state/reducers';
 import { ResponsiveSunburst } from '@nivo/sunburst';
 import { useState } from 'react';
-import { CircularProgress } from '@mui/material';
-import { getDateNumbers } from '.';
-import { negativeTypes } from '../../database';
+import { Box, CircularProgress } from '@mui/material';
+import { negativeTypes } from '@/database';
+import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
+import { ChartData, Inner } from '@/components/ExpenditureTracker/Insights';
 
-interface Inner {
-  name: string;
-  amount: number;
-}
-
-const CustomChart = () => {
+export default () => {
   const db = useSelector((state: State) => state.database);
   const { startDate, endDate } = getDateNumbers();
   const darkMode = useSelector((state: State) => state.darkMode);
 
-  const [data, setData] = useState({});
+  const [data, setData] = useState<ChartData>({
+    name: '',
+    children: [],
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [totalSpending, setTotalSpending] = useState(1);
 
@@ -26,7 +25,7 @@ const CustomChart = () => {
       (ex) => ex.datetime >= startDate && ex.datetime < endDate
     );
 
-    let res = [
+    let res: ChartData[] = [
       ...new Set(
         currentMonth
           .filter((item) => negativeTypes.includes(item.txn_type))
@@ -109,5 +108,3 @@ const CustomChart = () => {
     </div>
   );
 };
-
-export default CustomChart;
