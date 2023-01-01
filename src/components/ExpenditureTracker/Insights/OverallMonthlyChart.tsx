@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 import { State } from '@/state/reducers';
 import { ResponsiveSunburst } from '@nivo/sunburst';
 import { useState } from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
-import { negativeTypes } from '@/database';
+import { CircularProgress, Typography } from '@mui/material';
+import { FormCategories, negativeTypes } from '@/database';
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
 import { ChartData, Inner } from '@/components/ExpenditureTracker/Insights';
 
@@ -12,7 +12,6 @@ export default () => {
   const db = useSelector((state: State) => state.database);
   const { startDate, endDate } = getDateNumbers();
   const darkMode = useSelector((state: State) => state.darkMode);
-
   const [data, setData] = useState<ChartData>({
     name: '',
     children: [],
@@ -21,9 +20,10 @@ export default () => {
   const [totalSpending, setTotalSpending] = useState(1);
 
   useLiveQuery(async () => {
-    const currentMonth = (await db.expenditure.toArray()).filter(
-      (ex) => ex.datetime >= startDate && ex.datetime < endDate
-    );
+    const currentMonth = await db.expenditure
+      .where(FormCategories.datetime)
+      .between(startDate, endDate, true, false)
+      .toArray();
 
     let res: ChartData[] = [
       ...new Set(

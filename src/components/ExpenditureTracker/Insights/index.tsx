@@ -1,13 +1,17 @@
 import { Grid } from '@mui/material';
 import ExpenditureTable from '@/components/ExpenditureTracker/Insights/ExpenditureTable';
-import CustomChart from '@/components/ExpenditureTracker/Insights/CustomChart';
+import OverallMonthlyChart from '@/components/ExpenditureTracker/Insights/OverallMonthlyChart';
 import ListItems from '@/components/ExpenditureTracker/Insights/LineItems';
+import WeeklySpendingChart from '@/components/ExpenditureTracker/Insights/WeeklySpendingChart';
 
 export default () => {
   return (
     <Grid container justifyContent="center" alignItems="center" direction="column">
       <Grid item>
-        <CustomChart />
+        <WeeklySpendingChart />
+      </Grid>
+      <Grid item>
+        <OverallMonthlyChart />
       </Grid>
       <Grid item>
         <ListItems />

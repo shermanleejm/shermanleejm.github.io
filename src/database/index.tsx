@@ -110,13 +110,24 @@ export const RecurringTableColumns = [
   'id',
   'name',
   'amount',
-  'cron', // * * * * * --> min hour day mon weekday
+  'cron', // * * * * * --> minute hour day month weekday
+  'start',
 ];
+
+export interface RecurringTableType {
+  id?: number;
+  name: string;
+  category: string;
+  amount: number;
+  cron: string;
+  start: number;
+}
 
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
   public decks!: Table<DecksTableType, number>;
   public expenditure!: Table<ExpenditureTableType, number>;
+  public recurring!: Table<RecurringTableType, number>;
 
   public constructor() {
     super('mtgdb');
