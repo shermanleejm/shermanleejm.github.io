@@ -38,7 +38,7 @@ export default () => {
 
     let currentMonth = await db.expenditure
       .where(FormCategories.datetime)
-      .between(startDate, endDate, true, false)
+      .between(startDate, endDate || Infinity, true, false)
       .toArray();
 
     const currentMonthRecurring = (await db.recurring.toArray())

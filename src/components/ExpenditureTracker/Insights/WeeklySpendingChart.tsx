@@ -26,7 +26,7 @@ export default () => {
     const currentMonth = (
       await db.expenditure
         .where(FormCategories.datetime)
-        .between(startDate, endDate, true, false)
+        .between(startDate, endDate || Infinity, true, false)
         .toArray()
     ).reduce((acc, val) => {
       let day = dayjs.unix(val.datetime).format('ddd');

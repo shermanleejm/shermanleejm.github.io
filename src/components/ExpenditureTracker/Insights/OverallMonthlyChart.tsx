@@ -22,7 +22,7 @@ export default () => {
   useLiveQuery(async () => {
     const currentMonth = await db.expenditure
       .where(FormCategories.datetime)
-      .between(startDate, endDate, true, false)
+      .between(startDate, endDate || Infinity, true, false)
       .toArray();
 
     let res: ChartData[] = [
