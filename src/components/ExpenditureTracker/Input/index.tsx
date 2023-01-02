@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { State } from '@/state/reducers';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { TransactionTypes } from '@/database';
+import ExpenditureTable from '@/components/ExpenditureTracker/Input/ExpenditureTable';
 
 export const monthOffsetAtom = atom(0);
 
@@ -104,6 +105,9 @@ export default () => {
               openToaster(m, e);
             }}
           />
+        </Grid>
+        <Grid item>
+          <ExpenditureTable />
         </Grid>
       </Grid>
     </div>
