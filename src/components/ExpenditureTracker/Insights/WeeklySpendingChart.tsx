@@ -58,8 +58,6 @@ export default () => {
         keys={['amount']}
         indexBy="day"
         margin={{ top: 10, right: 10, bottom: 50, left: 50 }}
-        axisTop={null}
-        axisRight={null}
         axisBottom={{
           tickSize: 5,
           tickPadding: 5,
@@ -82,7 +80,21 @@ export default () => {
             ticks: { text: { fill: darkMode ? '#939393' : '#000' } },
           },
         }}
-        tooltip={(point) => <div>{point}</div>}
+        tooltip={({ id, value, color }) => (
+          <div
+            style={{
+              padding: 12,
+              color,
+              background: '#222222',
+            }}
+          >
+            <span>Look, I'm custom </span>
+            <br />
+            <strong>
+              {id}: {value}
+            </strong>
+          </div>
+        )}
         animate={true}
       />
     </div>

@@ -131,7 +131,7 @@ export class MTGDatabase extends Dexie {
 
   public constructor() {
     super('mtgdb');
-    this.version(4).stores({
+    this.version(5).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
       expenditure: `++${ExpenditureTableColumns.join(',')}`,

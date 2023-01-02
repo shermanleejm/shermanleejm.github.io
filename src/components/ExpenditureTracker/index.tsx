@@ -20,7 +20,7 @@ export default () => {
       component: <Goals />,
     },
   ];
-  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[1].name);
+  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);
 
   return (
     <Box
