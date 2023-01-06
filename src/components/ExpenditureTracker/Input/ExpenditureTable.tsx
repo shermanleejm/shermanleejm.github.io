@@ -18,9 +18,10 @@ const ExpenditureTable = () => {
   const [easterEggCounter, setEasterEggCounter] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<string>('');
 
-  const data = useLiveQuery(async () => {
-    return db.expenditure.toArray();
-  });
+  const data =
+    useLiveQuery(async () => {
+      return await db.expenditure.toArray();
+    }) || [];
 
   const handleRowEdit = useCallback((params: any) => {
     let id = params.row.id;

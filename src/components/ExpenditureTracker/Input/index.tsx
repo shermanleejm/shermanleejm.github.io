@@ -1,8 +1,6 @@
-import { Alert, Grid, IconButton, Snackbar } from '@mui/material';
-import React, { useState, useEffect } from 'react';
-import { ToasterSeverityEnum } from '@/components/MTGDB';
+import { Grid } from '@mui/material';
+import { useEffect } from 'react';
 import Form from './Form';
-import CloseIcon from '@mui/icons-material/Close';
 import { useLocation } from 'react-router-dom';
 import { changeManifest } from '@/components';
 import BigNumbers from './BigNumbers';
@@ -42,53 +40,13 @@ export function getDateNumbers() {
 
 export default () => {
   const location = useLocation();
-  const [showToaster, setShowToaster] = useState(false);
-  const [toasterSeverity, setToasterSeverity] = useState<ToasterSeverityEnum>(
-    ToasterSeverityEnum.SUCCESS
-  );
-  const [toasterMessage, setToasterMessage] = useState('');
 
   useEffect(() => {
     changeManifest(location);
   });
 
-  const handleCloseToaster = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowToaster(false);
-  };
-
-  function openToaster(message: string, severity: ToasterSeverityEnum) {
-    setToasterMessage(message);
-    setToasterSeverity(severity);
-    setShowToaster(true);
-  }
-
-  const toaster = (
-    <React.Fragment>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleCloseToaster}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  );
-
   return (
     <div>
-      <Snackbar
-        open={showToaster}
-        autoHideDuration={3000}
-        onClose={handleCloseToaster}
-        action={toaster}
-      >
-        <Alert severity={toasterSeverity}>{toasterMessage}</Alert>
-      </Snackbar>
-
       <Grid
         container
         justifyContent={'center'}
@@ -100,11 +58,7 @@ export default () => {
           <BigNumbers />
         </Grid>
         <Grid item>
-          <Form
-            toaster={function (m: string, e: ToasterSeverityEnum): void {
-              openToaster(m, e);
-            }}
-          />
+          <Form />
         </Grid>
         <Grid item>
           <ExpenditureTable />

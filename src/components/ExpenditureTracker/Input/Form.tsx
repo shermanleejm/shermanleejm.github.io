@@ -22,14 +22,11 @@ import { Add, Remove, Clear, HourglassEmpty, Paid } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { State } from '@/state/reducers';
 import { ExpenditureTableType, FormCategories, TransactionTypes } from '@/database';
-import { ToasterSeverityEnum } from '@/components/MTGDB';
 import dayjs, { Dayjs } from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { uniq } from 'lodash';
-
-type FormProps = {
-  toaster: (m: string, e: ToasterSeverityEnum) => void;
-};
+import { useAtom } from 'jotai';
+import { toasterAtom } from '@/components/ExpenditureTracker/Toaster';
 
 const emptyForm = {
   [FormCategories.category]: '',
@@ -46,9 +43,9 @@ const RECURRENCE_TYPES = {
 } as const;
 export type RecurrenceTypes = keyof typeof RECURRENCE_TYPES;
 
-export default ({ toaster }: FormProps) => {
+export default () => {
   const db = useSelector((state: State) => state.database);
-
+  const [, setToaster] = useAtom(toasterAtom);
   const existingCategories = useLiveQuery(async () => {
     // TODO: sort by popularity
     const categories = (await db.expenditure.toArray()).map(
@@ -75,7 +72,11 @@ export default ({ toaster }: FormProps) => {
       (x) => x === '' || x === null || x === undefined
     );
     if (!isFilled) {
-      toaster('Please fill in all fields first.', ToasterSeverityEnum.ERROR);
+      setToaster({
+        show: false,
+        message: 'Please fill in all fields first.',
+        severity: 'error',
+      });
       return;
     }
 
@@ -113,7 +114,7 @@ export default ({ toaster }: FormProps) => {
           category: form.category,
         })
         .then(() => {
-          toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
+          setToaster({ message: 'Recorded!', severity: 'success', show: true });
           setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
         });
       return;
@@ -122,7 +123,7 @@ export default ({ toaster }: FormProps) => {
     await db.expenditure
       .add({ ...form, [FormCategories.transactionType]: type })
       .then(() => {
-        toaster('Recorded!', ToasterSeverityEnum.SUCCESS);
+        setToaster({ message: 'Recorded!', severity: 'success', show: true });
         setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
       });
   }
@@ -283,7 +284,7 @@ export default ({ toaster }: FormProps) => {
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              inputFormat="DD MMM YYYY"
+              inputFormat="DD MM YYYY"
               label="Date"
               value={dayjs.unix(form[FormCategories.datetime])}
               onChange={(newDate: Dayjs | null) =>

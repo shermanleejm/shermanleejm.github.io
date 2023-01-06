@@ -88,6 +88,14 @@ export enum TransactionTypes {
 export const negativeTypes = [TransactionTypes.CREDIT, TransactionTypes.RECURRING];
 export const positiveTypes = [TransactionTypes.DEBIT, TransactionTypes.SALARY];
 
+export const ExpenditureTableColumns = [
+  'id',
+  'category',
+  'name',
+  'amount',
+  'datetime',
+  'txn_type',
+];
 export interface ExpenditureTableType {
   id?: number;
   [FormCategories.category]: string;
@@ -97,15 +105,6 @@ export interface ExpenditureTableType {
   [FormCategories.transactionType]: TransactionTypes;
 }
 
-export const ExpenditureTableColumns = [
-  'id',
-  'category',
-  'name',
-  'amount',
-  'datetime',
-  'txn_type',
-];
-
 export const RecurringTableColumns = [
   'id',
   'name',
@@ -113,7 +112,6 @@ export const RecurringTableColumns = [
   'cron', // * * * * * --> minute hour day month weekday
   'start',
 ];
-
 export interface RecurringTableType {
   id?: number;
   name: string;
@@ -123,19 +121,30 @@ export interface RecurringTableType {
   start: number;
 }
 
+export const GoalsTableColumns = ['id', 'name', 'startDate', 'endDate', 'amount'];
+export type GoalsTableType = {
+  id?: number;
+  name: string;
+  startDate: number;
+  endDate: number;
+  amount: number;
+};
+
 export class MTGDatabase extends Dexie {
   public cards!: Table<CardsTableType, number>;
   public decks!: Table<DecksTableType, number>;
   public expenditure!: Table<ExpenditureTableType, number>;
   public recurring!: Table<RecurringTableType, number>;
+  public goals!: Table<GoalsTableType, number>;
 
   public constructor() {
     super('mtgdb');
-    this.version(5).stores({
+    this.version(7).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
       expenditure: `++${ExpenditureTableColumns.join(',')}`,
       recurring: `++${RecurringTableColumns.join(',')}`,
+      goals: `++${GoalsTableColumns.join(',')}`,
     });
   }
 }

@@ -1,6 +1,7 @@
 import Goals from '@/components/ExpenditureTracker/Goals';
 import SpecialInput from '@/components/ExpenditureTracker/Input';
 import Insights from '@/components/ExpenditureTracker/Insights';
+import Toaster from '@/components/ExpenditureTracker/Toaster';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 import Toolbar from './Toolbar';
@@ -50,6 +51,8 @@ export default () => {
           }
         })}
       </Box>
+
+      <Toaster />
     </Box>
   );
 };
