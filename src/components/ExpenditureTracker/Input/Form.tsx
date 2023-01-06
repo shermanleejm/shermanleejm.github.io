@@ -240,13 +240,13 @@ export default ({ toaster }: FormProps) => {
         </Grid>
         <Grid item>
           <TextField
-            autoCapitalize={'none'}
             label={'Name'}
             sx={{ width: '80vw' }}
             value={form[FormCategories.name]}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               updateForm(FormCategories.name, e.target.value)
             }
+            inputProps={{ autoCapitalize: 'none' }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">

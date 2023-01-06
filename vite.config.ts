@@ -8,6 +8,7 @@ import * as path from 'path';
 export default defineConfig({
   plugins: [
     react({
+      jsxRuntime: 'classic',
       include: '**/*.tsx',
     }),
     viteTsconfigPaths(),

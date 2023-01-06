@@ -5,21 +5,22 @@ import { Box, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 import Toolbar from './Toolbar';
 
+const ExpenditureTabs = [
+  {
+    name: 'Input',
+    component: SpecialInput,
+  },
+  {
+    name: 'Insights',
+    component: Insights,
+  },
+  {
+    name: 'Goals',
+    component: Goals,
+  },
+];
+
 export default () => {
-  const ExpenditureTabs = [
-    {
-      name: 'Input',
-      component: <SpecialInput />,
-    },
-    {
-      name: 'Insights',
-      component: <Insights />,
-    },
-    {
-      name: 'Goals',
-      component: <Goals />,
-    },
-  ];
   const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);
 
   return (
@@ -45,7 +46,7 @@ export default () => {
       <Box sx={{ mt: 2, mb: 6 }}>
         {ExpenditureTabs.map((t, i) => {
           if (chosenTab === t.name) {
-            return t.component;
+            return <t.component />;
           }
         })}
       </Box>

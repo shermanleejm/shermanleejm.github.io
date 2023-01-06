@@ -1,31 +1,28 @@
-import { Button, Grid, TextField, Typography } from "@mui/material";
-import React, { useEffect } from "react";
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
-import { changeManifest } from "..";
-import WORDS from "./words";
+import { Button, Grid, TextField, Typography } from '@mui/material';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { changeManifest } from '..';
+import WORDS from './words';
 
 const WordleSolver = () => {
-  const [_1, set_1] = useState("");
-  const [_2, set_2] = useState("");
-  const [_3, set_3] = useState("");
-  const [_4, set_4] = useState("");
-  const [_5, set_5] = useState("");
-  const [incorrect_1, setIncorrect_1] = useState("");
-  const [incorrect_2, setIncorrect_2] = useState("");
-  const [incorrect_3, setIncorrect_3] = useState("");
-  const [incorrect_4, setIncorrect_4] = useState("");
-  const [incorrect_5, setIncorrect_5] = useState("");
-  const [wrongGuesses, setWrongGuesses] = useState("");
+  const [_1, set_1] = useState('');
+  const [_2, set_2] = useState('');
+  const [_3, set_3] = useState('');
+  const [_4, set_4] = useState('');
+  const [_5, set_5] = useState('');
+  const [incorrect_1, setIncorrect_1] = useState('');
+  const [incorrect_2, setIncorrect_2] = useState('');
+  const [incorrect_3, setIncorrect_3] = useState('');
+  const [incorrect_4, setIncorrect_4] = useState('');
+  const [incorrect_5, setIncorrect_5] = useState('');
+  const [wrongGuesses, setWrongGuesses] = useState('');
   const [words, setWords] = useState<string[]>([]);
   const [initial, setInitial] = useState<boolean>(true);
-  const [test, setTest] = useState("");
-  const [showTest, setShowTest] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     setWords(WORDS);
-    setTest(WORDS[Math.floor(Math.random()) * WORDS.length]);
     changeManifest(location);
   }, [location]);
 
@@ -33,11 +30,11 @@ const WordleSolver = () => {
     setInitial(false);
 
     let expression =
-      (_1 === "" ? "." : _1) +
-      (_2 === "" ? "." : _2) +
-      (_3 === "" ? "." : _3) +
-      (_4 === "" ? "." : _4) +
-      (_5 === "" ? "." : _5);
+      (_1 === '' ? '.' : _1) +
+      (_2 === '' ? '.' : _2) +
+      (_3 === '' ? '.' : _3) +
+      (_4 === '' ? '.' : _4) +
+      (_5 === '' ? '.' : _5);
 
     const regex = new RegExp(expression);
     let tmp = words.filter((w) => regex.test(w));
@@ -72,180 +69,114 @@ const WordleSolver = () => {
   return (
     <div
       style={{
-        margin: "auto",
-        textAlign: "center",
+        margin: 'auto',
+        textAlign: 'center',
       }}
     >
-      <Grid
-        container
-        alignItems={"center"}
-        justifyContent={"center"}
-        spacing={2}
-      >
-        <Grid item xs={12}>
-          {!showTest ? (
-            <Button
-              href="https://www.powerlanguage.co.uk/wordle/"
-              target="_blank"
-              onClick={() => {
-                setShowTest(true);
-              }}
-            >
-              WORDLE
-            </Button>
-          ) : (
-            <>
-              <TextField
-                style={{ width: "2.5rem" }}
-                value={test[0]}
-                type={_1 === test[0] ? "" : "password"}
-                autoCapitalize={"none"}
-              />
-              <TextField
-                style={{ width: "2.5rem" }}
-                value={test[1]}
-                type={_2 === test[1] ? "" : "password"}
-                autoCapitalize={"none"}
-              />
-              <TextField
-                style={{ width: "2.5rem" }}
-                value={test[2]}
-                autoCapitalize={"none"}
-                type={_3 === test[2] ? "" : "password"}
-              />
-              <TextField
-                style={{ width: "2.5rem" }}
-                value={test[3]}
-                autoCapitalize={"none"}
-                type={_4 === test[3] ? "" : "password"}
-              />
-              <TextField
-                style={{ width: "2.5rem" }}
-                value={test[4]}
-                type={_5 === test[4] ? "" : "password"}
-                autoCapitalize={"none"}
-              />
-            </>
-          )}
-        </Grid>
-
-        <Grid item>
-          <Typography>TIP: best starting word is CRATE</Typography>
-        </Grid>
-
+      <Grid container alignItems={'center'} justifyContent={'center'} spacing={2}>
         <Grid item xs={12}>
           <TextField
-            style={{ width: "2.5rem" }}
+            style={{ width: '2.5rem' }}
             inputRef={ref0}
             value={_1}
-            onFocus={(e: React.FocusEvent<HTMLInputElement>) =>
-              e.target.select()
-            }
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_1(
                 e.target.value
-                  .replace(/[^a-zA-Z]/, "")
+                  .replace(/[^a-zA-Z]/, '')
                   .substring(0, 1)
                   .toLowerCase()
               );
               ref1.current?.focus();
             }}
-            autoCapitalize={"none"}
+            inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
           />
           <TextField
-            style={{ width: "2.5rem" }}
+            style={{ width: '2.5rem' }}
             value={_2}
             inputRef={ref1}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Backspace") {
-                set_2("");
+              if (e.key === 'Backspace') {
+                set_2('');
                 ref0.current?.focus();
               }
             }}
-            onFocus={(e: React.FocusEvent<HTMLInputElement>) =>
-              e.target.select()
-            }
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_2(
                 e.target.value
-                  .replace(/[^a-zA-Z]/, "")
+                  .replace(/[^a-zA-Z]/, '')
                   .substring(0, 1)
                   .toLowerCase()
               );
               ref2.current?.focus();
             }}
-            autoCapitalize={"none"}
+            inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
           />
           <TextField
-            style={{ width: "2.5rem" }}
+            style={{ width: '2.5rem' }}
             value={_3}
             inputRef={ref2}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Backspace") {
-                set_3("");
+              if (e.key === 'Backspace') {
+                set_3('');
                 ref1.current?.focus();
               }
             }}
-            onFocus={(e: React.FocusEvent<HTMLInputElement>) =>
-              e.target.select()
-            }
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_3(
                 e.target.value
-                  .replace(/[^a-zA-Z]/, "")
+                  .replace(/[^a-zA-Z]/, '')
                   .substring(0, 1)
                   .toLowerCase()
               );
               ref3.current?.focus();
             }}
-            autoCapitalize={"none"}
+            inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
           />
           <TextField
-            style={{ width: "2.5rem" }}
+            style={{ width: '2.5rem' }}
             value={_4}
             inputRef={ref3}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Backspace") {
-                set_4("");
+              if (e.key === 'Backspace') {
+                set_4('');
                 ref2.current?.focus();
               }
             }}
-            onFocus={(e: React.FocusEvent<HTMLInputElement>) =>
-              e.target.select()
-            }
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_4(
                 e.target.value
-                  .replace(/[^a-zA-Z]/, "")
+                  .replace(/[^a-zA-Z]/, '')
                   .substring(0, 1)
                   .toLowerCase()
               );
               ref4.current?.focus();
             }}
-            autoCapitalize={"none"}
+            inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
           />
           <TextField
-            style={{ width: "2.5rem" }}
+            style={{ width: '2.5rem' }}
             value={_5}
             inputRef={ref4}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Backspace") {
-                set_5("");
+              if (e.key === 'Backspace') {
+                set_5('');
                 ref3.current?.focus();
               }
             }}
-            onFocus={(e: React.FocusEvent<HTMLInputElement>) =>
-              e.target.select()
-            }
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               set_5(
                 e.target.value
-                  .replace(/[^a-zA-Z]/, "")
+                  .replace(/[^a-zA-Z]/, '')
                   .substring(0, 1)
                   .toLowerCase()
               );
             }}
-            autoCapitalize={"none"}
+            inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
           />
         </Grid>
 
@@ -256,24 +187,24 @@ const WordleSolver = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setWrongGuesses(
                 Array.from(
-                  new Set(e.target.value.replace(/[^a-zA-Z]/, "").split(""))
-                ).join("")
+                  new Set(e.target.value.replace(/[^a-zA-Z]/, '').split(''))
+                ).join('')
               )
             }
-            autoCapitalize={"none"}
+            inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
           />
         </Grid>
 
         <Grid item xs={12}>
-          <Grid container justifyContent={"center"}>
+          <Grid container justifyContent={'center'}>
             <Grid item xs={2}>
               <TextField
                 label="incorrect (1)"
                 value={incorrect_1}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_1(e.target.value.replace(/[^a-zA-Z]/, ""));
+                  setIncorrect_1(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
-                autoCapitalize={"none"}
+                inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
               />
             </Grid>
             <Grid item xs={2}>
@@ -281,9 +212,9 @@ const WordleSolver = () => {
                 label="incorrect (2)"
                 value={incorrect_2}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_2(e.target.value.replace(/[^a-zA-Z]/, ""));
+                  setIncorrect_2(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
-                autoCapitalize={"none"}
+                inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
               />
             </Grid>
             <Grid item xs={2}>
@@ -291,9 +222,9 @@ const WordleSolver = () => {
                 label="incorrect (3)"
                 value={incorrect_3}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_3(e.target.value.replace(/[^a-zA-Z]/, ""));
+                  setIncorrect_3(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
-                autoCapitalize={"none"}
+                inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
               />
             </Grid>
             <Grid item xs={2}>
@@ -301,9 +232,9 @@ const WordleSolver = () => {
                 label="incorrect (4)"
                 value={incorrect_4}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_4(e.target.value.replace(/[^a-zA-Z]/, ""));
+                  setIncorrect_4(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
-                autoCapitalize={"none"}
+                inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
               />
             </Grid>
             <Grid item xs={2}>
@@ -311,9 +242,9 @@ const WordleSolver = () => {
                 label="incorrect (5)"
                 value={incorrect_5}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setIncorrect_5(e.target.value.replace(/[^a-zA-Z]/, ""));
+                  setIncorrect_5(e.target.value.replace(/[^a-zA-Z]/, ''));
                 }}
-                autoCapitalize={"none"}
+                inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
               />
             </Grid>
           </Grid>
@@ -327,12 +258,7 @@ const WordleSolver = () => {
 
         {!initial && (
           <Grid item>
-            <Grid
-              container
-              direction={"row"}
-              justifyContent="space-around"
-              spacing={1}
-            >
+            <Grid container direction={'row'} justifyContent="space-around" spacing={1}>
               {words.map((w) => (
                 <Grid item xs={3}>
                   <Typography>{w}</Typography>
