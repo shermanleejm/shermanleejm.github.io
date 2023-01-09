@@ -1,5 +1,3 @@
-import styled from '@emotion/styled';
-import { OpenInNew } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
@@ -9,8 +7,15 @@ import {
   CardContent,
   CardMedia,
   Grid,
-  IconButton,
+  Link,
   Modal,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
@@ -22,6 +27,7 @@ import {
   getPokemon,
   PokemonTypes,
   SelectedPokemon,
+  SelectedPokemonStats,
   useGenerations,
   usePokeData,
   useRecommended,
@@ -31,14 +37,30 @@ import PokeballConfetti from './PokeballConfetti';
 export const genAtom = atom('');
 
 export default () => {
+  const defaultStats = {
+    Total: '0',
+    HP: '0',
+    Attack: '0',
+    Defense: '0',
+    'Sp. Atk': '0',
+    'Sp. Def': '0',
+    Speed: '0',
+  } as SelectedPokemonStats;
+  const defaultSelectedPokemon = {
+    name: null,
+    types: [],
+    sprite: null,
+    generation: [],
+    total_stats: defaultStats,
+  } as SelectedPokemon;
   const defaultSelection = {
-    '0': { number: -1, name: null, types: [], sprite: null, generation: [] },
-    '1': { number: -1, name: null, types: [], sprite: null, generation: [] },
-    '2': { number: -1, name: null, types: [], sprite: null, generation: [] },
-    '3': { number: -1, name: null, types: [], sprite: null, generation: [] },
-    '4': { number: -1, name: null, types: [], sprite: null, generation: [] },
-    '5': { number: -1, name: null, types: [], sprite: null, generation: [] },
-  };
+    '0': defaultSelectedPokemon,
+    '1': defaultSelectedPokemon,
+    '2': defaultSelectedPokemon,
+    '3': defaultSelectedPokemon,
+    '4': defaultSelectedPokemon,
+    '5': defaultSelectedPokemon,
+  } as Record<string, SelectedPokemon>;
   const [selection, setSelection] =
     useState<Record<string, SelectedPokemon>>(defaultSelection);
   const [_remainingTypes, setRemainingTypes] = useState<PokemonTypes[]>([]);
@@ -49,7 +71,10 @@ export default () => {
   const [pokeWindow, setPokeWindow] = useState<SelectedPokemon[]>([]);
   const [pageNum, setPageNum] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const [showStats, setShowStats] = useState(false);
+  const [showStats, setShowStats] = useState({
+    show: false,
+    stats: defaultStats,
+  });
 
   const { pokeNames } = usePokeData();
   const { recommendedPokemon, remainingTypes } = useRecommended(selection);
@@ -111,10 +136,19 @@ export default () => {
 
     return (
       <Card>
-        <CardMedia component="img" src={sprite} alt={name} />
+        <Link href={selected.url} target="_blank">
+          <CardMedia component="img" src={sprite} alt={name} />
+        </Link>
         <CardContent sx={{ textAlign: 'center' }}>
-          {!showBox && <Typography>{name}</Typography>}
-          <Typography fontSize={13} variant={'subtitle1'}>
+          <Typography>{!showBox && name}</Typography>
+          <Typography
+            fontSize={13}
+            variant={'subtitle1'}
+            sx={{ cursor: 'pointer' }}
+            onClick={() =>
+              setShowStats({ stats: selected.total_stats || defaultStats, show: true })
+            }
+          >
             {types.map((t, i) => (
               <span key={i}>
                 {i === 1 ? ' · ' : ''}
@@ -123,18 +157,7 @@ export default () => {
             ))}
           </Typography>
         </CardContent>
-        <CardActions>
-          {showBox ? (
-            <TypeSelector {...{ cardIndex }} />
-          ) : (
-            <Grid container direction="row" justifyContent="space-around">
-              <Button size="small">stats</Button>
-              <IconButton target={'_blank'} href={selected.url || ''}>
-                <OpenInNew />
-              </IconButton>
-            </Grid>
-          )}
-        </CardActions>
+        <CardActions>{showBox ? <TypeSelector {...{ cardIndex }} /> : <></>}</CardActions>
       </Card>
     );
   };
@@ -183,7 +206,10 @@ export default () => {
 
   const StatsModal = () => {
     return (
-      <Modal open={showStats} onClose={() => setShowStats(false)}>
+      <Modal
+        open={showStats.show}
+        onClose={() => setShowStats({ ...showStats, show: false })}
+      >
         <Box
           sx={{
             position: 'absolute' as 'absolute',
@@ -193,12 +219,26 @@ export default () => {
             width: 400,
             bgcolor: 'background.paper',
             boxShadow: 24,
-            pt: 2,
-            px: 4,
-            pb: 3,
           }}
         >
-          stats
+          <TableContainer component={Paper} sx={{ minWidth: '100%' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  {Object.keys(showStats.stats).map((k) => (
+                    <TableCell>{k}</TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  {Object.values(showStats.stats).map((v) => (
+                    <TableCell>{v}</TableCell>
+                  ))}
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </Modal>
     );

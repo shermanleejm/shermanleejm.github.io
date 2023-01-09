@@ -29,6 +29,15 @@ export function useGenerations() {
   );
 }
 
+export type SelectedPokemonStats = {
+  Total: string;
+  HP: string;
+  Attack: string;
+  Defense: string;
+  'Sp. Atk': string;
+  'Sp. Def': string;
+  Speed: string;
+};
 export type SelectedPokemon = {
   generation?: string[];
   number?: number | null;
@@ -36,15 +45,7 @@ export type SelectedPokemon = {
   name: string | null;
   types: PokemonTypes[];
   sprite: string | null;
-  total_stats?: {
-    Total: string;
-    HP: string;
-    Attack: string;
-    Defense: string;
-    'Sp. Atk': string;
-    'Sp. Def': string;
-    Speed: string;
-  };
+  total_stats?: SelectedPokemonStats;
 };
 
 export const usePokeData = (): {
