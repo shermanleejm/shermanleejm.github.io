@@ -82,15 +82,15 @@ export default () => {
   const [chosenGen, setChosenGen] = useAtom(genAtom);
 
   useEffect(() => {
+    setPageNum(0);
     setRemainingTypes(remainingTypes);
     setRecommendedPokemon(recommendedPokemon);
     setPokeNames(pokeNames);
     if (recommendedPokemon.length > 0) {
-      setPokeWindow(recommendedPokemon[pageNum]);
+      setPokeWindow(recommendedPokemon[0]);
     } else {
       setPokeWindow([]);
     }
-    setPageNum(0);
   }, [selection, chosenGen]);
 
   const loadMore = () => {
