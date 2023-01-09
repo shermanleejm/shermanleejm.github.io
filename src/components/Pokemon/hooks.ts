@@ -1,19 +1,78 @@
-import { uniq } from 'lodash';
-import pokemondb from './fixtures/pokemondb.json';
+import { genAtom } from '@/components/Pokemon';
+import { useAtom } from 'jotai';
+import { uniq, uniqBy } from 'lodash';
+import pokemondb from './fixtures/pokestats.json';
 import poketypes from './fixtures/types.json';
 
+const NON_FAIRY_GEN = [
+  'red-blue-yellow',
+  'firered-leafgreen',
+  'gold-silver-crystal',
+  'heartgold-soulsilver',
+  'ruby-sapphire-emerald',
+  'diamond-pearl',
+  'platinum',
+  'black-white',
+  'black-white-2',
+];
+
+type RawPoketypes = {
+  name: string;
+  immunes: string[];
+  strengths: string[];
+  weaknesses: string[];
+};
+
+export function useGenerations() {
+  return uniq(
+    pokemondb.reduce((acc, i) => uniq([...acc, ...i.generation]), [] as string[])
+  );
+}
+
 export type SelectedPokemon = {
-  generation: number;
-  number: number | null;
+  generation?: string[];
+  number?: number | null;
+  url?: string;
   name: string | null;
   types: PokemonTypes[];
   sprite: string | null;
+  total_stats?: {
+    Total: string;
+    HP: string;
+    Attack: string;
+    Defense: string;
+    'Sp. Atk': string;
+    'Sp. Def': string;
+    Speed: string;
+  };
 };
 
-export const usePokeData = (): { pokeNames: string[]; pokeTypes: PokemonTypes[] } => {
+export const usePokeData = (): {
+  pokeNames: string[];
+  pokeTypes: PokemonTypes[];
+  _pokedb: SelectedPokemon[];
+  _poketypes: RawPoketypes[];
+} => {
+  const [chosenGen] = useAtom(genAtom);
+
   return {
-    pokeNames: pokemondb.map((p) => p.name),
-    pokeTypes: poketypes.map((p) => p.name) as PokemonTypes[],
+    pokeNames: pokemondb.reduce((acc, p) => {
+      if (chosenGen === '' || p.generation.includes(chosenGen)) return [...acc, p.name];
+      return acc;
+    }, [] as string[]),
+    pokeTypes: poketypes.reduce((acc, p) => {
+      if (NON_FAIRY_GEN.includes(chosenGen) && p.name === 'fairy') return acc;
+      return [...acc, p.name as PokemonTypes];
+    }, [] as PokemonTypes[]),
+    _pokedb: pokemondb.reduce((acc, p) => {
+      if (chosenGen === '' || p.generation.includes(chosenGen))
+        return [...acc, p as SelectedPokemon];
+      return acc;
+    }, [] as SelectedPokemon[]),
+    _poketypes: poketypes.reduce((acc, p) => {
+      if (NON_FAIRY_GEN.includes(chosenGen) && p.name === 'fairy') return acc;
+      return [...acc, p as RawPoketypes];
+    }, [] as RawPoketypes[]),
   };
 };
 
@@ -44,12 +103,15 @@ function typeCoverage(remainingTypes: PokemonTypes[], pTypes: PokemonTypes[]) {
   );
 }
 
-export function useRecommended(selection: Record<string, SelectedPokemon>) {
-  let remainingTypes = poketypes.map((p) => p.name) as PokemonTypes[];
+export const useRecommended = (selection: Record<string, SelectedPokemon>) => {
+  const { _poketypes, _pokedb } = usePokeData();
+
+  let remainingTypes = _poketypes.map((pt) => pt.name) as PokemonTypes[];
+
   Object.keys(selection).forEach((index) => {
     let pokemon = selection[index];
-    (pokemondb.find((p) => pokemon.name === p.name)?.types || []).forEach((t) => {
-      let strengths = poketypes.find((p) => p.name === t)?.strengths || [];
+    (_pokedb.find((p) => pokemon.name === p.name)?.types || []).forEach((t) => {
+      let strengths = _poketypes.find((p) => p.name === t)?.strengths || [];
       remainingTypes = remainingTypes.filter((t) => !strengths.includes(t));
     });
   });
@@ -58,21 +120,27 @@ export function useRecommended(selection: Record<string, SelectedPokemon>) {
   let allRecommendedPokemon =
     remainingTypes.length === 0
       ? []
-      : (pokemondb as SelectedPokemon[])
+      : _pokedb
           .filter((p) => {
             let strengths = getStrengths(p.types);
             return remainingTypes.some((rt) => strengths.includes(rt));
           })
-          .sort(
-            (a, b) =>
-              typeCoverage(remainingTypes, b.types) -
-              typeCoverage(remainingTypes, a.types)
-          );
+          .sort((a, b) => {
+            let aCov = typeCoverage(remainingTypes, a.types);
+            let bCov = typeCoverage(remainingTypes, b.types);
+            let aTotal = parseInt(a.total_stats!.Total);
+            let bTotal = parseInt(b.total_stats!.Total);
+            if (bCov < aCov) return -1;
+            if (bCov > aCov) return 1;
+            if (bTotal < aTotal) return -1;
+            if (bTotal > aTotal) return 1;
+            return 0;
+          });
 
-  let recommendedPokemon = chunker(allRecommendedPokemon);
+  let recommendedPokemon = chunker(uniqBy(allRecommendedPokemon, 'name'));
 
   return { recommendedPokemon, remainingTypes };
-}
+};
 
 function chunker(stuff: SelectedPokemon[], chunksize = 15) {
   const result: SelectedPokemon[][] = stuff.reduce((res, item, index) => {
@@ -88,42 +156,42 @@ function chunker(stuff: SelectedPokemon[], chunksize = 15) {
 }
 
 export type PokemonTypes =
-  | 'Normal'
-  | 'Fire'
-  | 'Water'
-  | 'Electric'
-  | 'Grass'
-  | 'Ice'
-  | 'Fighting'
-  | 'Poison'
-  | 'Ground'
-  | 'Flying'
-  | 'Psychic'
-  | 'Bug'
-  | 'Rock'
-  | 'Ghost'
-  | 'Dragon'
-  | 'Dark'
-  | 'Steel'
-  | 'Fairy';
+  | 'normal'
+  | 'fire'
+  | 'water'
+  | 'electric'
+  | 'grass'
+  | 'ice'
+  | 'fighting'
+  | 'poison'
+  | 'ground'
+  | 'flying'
+  | 'psychic'
+  | 'bug'
+  | 'rock'
+  | 'ghost'
+  | 'dragon'
+  | 'dark'
+  | 'steel'
+  | 'fairy';
 
 export const colorMap: Record<PokemonTypes, string | undefined> = {
-  Normal: undefined,
-  Fire: 'red',
-  Water: 'blue',
-  Electric: 'yellow',
-  Grass: 'green',
-  Ice: 'aqua',
-  Fighting: 'chocolate',
-  Poison: 'blueviolet',
-  Ground: 'brown',
-  Flying: 'bisue',
-  Psychic: 'deeppink',
-  Bug: 'darkolivegreen',
-  Rock: 'firebrick',
-  Ghost: 'indigo',
-  Dragon: 'slateblue',
-  Dark: 'darkslategrey',
-  Steel: 'darkgrey',
-  Fairy: 'fuchsia',
+  normal: undefined,
+  fire: 'red',
+  water: 'blue',
+  electric: 'yellow',
+  grass: 'green',
+  ice: 'aqua',
+  fighting: 'chocolate',
+  poison: 'blueviolet',
+  ground: 'brown',
+  flying: 'bisue',
+  psychic: 'deeppink',
+  bug: 'darkolivegreen',
+  rock: 'firebrick',
+  ghost: 'indigo',
+  dragon: 'slateblue',
+  dark: 'darkslategrey',
+  steel: 'darkgrey',
+  fairy: 'fuchsia',
 };
