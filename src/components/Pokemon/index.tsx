@@ -156,7 +156,7 @@ export default () => {
               {showBox ? <TypeSelector {...{ cardIndex }} /> : <></>}
             </Grid>
 
-            {cardIndex === '-1' && (
+            {(cardIndex === '-1' || selection[cardIndex].name !== null) && (
               <>
                 <Grid item xs={3}>
                   <IconButton size="small">
