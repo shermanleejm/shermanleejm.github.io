@@ -1,3 +1,4 @@
+import { Numbers, OpenInNew, Restaurant } from '@mui/icons-material';
 import {
   Autocomplete,
   Box,
@@ -7,7 +8,7 @@ import {
   CardContent,
   CardMedia,
   Grid,
-  Link,
+  IconButton,
   Modal,
   Paper,
   Table,
@@ -75,6 +76,7 @@ export default () => {
     show: false,
     stats: defaultStats,
   });
+  const [showSTAB, setShowSTAB] = useState(false);
 
   const { pokeNames } = usePokeData();
   const { recommendedPokemon, remainingTypes } = useRecommended(selection);
@@ -136,19 +138,10 @@ export default () => {
 
     return (
       <Card>
-        <Link href={selected.url} target="_blank">
-          <CardMedia component="img" src={sprite} alt={name} />
-        </Link>
+        <CardMedia component="img" src={sprite} alt={name} />
         <CardContent sx={{ textAlign: 'center' }}>
           <Typography>{!showBox && name}</Typography>
-          <Typography
-            fontSize={13}
-            variant={'subtitle1'}
-            sx={{ cursor: 'pointer' }}
-            onClick={() =>
-              setShowStats({ stats: selected.total_stats || defaultStats, show: true })
-            }
-          >
+          <Typography fontSize={13} variant={'subtitle1'}>
             {types.map((t, i) => (
               <span key={i}>
                 {i === 1 ? ' · ' : ''}
@@ -157,28 +150,70 @@ export default () => {
             ))}
           </Typography>
         </CardContent>
-        <CardActions>{showBox ? <TypeSelector {...{ cardIndex }} /> : <></>}</CardActions>
+        <CardActions>
+          <Grid container justifyContent={'space-around'}>
+            <Grid item xs={12}>
+              {showBox ? <TypeSelector {...{ cardIndex }} /> : <></>}
+            </Grid>
+
+            {cardIndex === '-1' && (
+              <>
+                <Grid item xs={3}>
+                  <IconButton size="small">
+                    <Restaurant />
+                  </IconButton>
+                </Grid>
+
+                <Grid item xs={3}>
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      setShowStats({
+                        stats: selected.total_stats || defaultStats,
+                        show: true,
+                      })
+                    }
+                  >
+                    <Numbers />
+                  </IconButton>
+                </Grid>
+
+                <Grid item xs={3}>
+                  <IconButton size="small" href={selected.url || ''} target="_blank">
+                    <OpenInNew />
+                  </IconButton>
+                </Grid>
+              </>
+            )}
+          </Grid>
+        </CardActions>
       </Card>
+    );
+  };
+
+  const DefaultModalBox: React.FC = ({ children }) => {
+    return (
+      <Box
+        sx={{
+          position: 'absolute' as 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 2,
+        }}
+      >
+        {children}
+      </Box>
     );
   };
 
   const ResetModal = () => {
     return (
       <Modal open={showModal} onClose={() => setShowModal(false)}>
-        <Box
-          sx={{
-            position: 'absolute' as 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            pt: 2,
-            px: 4,
-            pb: 3,
-          }}
-        >
+        <DefaultModalBox>
           <Typography>Confirm reset?</Typography>
           <Button
             onClick={() => {
@@ -199,7 +234,7 @@ export default () => {
           >
             Yes but louder
           </Button>
-        </Box>
+        </DefaultModalBox>
       </Modal>
     );
   };
@@ -210,17 +245,7 @@ export default () => {
         open={showStats.show}
         onClose={() => setShowStats({ ...showStats, show: false })}
       >
-        <Box
-          sx={{
-            position: 'absolute' as 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-          }}
-        >
+        <DefaultModalBox>
           <TableContainer component={Paper} sx={{ minWidth: '100%' }}>
             <Table>
               <TableHead>
@@ -239,7 +264,15 @@ export default () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Box>
+        </DefaultModalBox>
+      </Modal>
+    );
+  };
+
+  const STABModal = () => {
+    return (
+      <Modal open={showSTAB} onClose={() => setShowSTAB(false)}>
+        <DefaultModalBox></DefaultModalBox>
       </Modal>
     );
   };
