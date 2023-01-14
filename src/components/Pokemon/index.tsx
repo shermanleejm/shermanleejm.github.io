@@ -21,7 +21,7 @@ import {
   Typography,
 } from '@mui/material';
 import { atom, useAtom } from 'jotai';
-import { atomWithStorage } from 'jotai/vanilla/utils';
+import { atomWithStorage } from 'jotai/utils';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from '../MTGDB/AddNewCard/InfiniteScroll';
 import {
