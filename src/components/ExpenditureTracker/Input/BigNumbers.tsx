@@ -14,7 +14,10 @@ import {
 import dayjs, { Dayjs } from 'dayjs';
 import { RecurrenceTypes } from '@/components/ExpenditureTracker/Input/Form';
 import { max } from 'lodash';
-import { useState } from 'react';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai';
+
+const showBigNumbersAtom = atomWithStorage('showBigNumbers', false);
 
 export function calculateRecurring(
   array: RecurringTableType[],
@@ -98,7 +101,7 @@ export function calculateRecurring(
 const BigNumbers = () => {
   const db = useSelector((state: State) => state.database);
   const { startDate, endDate } = getDateNumbers();
-  const [showNumbers, setShowNumbers] = useState(false);
+  const [showBigNumbers, setShowBigNumbers] = useAtom(showBigNumbersAtom);
 
   const data = useLiveQuery(async () => {
     const wholeEx = await db.expenditure.toArray();
@@ -162,11 +165,11 @@ const BigNumbers = () => {
         direction={'row'}
         style={{ textAlign: 'center' }}
         spacing={2}
-        onClick={() => setShowNumbers(!showNumbers)}
+        onClick={() => setShowBigNumbers(!showBigNumbers)}
       >
         <Grid item xs={6} md={3}>
           <KeyItem
-            value={!showNumbers ? `*****` : `$${data?.total.toLocaleString()}`}
+            value={!showBigNumbers ? `*****` : `$${data?.total.toLocaleString()}`}
             title={'Total funds'}
             color={Number(data?.total.toLocaleString()) < 0 ? 'red' : 'green'}
           />
@@ -181,13 +184,17 @@ const BigNumbers = () => {
         <Grid item xs={6} md={3}>
           <KeyItem
             title="Monthly Spend"
-            value={!showNumbers ? `*****` : `$${data?.spending.toLocaleString()}` || '$0'}
+            value={
+              !showBigNumbers ? `*****` : `$${data?.spending.toLocaleString()}` || '$0'
+            }
           />
         </Grid>
         <Grid item xs={6} md={3}>
           <KeyItem
             title="Monthly Save"
-            value={!showNumbers ? `*****` : `$${data?.saving.toLocaleString()}` || '$0'}
+            value={
+              !showBigNumbers ? `*****` : `$${data?.saving.toLocaleString()}` || '$0'
+            }
           />
         </Grid>
       </Grid>
