@@ -21,6 +21,7 @@ import {
   Typography,
 } from '@mui/material';
 import { atom, useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/vanilla/utils';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from '../MTGDB/AddNewCard/InfiniteScroll';
 import {
@@ -35,35 +36,36 @@ import {
 } from './hooks';
 import PokeballConfetti from './PokeballConfetti';
 
+const defaultStats = {
+  Total: '0',
+  HP: '0',
+  Attack: '0',
+  Defense: '0',
+  'Sp. Atk': '0',
+  'Sp. Def': '0',
+  Speed: '0',
+} as SelectedPokemonStats;
+const defaultSelectedPokemon = {
+  name: null,
+  types: [],
+  sprite: null,
+  generation: [],
+  total_stats: defaultStats,
+} as SelectedPokemon;
+const defaultSelection = {
+  '0': defaultSelectedPokemon,
+  '1': defaultSelectedPokemon,
+  '2': defaultSelectedPokemon,
+  '3': defaultSelectedPokemon,
+  '4': defaultSelectedPokemon,
+  '5': defaultSelectedPokemon,
+} as Record<string, SelectedPokemon>;
+
 export const genAtom = atom('');
+const selectionAtom = atomWithStorage('selection', defaultSelection);
 
 export default () => {
-  const defaultStats = {
-    Total: '0',
-    HP: '0',
-    Attack: '0',
-    Defense: '0',
-    'Sp. Atk': '0',
-    'Sp. Def': '0',
-    Speed: '0',
-  } as SelectedPokemonStats;
-  const defaultSelectedPokemon = {
-    name: null,
-    types: [],
-    sprite: null,
-    generation: [],
-    total_stats: defaultStats,
-  } as SelectedPokemon;
-  const defaultSelection = {
-    '0': defaultSelectedPokemon,
-    '1': defaultSelectedPokemon,
-    '2': defaultSelectedPokemon,
-    '3': defaultSelectedPokemon,
-    '4': defaultSelectedPokemon,
-    '5': defaultSelectedPokemon,
-  } as Record<string, SelectedPokemon>;
-  const [selection, setSelection] =
-    useState<Record<string, SelectedPokemon>>(defaultSelection);
+  const [selection, setSelection] = useAtom(selectionAtom);
   const [_remainingTypes, setRemainingTypes] = useState<PokemonTypes[]>([]);
   const [_recommendedPokemon, setRecommendedPokemon] = useState<SelectedPokemon[][]>([
     [],
