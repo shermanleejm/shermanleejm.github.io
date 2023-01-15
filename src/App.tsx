@@ -1,7 +1,13 @@
 import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import { Pages } from './components';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Button, ThemeProvider, CssBaseline, Grid } from '@mui/material';
+import {
+  Button,
+  ThemeProvider,
+  CssBaseline,
+  Grid,
+  CircularProgress,
+} from '@mui/material';
 import { bindActionCreators } from 'redux';
 import { DarkModeActionCreators } from './state/action-creators';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
@@ -9,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { State } from './state/reducers';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import React from 'react';
 
 export default function App() {
   const { toggleDarkMode } = bindActionCreators(DarkModeActionCreators, useDispatch());
@@ -47,7 +54,17 @@ export default function App() {
         )}
         <Routes>
           {Pages.map((page, index) => {
-            return <Route key={index} path={page.link} element={<page.component />} />;
+            return (
+              <Route
+                key={index}
+                path={page.link}
+                element={
+                  <React.Suspense fallback={<CircularProgress />}>
+                    <page.component />
+                  </React.Suspense>
+                }
+              />
+            );
           })}
         </Routes>
       </ThemeProvider>

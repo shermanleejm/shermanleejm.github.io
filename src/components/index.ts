@@ -1,15 +1,15 @@
 import React from 'react';
-import AssetTracker from './AssetTracker';
-import ContactMe from './ContactMe';
-import Home from './Home';
-import MTGDB from './MTGDB/';
-import Terminal from './Terminal';
-import WordleSolver from './WordleSolver';
-import Tracetogether from './Tracetogether';
-import SelfDrivingCar from './SelfDrivingCar';
-import ExpenditureTracker from './ExpenditureTracker';
-import CSSPlayground from './CSSPlayground';
-import Pokemon from './Pokemon';
+// const SelfDrivingCar = React.lazy(() => import('@/components/SelfDrivingCar'));
+const ExpenditureTracker = React.lazy(() => import('@/components/ExpenditureTracker'));
+const Home = React.lazy(() => import('@/components/Home'));
+const AssetTracker = React.lazy(() => import('@/components/AssetTracker'));
+const ContactMe = React.lazy(() => import('@/components/ContactMe'));
+const MTGDB = React.lazy(() => import('@/components/MTGDB'));
+const Terminal = React.lazy(() => import('@/components/Terminal'));
+const Tracetogether = React.lazy(() => import('@/components/Tracetogether'));
+const CSSPlayground = React.lazy(() => import('@/components/CSSPlayground'));
+const Pokemon = React.lazy(() => import('@/components/Pokemon'));
+const WordleSolver = React.lazy(() => import('@/components/WordleSolver'));
 
 import terminal from '../assets/terminal.png';
 import tracker from '../assets/tracker.jpg';
@@ -17,7 +17,7 @@ import contactMe from '../assets/contactMe.png';
 import mtg from '../assets/mtg.png';
 import wordle from '../assets/wordle.jpg';
 import money from '../assets/money.jpg';
-import car from '../assets/car.jpg';
+// import car from '../assets/car.jpg';
 import css from '../assets/css.jpg';
 import pokemon from '../assets/pokemon.png';
 
