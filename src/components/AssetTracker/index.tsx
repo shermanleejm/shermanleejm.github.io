@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { changeManifest } from '..';
 
-const AssetTracker = () => {
+export default () => {
   const location = useLocation();
 
   useEffect(() => {
@@ -14,11 +14,9 @@ const AssetTracker = () => {
 
   return (
     <div style={{ margin: '0 0% 0 0%' }}>
-      <CryptoTracker />
       <Countdown />
       <BoringTracker />
+      <CryptoTracker />
     </div>
   );
 };
-
-export default AssetTracker;

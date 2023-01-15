@@ -22,7 +22,7 @@ const ExpenditureTabs = [
 ];
 
 export default () => {
-  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);
+  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[2].name);
 
   return (
     <Box

@@ -1,3 +1,4 @@
+import CustomDatePicker from '@/components/ExpenditureTracker/Goals/CustomDatePicker';
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
 import { calculateRecurring } from '@/components/ExpenditureTracker/Input/BigNumbers';
 import { toasterAtom } from '@/components/ExpenditureTracker/Toaster';
@@ -9,6 +10,8 @@ import {
   Card,
   CardActions,
   CardContent,
+  Checkbox,
+  FormControlLabel,
   Grid,
   IconButton,
   TextField,
@@ -29,9 +32,9 @@ const DEFAULT_STATE = {
   startDate: dayjs().add(-1, 'day').unix(),
   endDate: dayjs().unix(),
 } as const;
-type DEFAULT_STATE_KEYS = keyof typeof DEFAULT_STATE;
+export type DEFAULT_STATE_KEYS = keyof typeof DEFAULT_STATE;
 
-const GoalCard = ({ existingIndex }: Props) => {
+export default ({ existingIndex }: Props) => {
   const db = useSelector((state: State) => state.database);
   const [goalName, setGoalName] = useState('');
   const [goalAmount, setGoalAmount] = useState('');
@@ -39,6 +42,7 @@ const GoalCard = ({ existingIndex }: Props) => {
     DEFAULT_STATE
   );
   const [, setToaster] = useAtom(toasterAtom);
+  const [isForever, setIsForever] = useState(false);
   const { startDate, endDate } = getDateNumbers();
 
   const goal =
@@ -77,7 +81,7 @@ const GoalCard = ({ existingIndex }: Props) => {
       .add({
         name: goalName,
         startDate: goalDates.startDate,
-        endDate: goalDates.endDate,
+        endDate: isForever ? null : goalDates.endDate,
         amount: parseFloat(goalAmount),
       })
       .then(() => {
@@ -105,34 +109,6 @@ const GoalCard = ({ existingIndex }: Props) => {
       });
     });
   }
-
-  const CustomDatePicker: React.FC<{ which: DEFAULT_STATE_KEYS }> = ({ which }) => {
-    return (
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker
-          disabled={goal !== undefined}
-          inputFormat="DD/MM/YYYY"
-          label={which === 'startDate' ? 'Start Date' : 'End Date'}
-          value={dayjs.unix(goalDates[which])}
-          views={['day', 'month', 'year']}
-          onChange={(newDate: Dayjs | null) =>
-            setGoalDates(
-              which === 'startDate'
-                ? {
-                    ...goalDates,
-                    startDate: newDate?.unix() || 0,
-                  }
-                : {
-                    ...goalDates,
-                    endDate: newDate?.unix() || 0,
-                  }
-            )
-          }
-          renderInput={(params) => <TextField fullWidth {...params} />}
-        />
-      </LocalizationProvider>
-    );
-  };
 
   function onTrackStatus(): string {
     let good = '🎉 Whoohoo! you are on track to achieving this 🎉';
@@ -175,11 +151,28 @@ const GoalCard = ({ existingIndex }: Props) => {
           </Grid>
 
           <Grid item xs={6}>
-            <CustomDatePicker which="startDate" />
+            <CustomDatePicker
+              {...{ which: 'startDate', goal, goalDates, setGoalDates, isForever }}
+            />
           </Grid>
 
           <Grid item xs={6}>
-            <CustomDatePicker which="endDate" />
+            <CustomDatePicker
+              {...{ which: 'endDate', goal, goalDates, setGoalDates, isForever }}
+            />
+          </Grid>
+
+          <Grid item xs={2}>
+            <FormControlLabel
+              label={'4eva?'}
+              labelPlacement="top"
+              control={
+                <Checkbox
+                  disabled={goal !== undefined}
+                  onChange={() => setIsForever(!isForever)}
+                />
+              }
+            />
           </Grid>
 
           {existingIndex && (
@@ -198,7 +191,7 @@ const GoalCard = ({ existingIndex }: Props) => {
       </CardContent>
 
       <CardActions sx={{ justifyContent: 'space-between' }}>
-        <Button size="small" onClick={() => recordNewGoal()}>
+        <Button size="small" onClick={() => recordNewGoal()} fullWidth>
           submit
         </Button>
 
@@ -211,5 +204,3 @@ const GoalCard = ({ existingIndex }: Props) => {
     </Card>
   );
 };
-
-export default GoalCard;

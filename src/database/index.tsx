@@ -126,7 +126,7 @@ export type GoalsTableType = {
   id?: number;
   name: string;
   startDate: number;
-  endDate: number;
+  endDate: number | null;
   amount: number;
 };
 
@@ -139,7 +139,7 @@ export class MTGDatabase extends Dexie {
 
   public constructor() {
     super('mtgdb');
-    this.version(7).stores({
+    this.version(8).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
       expenditure: `++${ExpenditureTableColumns.join(',')}`,
