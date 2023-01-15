@@ -16,6 +16,10 @@ import { RecurrenceTypes } from '@/components/ExpenditureTracker/Input/Form';
 import { max } from 'lodash';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
+import {
+  calculatePortfolioValue,
+  totalPortfolioValue,
+} from '@/components/AssetTracker/BoringTracker/hooks';
 
 const showBigNumbersAtom = atomWithStorage('showBigNumbers', false);
 
@@ -102,6 +106,8 @@ const BigNumbers = () => {
   const db = useSelector((state: State) => state.database);
   const { startDate, endDate } = getDateNumbers();
   const [showBigNumbers, setShowBigNumbers] = useAtom(showBigNumbersAtom);
+  const portPct = calculatePortfolioValue();
+  const portVal = totalPortfolioValue();
 
   const data = useLiveQuery(async () => {
     const wholeEx = await db.expenditure.toArray();
@@ -195,6 +201,19 @@ const BigNumbers = () => {
             value={
               !showBigNumbers ? `*****` : `$${data?.saving.toLocaleString()}` || '$0'
             }
+          />
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <KeyItem
+            title="Total Portfolio"
+            value={!showBigNumbers ? `*****` : `$${portVal}` || '$0'}
+          />
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <KeyItem
+            title="Total Portfolio"
+            value={!showBigNumbers ? `*****` : `${portPct}%` || '0%'}
+            color={!showBigNumbers ? 'white' : portPct < 0 ? 'red' : 'green'}
           />
         </Grid>
       </Grid>

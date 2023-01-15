@@ -72,9 +72,9 @@ export default () => {
 
       <Typography variant="h4" style={{ margin: '3% 0 3% 0' }}>
         Boring{' '}
-        <span style={{ color: calculatePortfolioValue(boring) >= 0 ? 'green' : 'red' }}>
-          {calculatePortfolioValue(boring) > 0 && '+'}
-          {calculatePortfolioValue(boring)}%
+        <span style={{ color: calculatePortfolioValue() >= 0 ? 'green' : 'red' }}>
+          {calculatePortfolioValue() > 0 && '+'}
+          {calculatePortfolioValue()}%
         </span>
       </Typography>
 

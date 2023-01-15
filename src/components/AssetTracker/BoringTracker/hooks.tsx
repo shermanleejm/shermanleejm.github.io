@@ -1,7 +1,10 @@
-import { Boring } from '@/components/AssetTracker/BoringTracker';
+import { boringAtom } from '@/components/AssetTracker/BoringTracker';
+import { useAtom } from 'jotai';
 import { round } from 'lodash';
 
-export function calculatePortfolioValue(boring: Boring[]) {
+export function calculatePortfolioValue() {
+  const [boring] = useAtom(boringAtom);
+
   let totalMarketValue = boring.reduce(
     (total, b) => (total += parseFloat(b.quantity) * parseFloat(b.price)),
     0
@@ -14,4 +17,16 @@ export function calculatePortfolioValue(boring: Boring[]) {
     let delta = (item.open || price) - price;
     return round(total + weight * delta, 2);
   }, 0);
+}
+
+export function totalPortfolioValue() {
+  const [boring] = useAtom(boringAtom);
+
+  return round(
+    boring.reduce(
+      (total, b) => (total += parseFloat(b.quantity) * (b.open || parseFloat(b.price))),
+      0
+    ) * 1.35,
+    2
+  );
 }
