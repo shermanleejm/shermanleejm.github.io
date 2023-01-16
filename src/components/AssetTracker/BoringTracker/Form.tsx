@@ -62,14 +62,17 @@ export default ({ formStuff, formValue, setFormValue, setShowForm }: Props) => {
           <Button
             fullWidth
             onClick={() => {
-              setBoring([
+              setBoring({
                 ...boring,
-                {
-                  ticker: formStuff.symbol,
-                  quantity: formValue.quantity,
-                  price: formValue.price,
-                },
-              ]);
+                equities: [
+                  ...boring.equities,
+                  {
+                    ticker: formStuff.symbol,
+                    quantity: formValue.quantity,
+                    price: formValue.price,
+                  },
+                ],
+              });
 
               setShowForm(false);
             }}

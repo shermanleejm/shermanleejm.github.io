@@ -284,7 +284,7 @@ export default () => {
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              inputFormat="DD MM YYYY"
+              inputFormat="DD MMM YYYY"
               label="Date"
               value={dayjs.unix(form[FormCategories.datetime])}
               onChange={(newDate: Dayjs | null) =>

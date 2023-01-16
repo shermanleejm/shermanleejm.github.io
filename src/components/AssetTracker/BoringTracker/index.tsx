@@ -1,4 +1,4 @@
-import { Button, TextField, Typography } from '@mui/material';
+import { Button, Grid, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import axios from 'axios';
 import { atomWithStorage } from 'jotai/utils';
@@ -7,8 +7,16 @@ import BoringForm from '@/components/AssetTracker/BoringTracker/Form';
 import BoringTable from '@/components/AssetTracker/BoringTracker/Table';
 import SearchResults from '@/components/AssetTracker/BoringTracker/SearchResults';
 import { calculatePortfolioValue } from '@/components/AssetTracker/BoringTracker/hooks';
+import BondsForm, { BondCron } from '@/components/AssetTracker/BoringTracker/BondsForm';
 
-export interface Boring {
+export type Bond = {
+  amount: number;
+  startDate: number;
+  endDate: number | null;
+  interestRate: number;
+  cron: BondCron;
+};
+export type Equity = {
   ticker: string;
   quantity: string;
   price: string;
@@ -16,23 +24,28 @@ export interface Boring {
   low?: number;
   open?: number;
   pl?: number;
-}
+};
 export const apiKeyAtom = atomWithStorage('apiKey', '111111111');
-export const boringAtom = atomWithStorage('boring', [] as Boring[]);
+export const boringAtom = atomWithStorage('boring', {
+  bonds: [] as Bond[],
+  equities: [] as Equity[],
+});
 export const refreshAtom = atom(false);
+export const keywordAtom = atom('');
 
 export default () => {
   const [apiKey, setAPIKey] = useAtom(apiKeyAtom);
   const [boring, setBoring] = useAtom(boringAtom);
+  const [keyword, setKeyword] = useAtom(keywordAtom);
+  const [refresh, setRefresh] = useAtom(refreshAtom);
 
-  const [keyword, setKeyword] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showBondsForm, setShowBondsForm] = useState(true);
   const [formStuff, setFormStuff] = useState() as any;
   const [formValue, setFormValue] = useState({ price: '', quantity: '' });
   const [errorMessage, setErrorMessage] = useState() as any;
-  const [refresh, setRefresh] = useAtom(refreshAtom);
 
   function shuffle(array: any[]) {
     var currentIndex = array.length,
@@ -64,54 +77,77 @@ export default () => {
       });
   }
 
+  function handleSearch() {
+    if (keyword === 'bonds') {
+      setShowBondsForm(true);
+      return;
+    }
+    queryTicker(keyword);
+    setShowSearchResults(true);
+  }
+
   return (
     <div style={{ margin: '0 4% 10% 4%' }}>
-      <Typography style={{ color: 'red' }}>
-        {errorMessage !== undefined && errorMessage}
-      </Typography>
-
-      <Typography variant="h4" style={{ margin: '3% 0 3% 0' }}>
-        Boring{' '}
-        <span style={{ color: calculatePortfolioValue() >= 0 ? 'green' : 'red' }}>
-          {calculatePortfolioValue() > 0 && '+'}
-          {calculatePortfolioValue()}%
-        </span>
-      </Typography>
-
-      <TextField
-        label="Alpha Vantage API key"
-        size="small"
-        value={apiKey}
-        onChange={(e) => setAPIKey(e.target.value)}
-        style={{ width: '60%', margin: '0 0 3% 0' }}
-      />
-
-      <TextField
-        label="Add new boring equity"
-        size="small"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        style={{ width: '60%', margin: '0 0 3% 0' }}
-      />
-      <Button
-        disabled={!keyword}
-        onClick={() => {
-          queryTicker(keyword);
-          setShowSearchResults(true);
-        }}
+      <Grid
+        container
+        direction={'row'}
+        justifyContent={'flex-start'}
+        alignItems={'flex-start'}
+        spacing={2}
       >
-        search
-      </Button>
+        <Grid item xs={12}>
+          <Typography style={{ color: 'red' }}>
+            {errorMessage !== undefined && errorMessage}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h4" style={{ margin: '3% 0 3% 0' }}>
+            Boring{' '}
+            <span style={{ color: calculatePortfolioValue() >= 0 ? 'green' : 'red' }}>
+              {calculatePortfolioValue() > 0 && '+'}
+              {calculatePortfolioValue()}%
+            </span>
+          </Typography>
+        </Grid>
+        <Grid item xs={10}>
+          <TextField
+            label="Alpha Vantage API key"
+            size="small"
+            value={apiKey}
+            onChange={(e) => setAPIKey(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={10}>
+          <TextField
+            fullWidth
+            label="Add new boring"
+            size="small"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            inputProps={{ autoCapitalize: 'none', autoCorrect: 'off' }}
+          />
+          <Typography variant="subtitle2">For bonds type "bonds"</Typography>
+        </Grid>
+        <Grid item xs={2}>
+          <Button disabled={!keyword} onClick={() => handleSearch()}>
+            search
+          </Button>
+        </Grid>
+      </Grid>
 
-      {showSearchResults && keyword !== '' && keyword !== 'bonds' && (
+      {showSearchResults && !['', 'bonds'].includes(keyword) && (
         <SearchResults
           {...{ setShowForm, setShowSearchResults, setFormStuff, searchResults }}
         />
       )}
 
-      {showForm && keyword === 'bonds' && (
+      {showForm && (
         <BoringForm {...{ formStuff, formValue, setFormValue, setShowForm }} />
       )}
+
+      {showBondsForm && <BondsForm {...{ setShowBondsForm }} />}
 
       <BoringTable {...{ setErrorMessage }} />
 

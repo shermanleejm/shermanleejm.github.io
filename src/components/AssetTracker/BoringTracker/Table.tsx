@@ -1,6 +1,6 @@
 import {
   apiKeyAtom,
-  Boring,
+  Equity,
   boringAtom,
   refreshAtom,
 } from '@/components/AssetTracker/BoringTracker';
@@ -37,9 +37,9 @@ export default ({ setErrorMessage }: Props) => {
     }
 
     async function fetchLocalData() {
-      if (boring.length > 0) {
-        let updatedBoring = [] as Boring[];
-        for (let line of boring) {
+      if (boring.equities.length > 0) {
+        let updatedBoring = [] as Equity[];
+        for (let line of boring.equities) {
           let tickerData: any = await getPrice(line.ticker);
           if (tickerData === undefined) {
             setErrorMessage('Alpha Vantage only allows 5 requests every minute.');
@@ -58,7 +58,10 @@ export default ({ setErrorMessage }: Props) => {
           }
           updatedBoring.push(line);
         }
-        setBoring(updatedBoring);
+        setBoring({
+          ...boring,
+          equities: updatedBoring,
+        });
         setErrorMessage(undefined);
       }
     }
@@ -66,7 +69,7 @@ export default ({ setErrorMessage }: Props) => {
     fetchLocalData();
   }, [refresh, boring]);
 
-  return boring.length === 0 ? (
+  return boring.equities.length === 0 ? (
     <></>
   ) : (
     <TableContainer style={{ margin: '0 0 3% 0' }}>
@@ -84,7 +87,7 @@ export default ({ setErrorMessage }: Props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {boring.map((row: any, index: number) => {
+          {boring.equities.map((row: any, index: number) => {
             return (
               <TableRow key={index}>
                 <TableCell>{row.ticker}</TableCell>
@@ -100,9 +103,12 @@ export default ({ setErrorMessage }: Props) => {
                 <TableCell>
                   <IconButton
                     onClick={() => {
-                      let tmp = boring;
+                      let tmp = boring.equities;
                       tmp.splice(index, 1);
-                      setBoring(tmp);
+                      setBoring({
+                        ...boring,
+                        equities: tmp,
+                      });
                       setRefresh(!refresh);
                     }}
                   >
