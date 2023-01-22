@@ -97,8 +97,9 @@ const ExpenditureTable = () => {
     <div>
       <Resizable
         size={{ width: tableWidth, height: tableHeight }}
-        onResizeStop={(e, direction, ref, d) => {
-          setTableHeight(tableHeight + d.height);
+        // @ts-ignore
+        onResizeStop={({ delta }) => {
+          setTableHeight(tableHeight + delta.height);
         }}
         minWidth={tableWidth}
         maxWidth={tableWidth}
