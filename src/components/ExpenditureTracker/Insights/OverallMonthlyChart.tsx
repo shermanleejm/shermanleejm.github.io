@@ -7,6 +7,7 @@ import { CircularProgress, Typography } from '@mui/material';
 import { FormCategories, negativeTypes } from '@/database';
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
 import { ChartData, Inner } from '@/components/ExpenditureTracker/Insights';
+import { Box } from '@mui/system';
 
 export default () => {
   const db = useSelector((state: State) => state.database);
@@ -70,12 +71,15 @@ export default () => {
   ) : data.children.length === 0 ? (
     <Typography>Your chart is empty 🪹, please input some data first 🍆</Typography>
   ) : (
-    <div
-      style={{
+    <Box
+      sx={{
+        m: 4,
         height: '40vh',
         width: '80vw',
+        textAlign: 'center',
       }}
     >
+      <Typography variant="h6">Overall Monthly Spending</Typography>
       <ResponsiveSunburst
         data={data}
         margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
@@ -107,6 +111,6 @@ export default () => {
           </div>
         )}
       />
-    </div>
+    </Box>
   );
 };

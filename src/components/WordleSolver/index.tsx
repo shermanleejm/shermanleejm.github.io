@@ -259,8 +259,8 @@ const WordleSolver = () => {
         {!initial && (
           <Grid item>
             <Grid container direction={'row'} justifyContent="space-around" spacing={1}>
-              {words.map((w) => (
-                <Grid item xs={3}>
+              {words.map((w, index) => (
+                <Grid item xs={3} key={index}>
                   <Typography>{w}</Typography>
                 </Grid>
               ))}

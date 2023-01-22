@@ -40,9 +40,9 @@ const Intro = () => {
         </Grid>
         <Grid item justifyContent={'center'}>
           <Grid container direction="row" justifyContent={'center'} spacing={5}>
-            {IconButtons.map((ib) => {
+            {IconButtons.map((ib, index) => {
               return (
-                <Grid item>
+                <Grid item key={index}>
                   <Button href={ib.link} target="_blank" rel="noopener" size="large">
                     <ib.icon style={{ transform: 'scale(2.0)' }} />
                   </Button>

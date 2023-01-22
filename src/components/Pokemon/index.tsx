@@ -252,15 +252,15 @@ export default () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  {Object.keys(showStats.stats).map((k) => (
-                    <TableCell>{k}</TableCell>
+                  {Object.keys(showStats.stats).map((k, index) => (
+                    <TableCell key={index}>{k}</TableCell>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
                 <TableRow>
-                  {Object.values(showStats.stats).map((v) => (
-                    <TableCell>{v}</TableCell>
+                  {Object.values(showStats.stats).map((v, index) => (
+                    <TableCell key={index}>{v}</TableCell>
                   ))}
                 </TableRow>
               </TableBody>

@@ -123,8 +123,8 @@ const DeckDisplay = ({ toaster }: MTGDBProps) => {
                 </CardActions>
               </Card>
             </Grid>
-            {Object.keys(decks).map((deckName) => (
-              <Grid item xs={6} sm={3}>
+            {Object.keys(decks).map((deckName, index) => (
+              <Grid item xs={6} sm={3} key={index}>
                 <Card>
                   <CardMedia
                     component="img"

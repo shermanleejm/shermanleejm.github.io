@@ -460,8 +460,8 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                 </Typography>
               </ListItemText>
             </ListItem>
-            {infoHelper.map((ele) => (
-              <ListItem>
+            {infoHelper.map((ele, index) => (
+              <ListItem key={index}>
                 <ListItemText>
                   <Typography variant="body1">{ele.title}</Typography>
                   <Typography variant="body2">{ele.explanation}</Typography>
@@ -581,8 +581,9 @@ const DeckBuilderUI = ({ currDeck, deckName }: DeckBuilderUIType) => {
                   numberSlug._8,
                   numberSlug._9,
                   numberSlug._10,
-                ].map((n) => (
+                ].map((n, index) => (
                   <Button
+                    key={index}
                     style={{
                       maxWidth: '30px',
                       maxHeight: '30px',

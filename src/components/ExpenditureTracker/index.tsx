@@ -22,7 +22,7 @@ const ExpenditureTabs = [
 ];
 
 export default () => {
-  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);
+  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[1].name);
 
   return (
     <Box
@@ -47,7 +47,7 @@ export default () => {
       <Box sx={{ mt: 2, mb: 6 }}>
         {ExpenditureTabs.map((t, i) => {
           if (chosenTab === t.name) {
-            return <t.component />;
+            return <t.component key={i} />;
           }
         })}
       </Box>

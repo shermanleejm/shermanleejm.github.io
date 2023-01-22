@@ -190,7 +190,7 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
             fullWidth
             multiple
             id="tags-standard"
-            options={data.tags as any || []}
+            options={(data.tags as any) || []}
             defaultValue={data.tags || []}
             freeSolo
             onChange={(_, values) => {
@@ -560,8 +560,8 @@ const CardDataGrid = ({ toaster }: CardDataGridProps) => {
                 </Typography>
               </ListItemText>
             </ListItem>
-            {infoHelper.map((ele) => (
-              <ListItem>
+            {infoHelper.map((ele, index) => (
+              <ListItem key={index}>
                 <ListItemText>
                   <Typography variant="body1">{ele.title}</Typography>
                   <Typography variant="body2">{ele.explanation}</Typography>

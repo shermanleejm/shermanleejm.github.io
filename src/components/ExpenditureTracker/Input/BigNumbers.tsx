@@ -23,6 +23,22 @@ import {
 
 const showBigNumbersAtom = atomWithStorage('showBigNumbers', false);
 
+function addToAddition(
+  addition: (ExpenditureTableType & { recurringId?: number })[],
+  re: RecurringTableType,
+  pointer: Dayjs
+) {
+  addition.push({
+    category: re.category,
+    name: re.name,
+    amount: re.amount,
+    txn_type: TransactionTypes.RECURRING,
+    datetime: pointer.unix(),
+    recurringId: re.id,
+  });
+  return addition;
+}
+
 export function calculateRecurring(
   array: RecurringTableType[],
   startDate: number,
@@ -33,36 +49,24 @@ export function calculateRecurring(
 
     let reType = re.cron.split(' ')[0] as RecurrenceTypes;
     let reVal = re.cron.split(' ')[1];
-    let addition: ExpenditureTableType[] = [];
+    let addition: (ExpenditureTableType & { recurringId?: number })[] = [];
     let pointer: Dayjs = dayjs.unix(startDate);
     switch (reType) {
       case 'weekly':
         let reDay = parseInt(reVal);
-        // get dayOfWeek of startDate
         let dayOfWeek = pointer.day();
         let difference = Math.abs(dayOfWeek - reDay);
-        // add days till recurring start and store in pointer
         if (dayOfWeek < reDay) {
           pointer = pointer.add(difference, 'd');
         } else {
           pointer = pointer.add(7 - difference, 'd');
         }
         while (pointer.unix() < endDate) {
-          // keep adding into addition and add 1 week until endDate
-          addition.push({
-            category: re.category,
-            name: re.name,
-            amount: re.amount,
-            txn_type: TransactionTypes.RECURRING,
-            datetime: pointer.unix(),
-          });
+          addition = addToAddition(addition, re, pointer);
           pointer = pointer.add(1, 'w');
         }
         break;
       case 'monthly':
-        // create a new line item
-        // get a pointer variable
-        // check if re.start is more than startDate
         let reDate = parseInt(reVal);
         let _difference = Math.abs(parseInt(reVal) - dayjs.unix(startDate).date());
         if (dayjs.unix(startDate).date() < dayjs.unix(re.start).date()) {
@@ -71,13 +75,7 @@ export function calculateRecurring(
           pointer = dayjs.unix(startDate).set('D', reDate);
         }
         while (pointer.unix() < endDate) {
-          addition.push({
-            category: re.category,
-            name: re.name,
-            amount: re.amount,
-            txn_type: TransactionTypes.RECURRING,
-            datetime: pointer.unix(),
-          });
+          addition = addToAddition(addition, re, pointer);
           pointer = pointer.add(1, 'M');
         }
         break;
@@ -85,13 +83,7 @@ export function calculateRecurring(
         let _year = max([dayjs.unix(startDate).year(), dayjs.unix(endDate).year()]);
         let reYearDate = dayjs(reVal, 'DD-MM').set('year', _year || dayjs().year());
         if (reYearDate.unix() < endDate && reYearDate.unix() >= startDate) {
-          addition.push({
-            category: re.category,
-            name: re.name,
-            amount: re.amount,
-            txn_type: TransactionTypes.RECURRING,
-            datetime: pointer.unix(),
-          });
+          addition = addToAddition(addition, re, pointer);
         }
         break;
       default:

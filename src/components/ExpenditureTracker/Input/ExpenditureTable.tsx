@@ -10,6 +10,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { Resizable } from 're-resizable';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { downloadFile } from '@/components/Helpers';
+import { calculateRecurring } from '@/components/ExpenditureTracker/Input/BigNumbers';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
@@ -20,7 +21,33 @@ const ExpenditureTable = () => {
 
   const data =
     useLiveQuery(async () => {
-      return await db.expenditure.toArray();
+      const normalExpenditure = await db.expenditure.toArray();
+
+      const { minDate, maxDate } = normalExpenditure.reduce(
+        (dates, curr) => {
+          return {
+            minDate: Math.min(curr.datetime, dates.minDate),
+            maxDate: Math.max(curr.datetime, dates.maxDate),
+          };
+        },
+        { minDate: Infinity, maxDate: 0 }
+      );
+
+      const maxId = normalExpenditure.reduce((id, curr) => Math.max(id, curr.id || 0), 0);
+
+      const monthlyRecurring = calculateRecurring(
+        await db.recurring.where('start').belowOrEqual(maxDate).toArray(),
+        minDate,
+        maxDate
+      ).map((val, index) => ({ ...val, id: maxId + index }));
+
+      console.log({
+        minDate: dayjs.unix(minDate).format('DD-MMM-YYYY'),
+        maxDate: dayjs.unix(maxDate).format('DD-MMM-YYYY'),
+        monthlyRecurring,
+      });
+
+      return [...normalExpenditure, ...monthlyRecurring];
     }) || [];
 
   const handleRowEdit = useCallback((params: any) => {
@@ -49,13 +76,20 @@ const ExpenditureTable = () => {
         return (
           <IconButton
             onClick={async () => {
-              await db.expenditure.delete(params.row.id);
+              if (params.row.recurringId) {
+                await db.recurring.delete(params.row.recurringId);
+              } else {
+                await db.expenditure.delete(params.row.id);
+              }
             }}
           >
             <DeleteForeverIcon />
           </IconButton>
         );
       },
+    },
+    {
+      field: 'txn_type',
     },
   ];
 
@@ -75,7 +109,7 @@ const ExpenditureTable = () => {
             [`& .${TransactionTypes.DEBIT}`]: { bgcolor: 'green' },
             [`& .${TransactionTypes.CREDIT}`]: { bgcolor: 'red' },
             [`& .${TransactionTypes.SALARY}`]: { bgcolor: 'blue' },
-            [`& .${TransactionTypes.RECURRING}`]: { bgcolor: 'yellow' },
+            [`& .${TransactionTypes.RECURRING}`]: { bgcolor: 'orange', color: 'grey' },
           }}
           onCellEditCommit={handleRowEdit}
           disableSelectionOnClick={true}
@@ -106,7 +140,11 @@ const ExpenditureTable = () => {
           <Button
             variant="contained"
             startIcon={<FileDownloadIcon />}
-            onClick={() => downloadFile(data, `expenditure`)}
+            onClick={async () => {
+              const expenditure = await db.expenditure.toArray();
+              const recurring = await db.recurring.toArray();
+              downloadFile({ expenditure, recurring }, `expenditure`);
+            }}
           >
             export
           </Button>
@@ -126,9 +164,20 @@ const ExpenditureTable = () => {
           <Button
             size="small"
             onClick={() => {
-              db.expenditure.clear().then(() => {
-                db.expenditure.bulkAdd(JSON.parse(uploadedFile));
-              });
+              const parsedUploadedFile = JSON.parse(uploadedFile) as {
+                expenditure: any;
+                recurring: any;
+              };
+              if ('expenditure' in parsedUploadedFile) {
+                db.expenditure.clear().then(() => {
+                  db.expenditure.bulkAdd(parsedUploadedFile.expenditure);
+                });
+              }
+              if ('recurring' in parsedUploadedFile) {
+                db.recurring.clear().then(() => {
+                  db.recurring.bulkAdd(parsedUploadedFile.recurring);
+                });
+              }
             }}
           >
             upload

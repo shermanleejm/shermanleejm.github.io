@@ -305,8 +305,8 @@ export default () => {
             alignItems={'center'}
             spacing={2}
           >
-            {TxnButtons.map((btn) => (
-              <Grid item xs={6}>
+            {TxnButtons.map((btn, index) => (
+              <Grid item xs={6} key={index}>
                 <div
                   style={{
                     display: 'flex',

@@ -182,7 +182,7 @@ const CryptoTracker = () => {
             {!isLoading &&
               cryptoData.map((crypto: any, index: any) => {
                 return (
-                  <TableRow>
+                  <TableRow key={index}>
                     <TableCell>
                       {`${crypto.name} (${selectCurrency}${displayPrincipal(
                         crypto.currentPrice

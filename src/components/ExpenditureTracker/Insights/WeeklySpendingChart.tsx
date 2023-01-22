@@ -1,6 +1,7 @@
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
 import { FormCategories, negativeTypes } from '@/database';
 import { State } from '@/state/reducers';
+import { Box, Typography } from '@mui/material';
 import { ResponsiveBar } from '@nivo/bar';
 import dayjs from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -47,12 +48,15 @@ export default () => {
   }, [startDate, endDate]);
 
   return (
-    <div
-      style={{
-        height: '30vh',
-        width: '90vw',
+    <Box
+      sx={{
+        m: 4,
+        height: '40vh',
+        width: '80vw',
+        textAlign: 'center',
       }}
     >
+      <Typography variant="h6">Weekly Spending</Typography>
       <ResponsiveBar
         data={data}
         keys={['amount']}
@@ -97,6 +101,6 @@ export default () => {
         )}
         animate={true}
       />
-    </div>
+    </Box>
   );
 };

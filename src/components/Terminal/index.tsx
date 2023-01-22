@@ -186,8 +186,8 @@ const Terminal = () => {
               ></button>
             </div>
             <div style={{ padding: '10px' }}>
-              {history.map((row: string) => {
-                return <Typography>{row}</Typography>;
+              {history.map((row: string, index) => {
+                return <Typography key={index}>{row}</Typography>;
               })}
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', padding: '0 0 0 10px' }}>

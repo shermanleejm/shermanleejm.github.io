@@ -14,8 +14,8 @@ export default () => {
         <GoalCard />
       </Grid>
 
-      {goals?.map((g) => (
-        <Grid item>
+      {goals?.map((g, index) => (
+        <Grid item key={index}>
           <GoalCard existingIndex={g.id!} />
         </Grid>
       ))}

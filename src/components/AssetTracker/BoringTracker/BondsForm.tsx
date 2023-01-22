@@ -153,8 +153,9 @@ export default ({ setShowBondsForm }: Props) => {
               flexDirection: 'row',
             }}
           >
-            {Object.keys(BOND_CRON).map((bc) => (
+            {Object.keys(BOND_CRON).map((bc, index) => (
               <FormControlLabel
+                key={index}
                 value={bc}
                 control={<Radio />}
                 label={BOND_CRON[bc as BondCron]}

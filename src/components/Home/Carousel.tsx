@@ -6,21 +6,17 @@ import {
   CardMedia,
   Typography,
   Grid,
-} from "@mui/material";
-import { Link } from "react-router-dom";
-import { Pages, PageType } from "..";
+} from '@mui/material';
+import { Link } from 'react-router-dom';
+import { Pages, PageType } from '..';
 
 const CarouselCard = ({ img, link, name, description }: PageType) => {
   return (
     <Card elevation={3}>
-      <CardMedia
-        component="img"
-        image={img}
-        sx={{ height: "auto", maxWidth: '200' }}
-      />
+      <CardMedia component="img" image={img} sx={{ height: 'auto', maxWidth: '200' }} />
       <CardContent>
         <Typography variant="h5">{name}</Typography>
-        <Typography variant="body2">{description}</Typography>
+        <Typography variant="subtitle2">{description}</Typography>
       </CardContent>
       <CardActions>
         <Button size="small" component={Link} to={link}>
@@ -40,13 +36,13 @@ const Carousel = () => {
       alignItems="flex-start"
       spacing={1}
     >
-      {Pages.map((p) => {
+      {Pages.map((p, index) => {
         if (p.disabled) {
           return;
         }
         return (
-          p.link !== "/" && (
-            <Grid item xs={6} md={4}>
+          p.link !== '/' && (
+            <Grid item xs={6} md={4} key={index}>
               <CarouselCard {...p} />
             </Grid>
           )

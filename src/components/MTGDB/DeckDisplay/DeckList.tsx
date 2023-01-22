@@ -180,9 +180,9 @@ const DeckList = (props: DeckListProps) => {
         <Grid item xs={12}>
           <Grid container spacing={1} wrap="nowrap" sx={{ overflow: 'auto' }}>
             {categories.map(
-              (c) =>
+              (c, index) =>
                 c && (
-                  <Grid item xs={5}>
+                  <Grid key={index} item xs={5}>
                     <Category
                       deckName={props.deckName}
                       title={c}
