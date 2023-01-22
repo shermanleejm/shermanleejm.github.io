@@ -79,10 +79,12 @@ export function calculateRecurring(
           pointer = pointer.add(1, 'M');
         }
         break;
+      // TODO: fix this
       case 'yearly':
         let _year = max([dayjs.unix(startDate).year(), dayjs.unix(endDate).year()]);
         let reYearDate = dayjs(reVal, 'DD-MM').set('year', _year || dayjs().year());
         if (reYearDate.unix() < endDate && reYearDate.unix() >= startDate) {
+          pointer = dayjs.unix(re.start);
           addition = addToAddition(addition, re, pointer);
         }
         break;
