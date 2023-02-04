@@ -1,16 +1,6 @@
-import { CircularProgress } from '@mui/material';
-import React from 'react';
-import { useSelector } from 'react-redux';
-import {
-  Bar,
-  BarChart,
-  LabelList,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-} from 'recharts';
-import { State } from '../../../state/reducers';
+import { darkModeAtom } from '@/App';
+import { useAtom } from 'jotai';
+import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { MTGTypesEnum } from '../interfaces';
 import { ManaDataInterface } from './DeckList';
 
@@ -37,7 +27,7 @@ type ManaChartProps = {
 };
 
 const ManaChart = ({ data }: ManaChartProps) => {
-  const dm = useSelector((state: State) => state.darkMode);
+  const [darkMode] = useAtom(darkModeAtom);
 
   return (
     <div style={{ margin: 'auto', height: 300 }}>
@@ -53,7 +43,7 @@ const ManaChart = ({ data }: ManaChartProps) => {
               stackId={'a'}
               fill={t.color}
               key={i}
-              label={{ position: 'top', offset: 1, fill: dm ? 'white' : 'black' }}
+              label={{ position: 'top', offset: 1, fill: darkMode ? 'white' : 'black' }}
             />
           ))}
         </BarChart>

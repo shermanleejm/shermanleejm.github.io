@@ -1,10 +1,16 @@
+import { darkModeAtom } from '@/App';
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
+import {
+  chartContainerStyle,
+  FunkyTooltip,
+} from '@/components/ExpenditureTracker/Insights';
 import { FormCategories, negativeTypes } from '@/database';
 import { State } from '@/state/reducers';
 import { Box, Typography } from '@mui/material';
 import { ResponsiveBar } from '@nivo/bar';
 import dayjs from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useAtom } from 'jotai';
 import { round } from 'lodash';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +22,7 @@ export default () => {
     acc[dayjs('01/01/2023', 'DD/MM/YYYY').add(i, 'day').format('ddd')] = 0;
     return { ...acc };
   }, {} as Record<string, number>);
-  const darkMode = useSelector((state: State) => state.darkMode);
+  const [darkMode] = useAtom(darkModeAtom);
   type DataType = {
     day: string;
     amount: number;
@@ -48,17 +54,11 @@ export default () => {
   }, [startDate, endDate]);
 
   return (
-    <Box
-      sx={{
-        m: 4,
-        height: '40vh',
-        width: '80vw',
-        textAlign: 'center',
-      }}
-    >
+    <Box sx={chartContainerStyle}>
       <Typography variant="h6">Weekly Spending</Typography>
       <ResponsiveBar
         data={data}
+        colors={{ scheme: 'nivo' }}
         keys={['amount']}
         indexBy="day"
         margin={{ top: 10, right: 10, bottom: 50, left: 50 }}
@@ -84,20 +84,12 @@ export default () => {
             ticks: { text: { fill: darkMode ? '#939393' : '#000' } },
           },
         }}
-        tooltip={({ id, value, color }) => (
-          <div
-            style={{
-              padding: 12,
-              color,
-              background: '#222222',
-            }}
-          >
-            <span>Look, I'm custom </span>
-            <br />
+        tooltip={({ id, value }) => (
+          <FunkyTooltip>
             <strong>
-              {id}: {value}
+              {id}: ${value}
             </strong>
-          </div>
+          </FunkyTooltip>
         )}
         animate={true}
       />

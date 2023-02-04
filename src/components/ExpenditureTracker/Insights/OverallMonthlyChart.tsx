@@ -6,13 +6,20 @@ import { useState } from 'react';
 import { CircularProgress, Typography } from '@mui/material';
 import { FormCategories, negativeTypes } from '@/database';
 import { getDateNumbers } from '@/components/ExpenditureTracker/Input';
-import { ChartData, Inner } from '@/components/ExpenditureTracker/Insights';
+import {
+  chartContainerStyle,
+  ChartData,
+  FunkyTooltip,
+  Inner,
+} from '@/components/ExpenditureTracker/Insights';
 import { Box } from '@mui/system';
+import { useAtom } from 'jotai';
+import { darkModeAtom } from '@/App';
 
 export default () => {
   const db = useSelector((state: State) => state.database);
   const { startDate, endDate } = getDateNumbers();
-  const darkMode = useSelector((state: State) => state.darkMode);
+  const [darkMode] = useAtom(darkModeAtom);
   const [data, setData] = useState<ChartData>({
     name: '',
     children: [],
@@ -71,14 +78,7 @@ export default () => {
   ) : data.children.length === 0 ? (
     <Typography>Your chart is empty 🪹, please input some data first 🍆</Typography>
   ) : (
-    <Box
-      sx={{
-        m: 4,
-        height: '40vh',
-        width: '80vw',
-        textAlign: 'center',
-      }}
-    >
+    <Box sx={chartContainerStyle}>
       <Typography variant="h6">Overall Monthly Spending</Typography>
       <ResponsiveSunburst
         data={data}
@@ -97,18 +97,11 @@ export default () => {
         arcLabel={(e) => `${e.id} $${e.value}`}
         arcLabelsTextColor={darkMode ? '#fff' : '#000'}
         tooltip={(e) => (
-          <div
-            style={{
-              backgroundColor: darkMode ? '#000' : '#fff',
-              color: darkMode ? '#fff' : '#000',
-              padding: '5px 10px 5px 10px',
-              borderRadius: '25px',
-            }}
-          >
+          <FunkyTooltip>
             {`${e.id} ${((e.value / totalSpending) * 100).toFixed(2)}% $${e.value.toFixed(
               2
             )}`}
-          </div>
+          </FunkyTooltip>
         )}
       />
     </Box>

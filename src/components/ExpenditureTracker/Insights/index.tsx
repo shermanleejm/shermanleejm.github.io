@@ -2,10 +2,17 @@ import { Grid } from '@mui/material';
 import OverallMonthlyChart from '@/components/ExpenditureTracker/Insights/OverallMonthlyChart';
 import ListItems from '@/components/ExpenditureTracker/Insights/LineItems';
 import WeeklySpendingChart from '@/components/ExpenditureTracker/Insights/WeeklySpendingChart';
+import OverallSavings from '@/components/ExpenditureTracker/Insights/OverallSavings';
+import { FC } from 'react';
+import { useAtom } from 'jotai';
+import { darkModeAtom } from '@/App';
 
 export default () => {
   return (
     <Grid container justifyContent="center" alignItems="center" direction="column">
+      <Grid item>
+        <OverallSavings />
+      </Grid>
       <Grid item>
         <WeeklySpendingChart />
       </Grid>
@@ -27,4 +34,27 @@ export type Inner = {
 export type ChartData = {
   name: string;
   children: any[];
+};
+
+export const chartContainerStyle = {
+  m: 4,
+  height: '40vh',
+  width: '80vw',
+  textAlign: 'center',
+};
+
+export const FunkyTooltip: FC = ({ children }) => {
+  const [darkMode] = useAtom(darkModeAtom);
+  return (
+    <div
+      style={{
+        backgroundColor: darkMode ? '#000' : '#fff',
+        color: darkMode ? '#fff' : '#000',
+        padding: '5px 10px 5px 10px',
+        borderRadius: '25px',
+      }}
+    >
+      {children}
+    </div>
+  );
 };

@@ -8,18 +8,17 @@ import {
   Grid,
   CircularProgress,
 } from '@mui/material';
-import { bindActionCreators } from 'redux';
-import { DarkModeActionCreators } from './state/action-creators';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
-import { useDispatch, useSelector } from 'react-redux';
-import { State } from './state/reducers';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import React from 'react';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai';
+
+export const darkModeAtom = atomWithStorage('dark-mode', true);
 
 export default function App() {
-  const { toggleDarkMode } = bindActionCreators(DarkModeActionCreators, useDispatch());
-  const darkMode = useSelector((state: State) => state.darkMode);
+  const [darkMode, toggleDarkMode] = useAtom(darkModeAtom);
   const currentLocation = useLocation();
 
   return (
@@ -46,7 +45,7 @@ export default function App() {
               )}
             </Grid>
             <Grid item>
-              <Button onClick={() => toggleDarkMode()}>
+              <Button onClick={() => toggleDarkMode(!darkMode)}>
                 {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
               </Button>
             </Grid>
