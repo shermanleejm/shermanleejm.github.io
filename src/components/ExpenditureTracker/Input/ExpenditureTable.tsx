@@ -11,6 +11,7 @@ import { Resizable } from 're-resizable';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { downloadFile } from '@/components/Helpers';
 import { calculateRecurring } from '@/components/ExpenditureTracker/Input/BigNumbers';
+import { sortBy } from 'lodash';
 
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
@@ -19,36 +20,29 @@ const ExpenditureTable = () => {
   const [easterEggCounter, setEasterEggCounter] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<string>('');
 
-  const data =
-    useLiveQuery(async () => {
-      const normalExpenditure = await db.expenditure.toArray();
+  const data = useLiveQuery(async () => {
+    const normalExpenditure = await db.expenditure.toArray();
 
-      const { minDate, maxDate } = normalExpenditure.reduce(
-        (dates, curr) => {
-          return {
-            minDate: Math.min(curr.datetime, dates.minDate),
-            maxDate: Math.max(curr.datetime, dates.maxDate),
-          };
-        },
-        { minDate: Infinity, maxDate: 0 }
-      );
+    let { minDate, maxDate } = normalExpenditure.reduce(
+      (dates, curr) => {
+        return {
+          minDate: Math.min(curr.datetime, dates.minDate),
+          maxDate: Math.max(curr.datetime, dates.maxDate),
+        };
+      },
+      { minDate: Infinity, maxDate: 0 }
+    );
 
-      const maxId = normalExpenditure.reduce((id, curr) => Math.max(id, curr.id || 0), 0);
+    const maxId = normalExpenditure.reduce((id, curr) => Math.max(id, curr.id || 0), 0);
 
-      const monthlyRecurring = calculateRecurring(
-        await db.recurring.where('start').belowOrEqual(maxDate).toArray(),
-        minDate,
-        maxDate
-      ).map((val, index) => ({ ...val, id: maxId + index }));
+    const monthlyRecurring = calculateRecurring(
+      await db.recurring.where('start').belowOrEqual(maxDate).toArray(),
+      minDate,
+      maxDate
+    ).map((val, index) => ({ ...val, id: maxId + index }));
 
-      console.log({
-        minDate: dayjs.unix(minDate).format('DD-MMM-YYYY'),
-        maxDate: dayjs.unix(maxDate).format('DD-MMM-YYYY'),
-        monthlyRecurring,
-      });
-
-      return [...normalExpenditure, ...monthlyRecurring];
-    }) || [];
+    return sortBy([...normalExpenditure, ...monthlyRecurring], ['datetime']);
+  });
 
   const handleRowEdit = useCallback((params: any) => {
     let id = params.row.id;

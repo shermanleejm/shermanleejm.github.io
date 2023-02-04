@@ -266,7 +266,6 @@ const AddNewCard = ({ toaster }: MTGDBProps) => {
     }
     navigator.clipboard
       .writeText(Array.from(missingCardsTxt).join('\n').substring(0, 99999))
-      .then(() => console.log('Copied'))
       .catch((err) =>
         toaster(
           'Sorry, your device settings does not allow me to copy to your clipboard',

@@ -1,8 +1,8 @@
-import { Button, Grid, Slider } from "@mui/material";
-import { useCallback, useState } from "react";
-import Cropper from "react-easy-crop";
-import { createWorker } from "tesseract.js";
-import getCroppedImg from "../helper";
+import { Button, Grid, Slider } from '@mui/material';
+import { useCallback, useState } from 'react';
+import Cropper from 'react-easy-crop';
+import { createWorker } from 'tesseract.js';
+import getCroppedImg from '../helper';
 
 interface CardCropperProps {
   setText: (newText: string) => void;
@@ -10,7 +10,7 @@ interface CardCropperProps {
 
 const CardCropper = ({ setText }: CardCropperProps) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [img, setImg] = useState("");
+  const [img, setImg] = useState('');
   const [imgUploaded, setImgUploaded] = useState(false);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -29,22 +29,18 @@ const CardCropper = ({ setText }: CardCropperProps) => {
   const showCroppedImage = useCallback(async () => {
     setIsLoading(true);
     try {
-      const croppedImage: any = await getCroppedImg(
-        img,
-        croppedAreaPixels,
-        rotation
-      );
+      const croppedImage: any = await getCroppedImg(img, croppedAreaPixels, rotation);
       try {
         let worker = createWorker({
-          logger: (m) => console.log(m),
+          logger: (m) => console.info(m),
         });
         await worker.load();
-        await worker.loadLanguage("eng");
-        await worker.initialize("eng");
+        await worker.loadLanguage('eng');
+        await worker.initialize('eng');
         const {
           data: { text },
         } = await worker.recognize(croppedImage);
-        setText(text.replace(/[^a-zA-Z0-9\s]/g, ""));
+        setText(text.replace(/[^a-zA-Z0-9\s]/g, ''));
         await worker.terminate();
       } catch (err) {
         console.error(err);
@@ -59,24 +55,19 @@ const CardCropper = ({ setText }: CardCropperProps) => {
   return (
     <>
       {/* Upload and Magic button  */}
-      <Grid item style={{ width: "80vw" }}>
-        <Grid
-          container
-          direction='row'
-          justifyContent='space-around'
-          spacing={3}
-        >
+      <Grid item style={{ width: '80vw' }}>
+        <Grid container direction="row" justifyContent="space-around" spacing={3}>
           <Grid item>
             <input
-              type='file'
-              accept='image/*'
-              capture='environment'
+              type="file"
+              accept="image/*"
+              capture="environment"
               onChange={handleChange}
-              style={{ display: "none" }}
-              id='upload-image'
+              style={{ display: 'none' }}
+              id="upload-image"
             />
-            <label htmlFor='upload-image'>
-              <Button component='span'>scanner</Button>
+            <label htmlFor="upload-image">
+              <Button component="span">scanner</Button>
             </label>
           </Grid>
           <Grid item>
@@ -87,8 +78,8 @@ const CardCropper = ({ setText }: CardCropperProps) => {
       {/* Cropper */}
       <Grid item>
         {imgUploaded && (
-          <div style={{ width: "80vw" }}>
-            <div style={{ position: "relative", height: 300, width: "100%" }}>
+          <div style={{ width: '80vw' }}>
+            <div style={{ position: 'relative', height: 300, width: '100%' }}>
               <Cropper
                 image={img}
                 crop={crop}
@@ -112,10 +103,10 @@ const CardCropper = ({ setText }: CardCropperProps) => {
         )}
       </Grid>
       <Grid item>
-        {img !== "" && imgUploaded && (
+        {img !== '' && imgUploaded && (
           <Button
             onClick={() => {
-              setImg("");
+              setImg('');
               setImgUploaded(false);
             }}
           >
