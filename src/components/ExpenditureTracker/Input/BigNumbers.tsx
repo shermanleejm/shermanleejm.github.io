@@ -137,7 +137,7 @@ const BigNumbers = () => {
     const allRecurring = calculateRecurring(
       await db.recurring.where('start').belowOrEqual(dayjs().unix()).toArray(),
       firstPaycheck,
-      endDate
+      dayjs().unix()
     ).reduce((acc, v) => acc + (v.amount as number), 0);
 
     let total = wholeEx.reduce(
