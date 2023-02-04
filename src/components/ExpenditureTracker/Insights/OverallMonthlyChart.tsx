@@ -74,9 +74,7 @@ export default () => {
   }, [startDate, endDate]);
 
   return isLoading ? (
-    <CircularProgress />
-  ) : data.children.length === 0 ? (
-    <Typography>Your chart is empty 🪹, please input some data first 🍆</Typography>
+    <></>
   ) : (
     <Box sx={chartContainerStyle}>
       <Typography variant="h6">Overall Monthly Spending</Typography>

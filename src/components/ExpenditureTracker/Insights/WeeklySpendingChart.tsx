@@ -28,6 +28,7 @@ export default () => {
     amount: number;
   };
   const [data, setData] = useState<DataType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useLiveQuery(async () => {
     const currentMonth = (
@@ -51,9 +52,12 @@ export default () => {
     }, [] as { day: string; amount: number }[]);
 
     setData(res);
+    setIsLoading(false);
   }, [startDate, endDate]);
 
-  return (
+  return isLoading ? (
+    <></>
+  ) : (
     <Box sx={chartContainerStyle}>
       <Typography variant="h6">Weekly Spending</Typography>
       <ResponsiveBar
@@ -84,13 +88,7 @@ export default () => {
             ticks: { text: { fill: darkMode ? '#939393' : '#000' } },
           },
         }}
-        tooltip={({ id, value }) => (
-          <FunkyTooltip>
-            <strong>
-              {id}: ${value}
-            </strong>
-          </FunkyTooltip>
-        )}
+        tooltip={({ value }) => <FunkyTooltip>${value}</FunkyTooltip>}
         animate={true}
       />
     </Box>

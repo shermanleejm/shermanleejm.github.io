@@ -13,13 +13,14 @@ import {
 } from '@/database';
 import dayjs, { Dayjs } from 'dayjs';
 import { RecurrenceTypes } from '@/components/ExpenditureTracker/Input/Form';
-import { max } from 'lodash';
+import { max, round } from 'lodash';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import {
   calculatePortfolioValue,
   totalPortfolioValue,
 } from '@/components/AssetTracker/BoringTracker/hooks';
+import { darkModeAtom } from '@/App';
 
 const showBigNumbersAtom = atomWithStorage('showBigNumbers', false);
 
@@ -102,6 +103,7 @@ const BigNumbers = () => {
   const [showBigNumbers, setShowBigNumbers] = useAtom(showBigNumbersAtom);
   const portPct = calculatePortfolioValue();
   const portVal = totalPortfolioValue();
+  const [darkMode] = useAtom(darkModeAtom);
 
   const data = useLiveQuery(async () => {
     const wholeEx = await db.expenditure.toArray();
@@ -171,7 +173,13 @@ const BigNumbers = () => {
           <KeyItem
             value={!showBigNumbers ? `*****` : `$${data?.total.toLocaleString()}`}
             title={'Total funds'}
-            color={Number(data?.total.toLocaleString()) < 0 ? 'red' : 'green'}
+            color={
+              !showBigNumbers
+                ? undefined
+                : Number(data?.total.toLocaleString()) < 0
+                ? 'red'
+                : 'green'
+            }
           />
         </Grid>
         <Grid item xs={6} md={3}>
@@ -200,14 +208,16 @@ const BigNumbers = () => {
         <Grid item xs={6} md={3}>
           <KeyItem
             title="Total Portfolio"
-            value={!showBigNumbers ? `*****` : `$${portVal}` || '$0'}
+            value={
+              !showBigNumbers ? `*****` : `$${round(portVal, 2).toLocaleString()}` || '$0'
+            }
           />
         </Grid>
         <Grid item xs={6} md={3}>
           <KeyItem
-            title="Total Portfolio"
+            title="Total Portfolio (%)"
             value={!showBigNumbers ? `*****` : `${portPct}%` || '0%'}
-            color={!showBigNumbers ? 'white' : portPct < 0 ? 'red' : 'green'}
+            color={!showBigNumbers ? undefined : portPct < 0 ? 'red' : 'green'}
           />
         </Grid>
       </Grid>

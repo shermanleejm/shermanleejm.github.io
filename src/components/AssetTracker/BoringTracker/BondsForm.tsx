@@ -30,6 +30,7 @@ type Props = {
 export default ({ setShowBondsForm }: Props) => {
   const [boring, setBoring] = useAtom(boringAtom);
   const [bondData, setBondData] = useState({
+    name: '',
     amount: null as number | null,
     startDate: dayjs().unix(),
     endDate: dayjs().add(1, 'M').unix() as number | null,
@@ -57,6 +58,19 @@ export default ({ setShowBondsForm }: Props) => {
   return (
     <Paper sx={{ p: 2, mb: 1 }} elevation={3}>
       <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            value={bondData.name}
+            onChange={(e) =>
+              setBondData({
+                ...bondData,
+                name: e.target.value,
+              })
+            }
+            fullWidth
+            label="Bond Name"
+          />
+        </Grid>
         <Grid item xs={12}>
           <NumberFormat
             fullWidth

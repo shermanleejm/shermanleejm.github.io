@@ -118,6 +118,32 @@ export default ({ setErrorMessage }: Props) => {
               </TableRow>
             );
           })}
+          {boring.bonds.map((row: any, index) => (
+            <TableRow>
+              <TableCell>{row.name}</TableCell>
+              <TableCell>1</TableCell>
+              <TableCell>{row.amount}</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
+              <TableCell>{row.interestRate}</TableCell>
+              <TableCell>
+                <IconButton
+                  onClick={() => {
+                    let tmp = boring.bonds;
+                    tmp.splice(index, 1);
+                    setBoring({
+                      ...boring,
+                      bonds: tmp,
+                    });
+                    setRefresh(!refresh);
+                  }}
+                >
+                  <Delete />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
