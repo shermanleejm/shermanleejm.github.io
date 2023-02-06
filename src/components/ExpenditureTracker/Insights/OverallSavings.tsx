@@ -10,117 +10,109 @@ import {
   TransactionTypes,
 } from '@/database';
 import { State } from '@/state/reducers';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Grid, ToggleButton, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { round, sortBy } from 'lodash';
 import { useSelector } from 'react-redux';
-import { ResponsiveLine } from '@nivo/line';
+import { ResponsiveLine, Serie } from '@nivo/line';
 import { useAtom } from 'jotai';
 import { darkModeAtom } from '@/App';
+import { useState } from 'react';
 
 export default () => {
   const db = useSelector((state: State) => state.database);
-  type Labels = 'savings' | 'spending';
+  const LABELS = ['savings', 'spending'];
+  type Labels = keyof typeof LABELS;
+
   type ChartData = {
     id: Labels;
     data: { x: string; y: number }[];
   };
   const [darkMode] = useAtom(darkModeAtom);
-  const overallSavings: ChartData[] =
-    useLiveQuery(async () => {
-      const paydays = [
-        ...(
-          await db.expenditure.where({ txn_type: TransactionTypes.SALARY }).toArray()
-        ).map((e) => e.datetime),
-        dayjs().unix(),
-      ];
-      if (paydays.length < 2) return [] as ChartData[];
+  const [selectedIds, setSelectedIds] = useState(LABELS);
+  const overallSavings = useLiveQuery(async () => {
+    const paydays = [
+      ...(
+        await db.expenditure.where({ txn_type: TransactionTypes.SALARY }).toArray()
+      ).map((e) => e.datetime),
+      dayjs().unix(),
+    ];
+    if (paydays.length < 2) return [] as ChartData[];
 
-      const allRecurring = calculateRecurring(
-        await db.recurring.where('start').belowOrEqual(dayjs().unix()).toArray(),
-        paydays[0],
-        dayjs().unix()
-      );
+    const allRecurring = calculateRecurring(
+      await db.recurring.where('start').belowOrEqual(dayjs().unix()).toArray(),
+      paydays[0],
+      dayjs().unix()
+    );
 
-      const allExpenditure = await db.expenditure.toArray();
+    const allExpenditure = await db.expenditure.toArray();
 
-      let paydayPointer = 0;
-      let accumulator: ExpenditureTableType[] = [];
-      let allData = sortBy([...allExpenditure, ...allRecurring], ['datetime']).reduce(
-        (total, curr) => {
-          let _start = paydays[paydayPointer];
-          let _end = paydays[paydayPointer + 1];
+    const _all = sortBy([...allExpenditure, ...allRecurring], ['datetime']);
 
-          if (curr.datetime >= _end) {
-            paydayPointer += 1;
-            let _tmp = accumulator;
-            accumulator = [curr];
-            return [...total, _tmp];
-          }
+    let savingsData: { x: string; y: number }[] = [];
+    let spendingData: { x: string; y: number }[] = [];
+    paydays.forEach((payday, index) => {
+      let nextPayday = paydays[index + 1];
+      let chunk: ExpenditureTableType[];
+      if (nextPayday === undefined) {
+        chunk = _all.filter((val) => val.datetime >= payday);
+      } else {
+        chunk = _all.filter((val) => val.datetime >= payday && val.datetime < nextPayday);
+      }
+      if (chunk.length === 0) return;
+      let _month = dayjs
+        .unix(sortBy(chunk, ['datetime'])[chunk.length - 1]?.datetime)
+        .format('MMM');
 
-          accumulator.push(curr);
+      savingsData.push({
+        x: _month,
+        y: round(
+          chunk.reduce(
+            (_total, _curr) =>
+              (_total += positiveTypes.includes(_curr.txn_type)
+                ? Number(_curr.amount)
+                : -Number(_curr.amount)),
+            0
+          ),
+          2
+        ),
+      });
 
-          return total;
-        },
-        [] as ExpenditureTableType[][]
-      );
+      spendingData.push({
+        x: _month,
+        y: round(
+          chunk.reduce(
+            (_total, _curr) =>
+              (_total += negativeTypes.includes(_curr.txn_type)
+                ? Number(_curr.amount)
+                : 0),
+            0
+          ),
+          2
+        ),
+      });
+    });
 
-      allData = [...allData, accumulator];
+    return [
+      {
+        id: 'savings',
+        data: savingsData,
+      },
+      {
+        id: 'spending',
+        data: spendingData,
+      },
+    ].filter((val) => selectedIds.includes(val.id)) as ChartData[];
+  }, [selectedIds]);
 
-      return [
-        {
-          id: 'savings',
-          data: allData.reduce((total, curr, index) => {
-            return [
-              ...total,
-              {
-                x: dayjs.unix(paydays[index]).format('MMM'),
-                y: round(
-                  curr.reduce(
-                    (_total, _curr) =>
-                      (_total += positiveTypes.includes(_curr.txn_type)
-                        ? Number(_curr.amount)
-                        : -Number(_curr.amount)),
-                    0
-                  ),
-                  2
-                ),
-              },
-            ] as { x: 'savings'; y: number }[];
-          }, [] as { x: 'savings'; y: number }[]),
-        },
-        {
-          id: 'spending',
-          data: allData.reduce((total, curr, index) => {
-            return [
-              ...total,
-              {
-                x: dayjs.unix(paydays[index]).format('MMM'),
-                y: round(
-                  curr.reduce(
-                    (_total, _curr) =>
-                      (_total += negativeTypes.includes(_curr.txn_type)
-                        ? Number(_curr.amount)
-                        : 0),
-                    0
-                  ),
-                  2
-                ),
-              },
-            ] as { x: 'savings'; y: number }[];
-          }, [] as { x: 'savings'; y: number }[]),
-        },
-      ];
-    }) ?? ([] as ChartData[]);
-
-  return overallSavings.length === 0 ? (
+  return (overallSavings || []).length === 0 ? (
     <></>
   ) : (
-    <Box sx={chartContainerStyle}>
+    <Box sx={{ ...chartContainerStyle, pb: 2 }}>
       <Typography variant="h6">Overall Savings and Spending</Typography>
       <ResponsiveLine
-        data={overallSavings}
+        data={overallSavings as Serie[]}
         margin={{ top: 10, right: 10, bottom: 50, left: 50 }}
         xScale={{ type: 'point' }}
         yScale={{
@@ -151,6 +143,37 @@ export default () => {
           </FunkyTooltip>
         )}
       />
+      <Grid container direction="row" spacing={1}>
+        <Grid item xs={5}>
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={() => setSelectedIds(['savings'])}
+          >
+            savings
+          </Button>
+        </Grid>
+        <Grid item xs={5}>
+          <Button
+            fullWidth
+            variant="outlined"
+            color="warning"
+            onClick={() => setSelectedIds(['spending'])}
+          >
+            spending
+          </Button>
+        </Grid>
+        <Grid item xs={2}>
+          <Button
+            fullWidth
+            variant="outlined"
+            color="error"
+            onClick={() => setSelectedIds(LABELS)}
+          >
+            all
+          </Button>
+        </Grid>
+      </Grid>
     </Box>
   );
 };

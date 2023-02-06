@@ -13,14 +13,13 @@ import {
 } from '@/database';
 import dayjs, { Dayjs } from 'dayjs';
 import { RecurrenceTypes } from '@/components/ExpenditureTracker/Input/Form';
-import { max, round } from 'lodash';
+import { max, round, sortBy } from 'lodash';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import {
   calculatePortfolioValue,
   totalPortfolioValue,
 } from '@/components/AssetTracker/BoringTracker/hooks';
-import { darkModeAtom } from '@/App';
 
 const showBigNumbersAtom = atomWithStorage('showBigNumbers', false);
 
@@ -103,7 +102,6 @@ const BigNumbers = () => {
   const [showBigNumbers, setShowBigNumbers] = useAtom(showBigNumbersAtom);
   const portPct = calculatePortfolioValue();
   const portVal = totalPortfolioValue();
-  const [darkMode] = useAtom(darkModeAtom);
 
   const data = useLiveQuery(async () => {
     const wholeEx = await db.expenditure.toArray();
@@ -117,15 +115,18 @@ const BigNumbers = () => {
       0
     );
 
-    let spending = currentMonth
-      .filter((ex) => negativeTypes.includes(ex.txn_type))
-      .reduce((prev, next) => prev + Number(next.amount), 0);
+    let spending = sortBy(
+      currentMonth.filter((ex) => negativeTypes.includes(ex.txn_type)),
+      ['datetime']
+    ).reduce((prev, next) => prev + (next.amount as number), 0);
 
     const monthlyRecurring = calculateRecurring(
-      await db.recurring.where('start').belowOrEqual(startDate).toArray(),
+      await db.recurring.where('start').belowOrEqual(dayjs().unix()).toArray(),
       startDate,
-      endDate
-    ).reduce((acc, v) => acc + (v.amount as number), 0);
+      dayjs().unix()
+    )
+      .filter((val) => val.datetime >= startDate && val.datetime < endDate)
+      .reduce((acc, v) => acc + (v.amount as number), 0);
 
     const firstPaycheck =
       (
