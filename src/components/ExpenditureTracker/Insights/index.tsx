@@ -38,6 +38,7 @@ export type ChartData = {
 
 export const chartContainerStyle = {
   m: 4,
+  mb: 6,
   height: '40vh',
   width: '80vw',
   textAlign: 'center',

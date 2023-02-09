@@ -10,7 +10,7 @@ import {
   TransactionTypes,
 } from '@/database';
 import { State } from '@/state/reducers';
-import { Box, Button, Grid, ToggleButton, Typography } from '@mui/material';
+import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { round, sortBy } from 'lodash';
@@ -22,15 +22,16 @@ import { useState } from 'react';
 
 export default () => {
   const db = useSelector((state: State) => state.database);
-  const LABELS = ['savings', 'spending'];
+  const LABELS = ['savings', 'spending', 'all'] as const;
   type Labels = keyof typeof LABELS;
 
   type ChartData = {
     id: Labels;
     data: { x: string; y: number }[];
+    color?: string;
   };
   const [darkMode] = useAtom(darkModeAtom);
-  const [selectedIds, setSelectedIds] = useState(LABELS);
+  const [selectedId, setSelectedId] = useState<Labels | 'all'>('all');
   const overallSavings = useLiveQuery(async () => {
     const paydays = [
       ...(
@@ -98,13 +99,18 @@ export default () => {
       {
         id: 'savings',
         data: savingsData,
+        color: '#128795',
       },
       {
         id: 'spending',
         data: spendingData,
+        color: '#fa0690',
       },
-    ].filter((val) => selectedIds.includes(val.id)) as ChartData[];
-  }, [selectedIds]);
+    ].filter((val) => {
+      if (selectedId === 'all') return true;
+      return val.id === selectedId;
+    }) as ChartData[];
+  }, [selectedId]);
 
   return (overallSavings || []).length === 0 ? (
     <></>
@@ -126,7 +132,7 @@ export default () => {
             ticks: { text: { fill: darkMode ? '#939393' : '#000' } },
           },
         }}
-        colors={{ scheme: 'category10' }}
+        colors={(d) => d.color}
         yFormat=" >-.2f"
         pointSize={10}
         pointColor={{ theme: 'background' }}
@@ -143,37 +149,17 @@ export default () => {
           </FunkyTooltip>
         )}
       />
-      <Grid container direction="row" spacing={1}>
-        <Grid item xs={5}>
-          <Button
-            variant="outlined"
-            fullWidth
-            onClick={() => setSelectedIds(['savings'])}
-          >
-            savings
-          </Button>
-        </Grid>
-        <Grid item xs={5}>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="warning"
-            onClick={() => setSelectedIds(['spending'])}
-          >
-            spending
-          </Button>
-        </Grid>
-        <Grid item xs={2}>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="error"
-            onClick={() => setSelectedIds(LABELS)}
-          >
-            all
-          </Button>
-        </Grid>
-      </Grid>
+      <ToggleButtonGroup
+        exclusive
+        value={selectedId}
+        onChange={(_e, val) => setSelectedId(val as Labels)}
+      >
+        {LABELS.map((val) => (
+          <ToggleButton size="small" value={val}>
+            {val}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
     </Box>
   );
 };
