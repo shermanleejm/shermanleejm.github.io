@@ -345,7 +345,7 @@ export default () => {
         ))}
       </ToggleButtonGroup>
 
-      <div style={{ fontSize: '0.8rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+      <Box style={{ fontSize: '0.8rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
         {selectedId === 'spending' && (
           <ToggleButtonGroup
             value={categoryIds}
@@ -358,9 +358,9 @@ export default () => {
             ))}
           </ToggleButtonGroup>
         )}
-      </div>
+      </Box>
 
-      <div style={{ fontSize: '0.8rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+      <Box sx={{ fontSize: '0.8rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
         {subNames && subNames.length > 0 && (
           <ToggleButtonGroup value={nameIds} onChange={(e, names) => setNameIds(names)}>
             {subNames?.map((name) => (
@@ -370,7 +370,7 @@ export default () => {
             ))}
           </ToggleButtonGroup>
         )}
-      </div>
+      </Box>
     </Box>
   );
 };
