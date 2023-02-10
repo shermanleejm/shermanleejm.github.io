@@ -1,5 +1,5 @@
 import { Grid } from '@mui/material';
-import OverallMonthlyChart from '@/components/ExpenditureTracker/Insights/OverallMonthlyChart';
+import OverallMonthlyChart from '@/components/ExpenditureTracker/Insights/CurrentMonthSpendingChart';
 import ListItems from '@/components/ExpenditureTracker/Insights/LineItems';
 import WeeklySpendingChart from '@/components/ExpenditureTracker/Insights/WeeklySpendingChart';
 import OverallSavings from '@/components/ExpenditureTracker/Insights/OverallSavings';
@@ -38,7 +38,6 @@ export type ChartData = {
 
 export const chartContainerStyle = {
   m: 4,
-  mb: 6,
   height: '40vh',
   width: '80vw',
   textAlign: 'center',

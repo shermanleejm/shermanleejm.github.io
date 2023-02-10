@@ -77,7 +77,7 @@ export default () => {
     <></>
   ) : (
     <Box sx={chartContainerStyle}>
-      <Typography variant="h6">Overall Monthly Spending</Typography>
+      <Typography variant="h6">Current Month's Spending</Typography>
       <ResponsiveSunburst
         data={data}
         margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
