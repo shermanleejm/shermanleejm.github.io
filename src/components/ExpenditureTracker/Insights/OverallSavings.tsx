@@ -12,9 +12,7 @@ import {
 import { State } from '@/state/reducers';
 import {
   Box,
-  Grid,
   MenuItem,
-  Select,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -104,17 +102,33 @@ function dateChunker(dates: number[], keys: string[], _all: ExpenditureTableType
           if (!(k in res)) {
             res[k] = [];
           }
-          const _chunk = chunk.filter(
-            (v) => v.category === k && negativeTypes.includes(v.txn_type)
-          );
-          // if (_chunk.length < 1) break;
-          res[k].push({
-            x: _month,
-            y: round(
-              _chunk.reduce((total, curr) => total + Number(curr.amount), 0),
-              2
-            ),
-          });
+          let _chunk: ExpenditureTableType[] = [];
+          if (k.includes('/')) {
+            _chunk = chunk.filter(
+              (v) =>
+                v.name.toLowerCase() === k.substring(1) &&
+                negativeTypes.includes(v.txn_type)
+            );
+            res[k].push({
+              x: _month,
+              y: round(
+                _chunk.reduce((total, curr) => total + Number(curr.amount), 0),
+                2
+              ),
+            });
+          } else {
+            _chunk = chunk.filter(
+              (v) => v.category === k && negativeTypes.includes(v.txn_type)
+            );
+            res[k].push({
+              x: _month,
+              y: round(
+                _chunk.reduce((total, curr) => total + Number(curr.amount), 0),
+                2
+              ),
+            });
+          }
+
           break;
       }
     });
@@ -144,7 +158,8 @@ export default () => {
   };
   const [darkMode] = useAtom(darkModeAtom);
   const [selectedId, setSelectedId] = useState<string>('all');
-  const [categoryIds, setSpendingIds] = useState<string[]>(() => []);
+  const [categoryIds, setCategoryIds] = useState<string[]>(() => []);
+  const [nameIds, setNameIds] = useState<string[]>(() => []);
   const [data, setData] = useState<ChartData[]>();
   const [selectedMonth, setSelectedMonth] = useState(6);
 
@@ -167,9 +182,17 @@ export default () => {
 
     const _names = uniq((await db.expenditure.toArray()).map((val) => val.category));
 
+    const _subKeys = uniq(
+      (await db.expenditure.toArray()).map((val) => `/${val.name.toLowerCase()}`)
+    );
+
     const _all = sortBy([...allExpenditure, ...allRecurring], ['datetime']);
 
-    const res = dateChunker(paydays, ['spending', 'savings'].concat(_names), _all);
+    const res = dateChunker(
+      paydays,
+      ['spending', 'savings'].concat(_names).concat(_subKeys),
+      _all
+    );
 
     return res;
   }, [selectedMonth]);
@@ -197,6 +220,34 @@ export default () => {
       .map((val) => val.name);
   });
 
+  const subNames = useLiveQuery(async () => {
+    return uniq(
+      (await db.expenditure.toArray())
+        .filter(
+          (val) =>
+            negativeTypes.includes(val.txn_type) && categoryIds.includes(val.category)
+        )
+        .reduce((total, val) => {
+          let tmp = total;
+          let item = total.find((v) => v.name === val.name);
+
+          if (item === undefined) {
+            tmp.push({
+              name: val.name,
+              count: Number(val.amount),
+            });
+          } else {
+            let index = total.indexOf(item);
+            tmp[index] = { ...item, count: item.count + Number(val.amount) };
+          }
+
+          return total;
+        }, [] as { name: string; count: number }[])
+        .sort((a, b) => b.count - a.count)
+        .map((val) => `/${val.name.toLowerCase()}`)
+    );
+  }, [categoryIds]);
+
   const elapsedMonths = useLiveQuery(async () => {
     const _min = (await db.expenditure.orderBy('datetime').first())?.datetime;
     const _max = (await db.expenditure.orderBy('datetime').last())?.datetime;
@@ -212,13 +263,14 @@ export default () => {
             return BASE_LABELS.includes(val.id);
           case 'spending':
             if (categoryIds.length === 0) return val.id === 'spending';
-            return categoryIds.includes(val.id);
+            if (nameIds.length === 0) return categoryIds.includes(val.id);
+            return nameIds.includes(val.id);
           default:
             return val.id === selectedId;
         }
       }) as ChartData[]
     );
-  }, [selectedId, overallSavings, categoryIds]);
+  }, [selectedId, overallSavings, categoryIds, nameIds]);
 
   return (overallSavings || []).length === 0 ? (
     <></>
@@ -280,7 +332,7 @@ export default () => {
         exclusive
         value={selectedId}
         onChange={(_e, val) => {
-          setSpendingIds([]);
+          setCategoryIds([]);
           if (val !== null) {
             setSelectedId(val);
           }
@@ -297,11 +349,23 @@ export default () => {
         {selectedId === 'spending' && (
           <ToggleButtonGroup
             value={categoryIds}
-            onChange={(e, _categoryIds) => setSpendingIds(_categoryIds)}
+            onChange={(e, _categoryIds) => setCategoryIds(_categoryIds)}
           >
             {names?.map((name) => (
               <ToggleButton size="small" value={name}>
                 {name}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        )}
+      </div>
+
+      <div style={{ fontSize: '0.8rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+        {subNames && subNames.length > 0 && (
+          <ToggleButtonGroup value={nameIds} onChange={(e, names) => setNameIds(names)}>
+            {subNames?.map((name) => (
+              <ToggleButton size="small" value={name}>
+                {name.substring(1)}
               </ToggleButton>
             ))}
           </ToggleButtonGroup>
