@@ -49,7 +49,6 @@ export const FunkyTooltip: FC = ({ children }) => {
     <Box
       sx={{
         backgroundColor: darkMode ? '#000' : '#fff',
-        color: darkMode ? '#fff' : '#000',
         padding: '5px 10px 5px 10px',
         borderRadius: '25px',
       }}

@@ -319,7 +319,7 @@ export default () => {
           useMesh={true}
           tooltip={(e) => (
             <FunkyTooltip>
-              <Typography>{e.point.serieId}</Typography>
+              <Typography>{(e.point.serieId as string).replace('/', '')}</Typography>
               <Typography>
                 {e.point.data.x}: {e.point.data.y}
               </Typography>
@@ -339,7 +339,7 @@ export default () => {
         }}
       >
         {BASE_LABELS.concat('all').map((val) => (
-          <ToggleButton size="small" value={val}>
+          <ToggleButton size="small" value={val} color="primary">
             {val}
           </ToggleButton>
         ))}
@@ -350,6 +350,7 @@ export default () => {
           <ToggleButtonGroup
             value={categoryIds}
             onChange={(e, _categoryIds) => setCategoryIds(_categoryIds)}
+            color="primary"
           >
             {names?.map((name) => (
               <ToggleButton size="small" value={name}>
@@ -362,7 +363,11 @@ export default () => {
 
       <Box sx={{ fontSize: '0.8rem', overflowX: 'auto', whiteSpace: 'nowrap' }}>
         {subNames && subNames.length > 0 && (
-          <ToggleButtonGroup value={nameIds} onChange={(e, names) => setNameIds(names)}>
+          <ToggleButtonGroup
+            value={nameIds}
+            onChange={(e, names) => setNameIds(names)}
+            color="primary"
+          >
             {subNames?.map((name) => (
               <ToggleButton size="small" value={name}>
                 {name.substring(1)}
