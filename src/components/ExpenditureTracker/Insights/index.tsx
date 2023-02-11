@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import OverallMonthlyChart from '@/components/ExpenditureTracker/Insights/CurrentMonthSpendingChart';
 import ListItems from '@/components/ExpenditureTracker/Insights/LineItems';
 import WeeklySpendingChart from '@/components/ExpenditureTracker/Insights/WeeklySpendingChart';
@@ -46,8 +46,8 @@ export const chartContainerStyle = {
 export const FunkyTooltip: FC = ({ children }) => {
   const [darkMode] = useAtom(darkModeAtom);
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         backgroundColor: darkMode ? '#000' : '#fff',
         color: darkMode ? '#fff' : '#000',
         padding: '5px 10px 5px 10px',
@@ -55,6 +55,6 @@ export const FunkyTooltip: FC = ({ children }) => {
       }}
     >
       {children}
-    </div>
+    </Box>
   );
 };
