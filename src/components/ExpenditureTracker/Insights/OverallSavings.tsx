@@ -283,7 +283,7 @@ export default () => {
         label="Last number of months"
         select
         fullWidth
-        sx={{ color: darkMode ? 'white' : 'black', mt: 2, mb: 2 }}
+        sx={{ mt: 2, mb: 2 }}
         onChange={(e) => setSelectedMonth(Number(e.target.value))}
       >
         {Array.from({ length: elapsedMonths || 12 }, (_, i) => i + 1).map((i) => (
@@ -339,42 +339,45 @@ export default () => {
         }}
       >
         {BASE_LABELS.concat('all').map((val) => (
-          <ToggleButton size="small" value={val} color="primary">
+          <ToggleButton size="small" value={val}>
             {val}
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
 
-      <Box style={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-        {names !== undefined && selectedId === 'spending' && (
-          <ToggleButtonGroup
-            value={categoryIds}
-            onChange={(e, _categoryIds) => setCategoryIds(_categoryIds)}
-            color="primary"
-          >
-            {names?.map((name) => (
-              <ToggleButton size="small" value={name}>
+      <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
+        <ToggleButtonGroup
+          value={categoryIds}
+          onChange={(e, _categoryIds) => setCategoryIds(_categoryIds)}
+        >
+          {names !== undefined &&
+            selectedId === 'spending' &&
+            names?.map((name) => (
+              <ToggleButton
+                size="small"
+                value={name}
+                sx={{ color: darkMode ? 'lightgrey' : 'black' }}
+              >
                 {name}
               </ToggleButton>
             ))}
-          </ToggleButtonGroup>
-        )}
+        </ToggleButtonGroup>
       </Box>
 
       <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap' }}>
-        {subNames !== undefined && subNames.length > 0 && (
-          <ToggleButtonGroup
-            value={nameIds}
-            onChange={(e, names) => setNameIds(names)}
-            color="primary"
-          >
-            {subNames?.map((name) => (
-              <ToggleButton size="small" value={name}>
+        <ToggleButtonGroup value={nameIds} onChange={(e, names) => setNameIds(names)}>
+          {subNames !== undefined &&
+            subNames.length > 0 &&
+            subNames?.map((name) => (
+              <ToggleButton
+                size="small"
+                value={name}
+                sx={{ color: darkMode ? 'lightgrey' : 'black' }}
+              >
                 {name.substring(1)}
               </ToggleButton>
             ))}
-          </ToggleButtonGroup>
-        )}
+        </ToggleButtonGroup>
       </Box>
     </Box>
   );
