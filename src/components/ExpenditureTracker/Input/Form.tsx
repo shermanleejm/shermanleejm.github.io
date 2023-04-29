@@ -247,6 +247,7 @@ export default () => {
       >
         <Grid item>
           <Autocomplete
+            size="small"
             clearOnEscape
             freeSolo
             autoSelect
@@ -260,6 +261,7 @@ export default () => {
         </Grid>
         <Grid item>
           <Autocomplete
+            size="small"
             clearOnEscape
             freeSolo
             autoSelect
@@ -274,6 +276,7 @@ export default () => {
         </Grid>
         <Grid item>
           <TextField
+            size="small"
             label={'Name'}
             sx={{ width: '80vw' }}
             value={form[FormCategories.name]}
@@ -299,6 +302,7 @@ export default () => {
         </Grid>
         <Grid item>
           <NumberFormat
+            size="small"
             style={{ width: '80vw' }}
             value={form[FormCategories.amount]}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -327,7 +331,9 @@ export default () => {
                   newDate === null ? null : newDate.unix()
                 )
               }
-              renderInput={(params) => <TextField sx={{ width: '80vw' }} {...params} />}
+              renderInput={(params) => (
+                <TextField size="small" sx={{ width: '80vw' }} {...params} />
+              )}
             />
           </LocalizationProvider>
         </Grid>

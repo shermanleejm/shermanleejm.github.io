@@ -117,7 +117,7 @@ const BigNumbers = () => {
         alignItems={'center'}
         direction={'row'}
         style={{ textAlign: 'center' }}
-        spacing={2}
+        spacing={1}
         onClick={() => setShowBigNumbers(!showBigNumbers)}
       >
         <Grid item xs={6} md={3}>
