@@ -30,7 +30,7 @@ export const getExpenditureTableData = async () => {
 export const getBigNumbersData = async (startDate: number, endDate: number) => {
   const wholeEx = await db.expenditure.toArray();
   const currentMonth = wholeEx.filter(
-    (ex) => ex.datetime >= startDate && ex.datetime < endDate
+    (ex) => ex.datetime >= startDate && ex.datetime <= endDate
   );
 
   let saving = currentMonth.reduce(

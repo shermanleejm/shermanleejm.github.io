@@ -34,6 +34,9 @@ export function getDateNumbers() {
   const startDate = paydays[totalMonths - monthOffset - 1]?.datetime ?? minDate;
   const endDate =
     monthOffset === 0 ? dayjs().unix() : paydays[totalMonths - monthOffset]?.datetime;
+  // const today = dayjs().subtract(totalMonths - monthOffset, 'month');
+  // const startDate = today.startOf('month').unix();
+  // const endDate = today.endOf('month').unix();
 
   return { minDate, totalMonths, paydays, startDate, endDate };
 }

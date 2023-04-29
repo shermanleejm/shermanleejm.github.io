@@ -9,13 +9,16 @@ import {
   chartContainerStyle,
   FunkyTooltip,
 } from '@/components/ExpenditureTracker/Insights';
+import { darkModeAtom } from '@/App';
+import { useAtom } from 'jotai';
 
 export default function CreditCard() {
   const { startDate, endDate } = getDateNumbers();
+  const [darkMode] = useAtom(darkModeAtom);
   const data = useLiveQuery(async () => {
     const currentMonth = await db.expenditure
       .where(FormCategories.datetime)
-      .between(startDate, endDate || Infinity, true, false)
+      .between(startDate, endDate || Infinity, true, true)
       .toArray();
 
     const currentMonthRecurring = calculateRecurring(
@@ -51,6 +54,18 @@ export default function CreditCard() {
           <FunkyTooltip>{`${e.id} $${e.value.toLocaleString()}`}</FunkyTooltip>
         )}
         margin={{ top: 10, right: 10, bottom: 40, left: 40 }}
+        theme={{
+          axis: {
+            legend: { text: { fill: darkMode ? '#939393' : '#000' } },
+            ticks: { text: { fill: darkMode ? '#939393' : '#000' } },
+          },
+          labels: {
+            text: {
+              fill: darkMode ? '#fff' : '#000',
+              textShadow: `1px 1px ${darkMode ? 'black' : 'white'}`,
+            },
+          },
+        }}
       />
     </Box>
   );

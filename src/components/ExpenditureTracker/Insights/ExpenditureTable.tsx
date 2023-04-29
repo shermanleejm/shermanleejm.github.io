@@ -16,7 +16,7 @@ import { sortBy } from 'lodash';
 const ExpenditureTable = () => {
   const db = useSelector((state: State) => state.database);
   const tableWidth = '90vw';
-  const [tableHeight, setTableHeight] = useState(220);
+  const [tableHeight, setTableHeight] = useState(400);
   const [easterEggCounter, setEasterEggCounter] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<string>('');
 
