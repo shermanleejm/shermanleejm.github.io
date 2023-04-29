@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, Typography } from '@mui/material';
+import { Button, Chip, Grid, IconButton, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
@@ -61,7 +61,26 @@ const ExpenditureTable = () => {
         return `${dayjs.unix(params.row.datetime).format('YYYY MMM DD')}`;
       },
     },
-    { field: 'category', editable: true },
+    {
+      field: 'category',
+      editable: true,
+      renderCell: (params: any) => {
+        let chips: string[] = [];
+        try {
+          chips = JSON.parse(params.row.category);
+        } catch (e) {
+          console.error(e);
+        }
+        return (
+          <>
+            {chips.map((c) => (
+              <Chip label={c} />
+            ))}
+          </>
+        );
+      },
+    },
+    { field: 'credit_card' },
     { field: 'name', editable: true },
     { field: 'amount', editable: true },
     {

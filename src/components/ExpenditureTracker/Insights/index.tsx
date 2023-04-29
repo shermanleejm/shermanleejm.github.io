@@ -1,26 +1,22 @@
 import { Box, Grid } from '@mui/material';
-import OverallMonthlyChart from '@/components/ExpenditureTracker/Insights/CurrentMonthSpendingChart';
-import ListItems from '@/components/ExpenditureTracker/Insights/LineItems';
-import WeeklySpendingChart from '@/components/ExpenditureTracker/Insights/WeeklySpendingChart';
 import OverallSavings from '@/components/ExpenditureTracker/Insights/OverallSavings';
 import { FC } from 'react';
 import { useAtom } from 'jotai';
 import { darkModeAtom } from '@/App';
+import CreditCard from '@/components/ExpenditureTracker/Insights/CreditCard';
+import ExpenditureTable from '@/components/ExpenditureTracker/Insights/ExpenditureTable';
 
 export default () => {
   return (
     <Grid container justifyContent="center" alignItems="center" direction="column">
       <Grid item>
+        <CreditCard />
+      </Grid>
+      <Grid item>
         <OverallSavings />
       </Grid>
       <Grid item>
-        <WeeklySpendingChart />
-      </Grid>
-      <Grid item>
-        <OverallMonthlyChart />
-      </Grid>
-      <Grid item>
-        <ListItems />
+        <ExpenditureTable />
       </Grid>
     </Grid>
   );

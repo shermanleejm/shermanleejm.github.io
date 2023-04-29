@@ -29,11 +29,12 @@ import { useAtom } from 'jotai';
 import { toasterAtom } from '@/components/ExpenditureTracker/Toaster';
 
 const emptyForm = {
-  [FormCategories.category]: '',
+  [FormCategories.category]: [],
   [FormCategories.name]: '',
   [FormCategories.amount]: '',
   [FormCategories.datetime]: dayjs().unix(),
   [FormCategories.transactionType]: TransactionTypes.CREDIT,
+  [FormCategories.creditCard]: '',
 };
 
 const RECURRENCE_TYPES = {
@@ -46,17 +47,30 @@ export type RecurrenceTypes = keyof typeof RECURRENCE_TYPES;
 export default () => {
   const db = useSelector((state: State) => state.database);
   const [, setToaster] = useAtom(toasterAtom);
-  const existingCategories = useLiveQuery(async () => {
+  const existing = useLiveQuery(async () => {
+    const allExpenditure = await db.expenditure.toArray();
+    const allRecurring = await db.recurring.toArray();
     // TODO: sort by popularity
-    const categories = (await db.expenditure.toArray()).map(
-      (val) => val[FormCategories.category]
+    const categories = allExpenditure.reduce(
+      (a, b) => [...a, ...JSON.parse(b[FormCategories.category])],
+      [] as string[]
     );
 
-    const recurringCategories = (await db.recurring.toArray()).map((re) => re.name);
+    const recurringCategories = allRecurring.reduce(
+      (a, b) => [...a, b.name],
+      [] as string[]
+    );
 
-    return [...uniq(categories), ...uniq(recurringCategories)];
+    const creditCards = allExpenditure.map((val) => val[FormCategories.creditCard]);
+
+    const recurringCreditCards = allRecurring.map((a) => a.credit_card);
+
+    return {
+      categories: uniq([...categories, ...recurringCategories]),
+      creditCards: uniq([...creditCards, ...recurringCreditCards]),
+    };
   });
-  const [form, setForm] = useState<ExpenditureTableType>(emptyForm);
+  const [form, setForm] = useState(emptyForm);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [chosenRecurrence, setChosenRecurrence] = useState<RecurrenceTypes>('monthly');
 
@@ -67,10 +81,11 @@ export default () => {
     });
   }
 
-  async function handleSubmit(type: TransactionTypes) {
+  function handleSubmit(type: TransactionTypes) {
     let isFilled = !Object.values(form).some(
       (x) => x === '' || x === null || x === undefined
     );
+
     if (!isFilled) {
       setToaster({
         show: false,
@@ -79,6 +94,8 @@ export default () => {
       });
       return;
     }
+
+    const categoryString = JSON.stringify(form.category);
 
     if (type === TransactionTypes.RECURRING) {
       if (showRecurringModal === false) {
@@ -105,13 +122,15 @@ export default () => {
           cron = `${chosenRecurrence} ${inputDate.day()}`;
           break;
       }
+
       db.recurring
         .add({
           name: form.name,
-          amount: form.amount as number,
+          amount: parseFloat(form.amount),
           cron: cron,
           start: form.datetime,
-          category: form.category,
+          category: categoryString,
+          credit_card: form.credit_card,
         })
         .then(() => {
           setToaster({ message: 'Recorded!', severity: 'success', show: true });
@@ -120,8 +139,8 @@ export default () => {
       return;
     }
 
-    await db.expenditure
-      .add({ ...form, [FormCategories.transactionType]: type })
+    db.expenditure
+      .add({ ...form, category: categoryString, [FormCategories.transactionType]: type })
       .then(() => {
         setToaster({ message: 'Recorded!', severity: 'success', show: true });
         setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
@@ -232,7 +251,21 @@ export default () => {
             freeSolo
             autoSelect
             autoComplete
-            options={existingCategories || []}
+            options={existing?.creditCards || []}
+            sx={{ width: '80vw' }}
+            value={form[FormCategories.creditCard]}
+            onChange={(e, val) => updateForm(FormCategories.creditCard, val)}
+            renderInput={(params) => <TextField {...params} label="Source" />}
+          />
+        </Grid>
+        <Grid item>
+          <Autocomplete
+            clearOnEscape
+            freeSolo
+            autoSelect
+            autoComplete
+            multiple
+            options={existing?.categories || []}
             sx={{ width: '80vw' }}
             value={form[FormCategories.category]}
             onChange={(e, val) => updateForm(FormCategories.category, val)}
@@ -284,7 +317,8 @@ export default () => {
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              inputFormat="DD MMM YYYY"
+              inputFormat="DD/MM/YYYY"
+              mask="__/__/____"
               label="Date"
               value={dayjs.unix(form[FormCategories.datetime])}
               onChange={(newDate: Dayjs | null) =>

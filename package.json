@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
+    "@handsontable/react": "^12.3.3",
     "@mui/icons-material": "^5.2.5",
     "@mui/material": "^5.2.6",
     "@mui/styles": "^5.2.3",
@@ -23,6 +24,7 @@
     "dexie-export-import": "^1.0.3",
     "dexie-react-hooks": "^1.1.1",
     "downloadjs": "^1.4.7",
+    "handsontable": "^12.3.3",
     "jotai": "^1.11.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.3",

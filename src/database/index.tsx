@@ -76,6 +76,7 @@ export enum FormCategories {
   amount = 'amount',
   datetime = 'datetime',
   transactionType = 'txn_type',
+  creditCard = 'credit_card',
 }
 
 export enum TransactionTypes {
@@ -95,6 +96,7 @@ export const ExpenditureTableColumns = [
   'amount',
   'datetime',
   'txn_type',
+  'credit_card',
 ];
 export interface ExpenditureTableType {
   id?: number;
@@ -103,6 +105,7 @@ export interface ExpenditureTableType {
   [FormCategories.amount]: string | number;
   [FormCategories.datetime]: number;
   [FormCategories.transactionType]: TransactionTypes;
+  [FormCategories.creditCard]: string;
 }
 
 export const RecurringTableColumns = [
@@ -111,6 +114,7 @@ export const RecurringTableColumns = [
   'amount',
   'cron', // * * * * * --> minute hour day month weekday
   'start',
+  'credit_card',
 ];
 export interface RecurringTableType {
   id?: number;
@@ -119,6 +123,7 @@ export interface RecurringTableType {
   amount: number;
   cron: string;
   start: number;
+  [FormCategories.creditCard]: string;
 }
 
 export const GoalsTableColumns = ['id', 'name', 'startDate', 'endDate', 'amount'];
@@ -139,7 +144,7 @@ export class MTGDatabase extends Dexie {
 
   public constructor() {
     super('mtgdb');
-    this.version(8).stores({
+    this.version(12).stores({
       cards: `++${CardsTableColumns.join(',')}`,
       decks: `++${DecksTableColumns.join(',')}`,
       expenditure: `++${ExpenditureTableColumns.join(',')}`,
@@ -148,3 +153,5 @@ export class MTGDatabase extends Dexie {
     });
   }
 }
+
+export const db = new MTGDatabase();
