@@ -66,8 +66,12 @@ export default () => {
     const recurringCreditCards = allRecurring.map((a) => a.credit_card);
 
     return {
-      categories: uniq([...categories, ...recurringCategories]),
-      creditCards: uniq([...creditCards, ...recurringCreditCards]),
+      categories: uniq([...categories, ...recurringCategories]).filter(
+        (val) => val !== undefined
+      ),
+      creditCards: uniq([...creditCards, ...recurringCreditCards]).filter(
+        (val) => val !== undefined
+      ),
     };
   });
   const [form, setForm] = useState(emptyForm);
