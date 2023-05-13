@@ -5,6 +5,7 @@ import Toaster from '@/components/ExpenditureTracker/Toaster';
 import { Box, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 import Toolbar from './Toolbar';
+import 'dayjs/locale/en-sg';
 
 const ExpenditureTabs = [
   {
@@ -22,7 +23,7 @@ const ExpenditureTabs = [
 ];
 
 export default () => {
-  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);
+  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[2].name);
 
   return (
     <Box

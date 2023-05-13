@@ -11,7 +11,7 @@
     "@mui/styles": "^5.2.3",
     "@mui/system": "^5.10.7",
     "@mui/x-data-grid": "^5.2.2",
-    "@mui/x-date-pickers": "^5.0.0-beta.2",
+    "@mui/x-date-pickers": "^6.0.0",
     "@nivo/bar": "0.80.0",
     "@nivo/core": "0.80.0",
     "@nivo/line": "0.80.0",

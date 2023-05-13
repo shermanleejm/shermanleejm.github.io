@@ -323,10 +323,8 @@ export default () => {
           />
         </Grid>
         <Grid item>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-sg'}>
             <DatePicker
-              inputFormat="DD/MM/YYYY"
-              mask="__/__/____"
               label="Date"
               value={dayjs.unix(form[FormCategories.datetime])}
               onChange={(newDate: Dayjs | null) =>
@@ -335,9 +333,7 @@ export default () => {
                   newDate === null ? null : newDate.unix()
                 )
               }
-              renderInput={(params) => (
-                <TextField size="small" sx={{ width: '80vw' }} {...params} />
-              )}
+              sx={{ width: '80vw' }}
             />
           </LocalizationProvider>
         </Grid>
