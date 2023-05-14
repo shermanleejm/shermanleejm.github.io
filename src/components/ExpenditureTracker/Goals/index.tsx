@@ -1,5 +1,5 @@
 import { State } from '@/state/reducers';
-import { Grid } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
@@ -101,9 +101,11 @@ export default () => {
     return (
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-sg">
         <DatePicker
+          inputFormat="DD MMM YYYY"
           label={label}
           onChange={(val) => reducer({ type: dataKey, payload: val })}
           value={dayjs(value)}
+          renderInput={(params) => <TextField {...params} />}
         />
       </LocalizationProvider>
     );

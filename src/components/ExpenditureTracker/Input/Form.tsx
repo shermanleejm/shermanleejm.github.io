@@ -333,7 +333,7 @@ export default () => {
                   newDate === null ? null : newDate.unix()
                 )
               }
-              sx={{ width: '80vw' }}
+              renderInput={(params) => <TextField sx={{ width: '80vw' }} {...params} />}
             />
           </LocalizationProvider>
         </Grid>
