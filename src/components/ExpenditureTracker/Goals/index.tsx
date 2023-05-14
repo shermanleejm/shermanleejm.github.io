@@ -8,10 +8,11 @@ import 'handsontable/dist/handsontable.full.min.css';
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react';
 import HyperFormula from 'hyperformula';
-import { cloneDeep, concat, debounce } from 'lodash';
+import { cloneDeep, concat } from 'lodash';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import { Box } from '@mui/system';
+import Handsontable from 'handsontable';
 
 registerAllModules();
 
