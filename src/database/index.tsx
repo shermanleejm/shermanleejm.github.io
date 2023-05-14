@@ -106,6 +106,7 @@ export interface ExpenditureTableType {
   [FormCategories.datetime]: number;
   [FormCategories.transactionType]: TransactionTypes;
   [FormCategories.creditCard]: string;
+  [FormCategories.category]: string;
 }
 
 export const RecurringTableColumns = [

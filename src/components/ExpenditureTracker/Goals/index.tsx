@@ -12,7 +12,10 @@ import { cloneDeep, concat } from 'lodash';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import { Box } from '@mui/system';
-import Handsontable from 'handsontable';
+import { ReactNode, useEffect } from 'react';
+import { CellMeta, CellProperties } from 'handsontable/settings';
+import Core from 'handsontable/core';
+import { textRenderer } from 'handsontable/renderers';
 
 registerAllModules();
 
@@ -36,6 +39,12 @@ export default () => {
   const db = useSelector((state: State) => state.database);
   const [data, setData] = useAtom(dataAtom);
 
+  useEffect(() => {
+    if (data.total.length > 1) {
+      setData({ ...data, total: initialData.total });
+    }
+  }, []);
+
   return (
     <Grid
       container
@@ -43,32 +52,33 @@ export default () => {
       justifyContent="center"
       alignItems="center"
       sx={{ width: '90vw' }}
-      spacing={2}
+      spacing={1}
     >
-      <Grid item lg={6}>
+      <Grid item xs={6}>
         <BasicDatePicker value={data.startDate} label="Start Date" dataKey="startDate" />
       </Grid>
-      <Grid item lg={6}>
+      <Grid item xs={6}>
         <BasicDatePicker value={data.endDate} label="End Date" dataKey="endDate" />
       </Grid>
-      <Grid item lg={12}>
-        <Box sx={{ width: '90vw' }}>
-          <CustomHotTable
-            data={data.expenditure}
-            reducerKey="expenditure"
-            updateData={reducer}
-          />
-        </Box>
+      <Grid item xs={12}>
+        <CustomHotTable
+          data={data.expenditure}
+          reducerKey="expenditure"
+          updateData={reducer}
+        />
       </Grid>
-      <Grid item lg={12}>
-        <Box sx={{ width: '90vw' }}>
-          <CustomHotTable data={data.income} reducerKey="income" updateData={reducer} />
-        </Box>
+      <Grid item xs={12}>
+        <CustomHotTable data={data.income} reducerKey="income" updateData={reducer} />
       </Grid>
-      <Grid item lg={12}>
-        <Box sx={{ width: '90vw' }}>
-          <CustomHotTable data={data.total} reducerKey="total" updateData={reducer} />
-        </Box>
+      <Grid item xs={12}>
+        <CustomHotTable
+          data={data.total}
+          reducerKey="total"
+          updateData={reducer}
+          minSpareRows={0}
+          rowHeaders={false}
+          readOnly={true}
+        />
       </Grid>
     </Grid>
   );
@@ -99,13 +109,13 @@ export default () => {
     value: string;
   }) {
     return (
-      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-sg">
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
           inputFormat="DD MMM YYYY"
           label={label}
           onChange={(val) => reducer({ type: dataKey, payload: val })}
           value={dayjs(value)}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => <TextField fullWidth {...params} />}
         />
       </LocalizationProvider>
     );
@@ -115,41 +125,82 @@ export default () => {
     reducerKey,
     data,
     updateData,
+    minSpareRows = 1,
+    rowHeaders = true,
+    readOnly = false,
   }: {
     reducerKey: InitialDataKey;
     data: any[][];
     updateData: typeof reducer;
+    minSpareRows?: number;
+    rowHeaders?: boolean;
+    readOnly?: boolean;
   }) {
+    function firstRowRenderer(
+      instance: Core,
+      td: HTMLTableCellElement,
+      row: number,
+      col: number,
+      prop: string | number,
+      value: any,
+      cellProperties: CellProperties
+    ) {
+      // @ts-ignore
+      textRenderer.apply(this, arguments);
+      td.style.fontWeight = 'bold';
+      td.style.color = (() => {
+        switch (reducerKey) {
+          case 'expenditure':
+            return 'red';
+          case 'income':
+            return 'green';
+          case 'total':
+          default:
+            return 'black';
+        }
+      })();
+      td.style.textAlign = 'center';
+    }
     return (
-      <HotTable
-        stretchH="all"
-        width="100%"
-        data={data}
-        rowHeaders
-        minSpareRows={1}
-        licenseKey="non-commercial-and-evaluation"
-        formulas={{
-          engine: hyperformulaInstance,
-          // @ts-ignore
-          sheetName: reducerKey,
-        }}
-        beforeChange={(changes) => {
-          let tmp = cloneDeep(data);
-          changes.forEach((change) => {
-            if (change === null) return;
-            const [row, col, oldVal, newVal] = change;
-            console.log({ row, col, oldVal, newVal });
-            if (row > data.length) {
-              concat(tmp, new Array(data.length - row).fill(''));
+      <Box sx={{ width: '90vw' }}>
+        <HotTable
+          stretchH="all"
+          width="100%"
+          data={data}
+          rowHeaders={rowHeaders}
+          minSpareRows={minSpareRows}
+          readOnly={readOnly}
+          licenseKey="non-commercial-and-evaluation"
+          formulas={{
+            engine: hyperformulaInstance,
+            // @ts-ignore
+            sheetName: reducerKey,
+          }}
+          cells={(row, col) => {
+            const cellProperties: CellMeta = {};
+            if (row === 0) {
+              cellProperties.readOnly = true;
+              cellProperties.renderer = firstRowRenderer;
             }
-            if (typeof col === 'number') {
-              tmp[row][col] = newVal;
-            }
-          });
-
-          updateData({ type: reducerKey, payload: tmp });
-        }}
-      />
+            return cellProperties;
+          }}
+          beforeChange={(changes) => {
+            let tmp = cloneDeep(data);
+            changes.forEach((change) => {
+              if (change === null) return;
+              const [row, col, oldVal, newVal] = change;
+              console.log({ row, col, oldVal, newVal });
+              if (row > data.length) {
+                concat(tmp, new Array(data.length - row).fill(''));
+              }
+              if (typeof col === 'number') {
+                tmp[row][col] = newVal;
+              }
+            });
+            updateData({ type: reducerKey, payload: tmp });
+          }}
+        />
+      </Box>
     );
   }
 };
