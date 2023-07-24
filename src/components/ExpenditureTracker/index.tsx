@@ -22,8 +22,8 @@ const ExpenditureTabs = [
   },
 ];
 
-export default () => {
-  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[0].name);
+export default function ExpenditureTracker() {
+  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[1].name);
 
   return (
     <Box
@@ -56,4 +56,4 @@ export default () => {
       <Toaster />
     </Box>
   );
-};
+}

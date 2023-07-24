@@ -5,8 +5,9 @@ import { darkModeAtom } from '@/App';
 import CreditCard from '@/components/ExpenditureTracker/Insights/CreditCard';
 import ExpenditureTable from '@/components/ExpenditureTracker/Insights/ExpenditureTable';
 import OverallFiltering from '@/components/ExpenditureTracker/Insights/OverallFiltering';
+import CurrentMonth from '@/components/ExpenditureTracker/Insights/CurrentMonth';
 
-export default () => {
+export default function Insights() {
   return (
     <Grid
       container
@@ -19,6 +20,9 @@ export default () => {
         <CreditCard />
       </Grid>
       <Grid item>
+        <CurrentMonth />
+      </Grid>
+      <Grid item>
         <OverallFiltering />
       </Grid>
       <Grid item>
@@ -26,7 +30,7 @@ export default () => {
       </Grid>
     </Grid>
   );
-};
+}
 
 export type Inner = {
   name: string;

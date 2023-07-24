@@ -1,4 +1,4 @@
-import { Button, Chip, Grid, IconButton, Typography } from '@mui/material';
+import { Button, Grid, IconButton, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
@@ -13,7 +13,7 @@ import { downloadFile } from '@/components/Helpers';
 import { calculateRecurring } from '@/components/ExpenditureTracker/Input/BigNumbers';
 import { sortBy } from 'lodash';
 
-const ExpenditureTable = () => {
+export default function ExpenditureTable() {
   const db = useSelector((state: State) => state.database);
   const tableWidth = '90vw';
   const [tableHeight, setTableHeight] = useState(400);
@@ -64,21 +64,6 @@ const ExpenditureTable = () => {
     {
       field: 'category',
       editable: true,
-      renderCell: (params: any) => {
-        let chips: string[] = [];
-        try {
-          chips = JSON.parse(params.row.category);
-        } catch (e) {
-          console.error(e);
-        }
-        return (
-          <>
-            {chips.map((c) => (
-              <Chip label={c} />
-            ))}
-          </>
-        );
-      },
     },
     { field: 'credit_card' },
     { field: 'name', editable: true },
@@ -212,6 +197,4 @@ const ExpenditureTable = () => {
       )}
     </div>
   );
-};
-
-export default ExpenditureTable;
+}

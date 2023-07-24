@@ -1,168 +1,121 @@
-import {
-  Autocomplete,
-  Box,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from '@mui/material';
-import dayjs from 'dayjs';
-import _, { omit, uniq } from 'lodash';
-import { useEffect, useState } from 'react';
-import hash from 'object-hash';
-import {
-  DAYJS_FORMAT,
-  recalculateData,
-  STARTING_MONTHS,
-  useAllDB,
-} from '@/components/ExpenditureTracker/Insights/helper';
-import {
-  chartContainerStyle,
-  FunkyTooltip,
-} from '@/components/ExpenditureTracker/Insights';
-import { ResponsiveLine } from '@nivo/line';
 import { darkModeAtom } from '@/App';
-import { useAtom } from 'jotai';
+import {
+  FunkyTooltip,
+  chartContainerStyle,
+} from '@/components/ExpenditureTracker/Insights';
+import { ExpenditureTableType, FormCategories, TransactionTypes, db } from '@/database';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { ResponsiveLine } from '@nivo/line';
+import dayjs from 'dayjs';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { atom, useAtom } from 'jotai';
+import _ from 'lodash';
+import objectHash from 'object-hash';
 
-export default function () {
+const categoryFilters = atom<string[]>([]);
+
+export default function OverallFiltering() {
   const [darkMode] = useAtom(darkModeAtom);
-  const ALL_DB = useAllDB();
-  const ALL_TAGS = uniq(
-    ALL_DB.reduce((a, b) => [...a, ...JSON.parse(b.category)], [] as string[])
-  );
+  const [filters, updateFilters] = useAtom(categoryFilters);
+  const { data, tags } = useLiveQuery(async () => {
+    const currentRange = (
+      await db.expenditure
+        .where(FormCategories.datetime)
+        .between(dayjs().subtract(6, 'months').unix(), dayjs().unix(), true, true)
+        .toArray()
+    ).filter((row) => row.txn_type === TransactionTypes.CREDIT);
 
-  type DataType = {
-    data: any;
-    tags: string[];
-    dates: string[];
-    months: number;
-  };
-  const [state, setState] = useState<DataType>({
-    data: [],
-    tags: [],
-    dates: new Array(STARTING_MONTHS)
-      .fill('')
-      .map((_val, i) => dayjs().subtract(i, 'month').format(DAYJS_FORMAT))
-      .reverse(),
-    months: STARTING_MONTHS,
-  });
+    const tags = _(currentRange)
+      .countBy(FormCategories.category)
+      .toPairs()
+      .sortBy(1)
+      .reverse()
+      .map((row) => row[0])
+      .value();
 
-  function reducer({ type, payload }: { type: keyof DataType; payload: any }) {
-    const newState = (() => {
-      switch (type) {
-        case 'tags':
-          return {
-            ...state,
-            tags: payload,
-            data: recalculateData({ tags: payload, dates: state.dates, ALL_DB }),
-          };
-        case 'months':
-          const dates = new Array(payload)
-            .fill('')
-            .map((_val, i) => dayjs().subtract(i, 'month').format(DAYJS_FORMAT))
-            .reverse();
-          return {
-            ...state,
-            months: payload,
-            dates,
-            data: recalculateData({ tags: state.tags, dates, ALL_DB }),
-          };
-        default:
-          return state;
-      }
-    })();
+    const data = _(currentRange)
+      .filter((row) => filters.includes(row[FormCategories.category]))
+      .value();
 
-    setState(newState);
-  }
-
-  useEffect(() => {
-    reducer({
-      type: 'data',
-      payload: recalculateData({ tags: state.tags, dates: state.dates, ALL_DB }),
-    });
-  }, [hash(ALL_DB)]);
-
+    return { data, tags };
+  }, [objectHash(filters)]) || { data: [], tags: [] };
+  console.log(convertData(data));
   return (
-    <Box sx={{ width: '80vw', textAlign: 'center' }}>
-      <Grid container direction="column" spacing={1}>
-        <Grid item>
-          <Typography variant="h6">Overall Savings and Spending</Typography>
-        </Grid>
-        <Grid item>
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={ALL_TAGS}
-            value={state.tags}
-            onChange={(_e, payload) => reducer({ type: 'tags', payload })}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                size="small"
-                variant="outlined"
-                label="Categories"
-                placeholder="Categories"
-              />
+    <div style={{ marginBottom: 20 }}>
+      <Typography variant="h6">Last 6 months</Typography>
+      <Autocomplete
+        size="small"
+        multiple
+        clearOnEscape
+        freeSolo
+        autoSelect
+        autoComplete
+        options={tags}
+        sx={{ width: '80vw' }}
+        value={filters}
+        onChange={(_e, val) => updateFilters(val as string[])}
+        renderInput={(params) => <TextField {...params} label="Source" />}
+      />
+      {data.length === 0 ? (
+        <></>
+      ) : (
+        <Box sx={_.omit(chartContainerStyle, ['m'])}>
+          <ResponsiveLine
+            data={convertData(data)}
+            margin={{ top: 50, right: 40, bottom: 50, left: 60 }}
+            xScale={{ type: 'point' }}
+            yScale={{
+              type: 'linear',
+              min: 'auto',
+              max: 'auto',
+              stacked: true,
+              reverse: false,
+            }}
+            theme={{
+              axis: {
+                legend: { text: { fill: darkMode ? '#939393' : '#000' } },
+                ticks: { text: { fill: darkMode ? '#939393' : '#000' } },
+              },
+            }}
+            yFormat=" >-.2f"
+            pointSize={10}
+            pointColor={{ theme: 'background' }}
+            pointBorderWidth={2}
+            pointBorderColor={{ from: 'serieColor' }}
+            pointLabelYOffset={-12}
+            useMesh={true}
+            tooltip={(e) => (
+              <FunkyTooltip>
+                <Typography>{(e.point.serieId as string).replace('/', '')}</Typography>
+                <Typography>
+                  {e.point.data.x}: {e.point.data.y}
+                </Typography>
+              </FunkyTooltip>
             )}
           />
-        </Grid>
-        <Grid item>
-          <Select
-            fullWidth
-            size="small"
-            variant="outlined"
-            value={state.months}
-            onChange={(e) => reducer({ type: 'months', payload: e.target.value })}
-          >
-            <MenuItem value={4}>Less</MenuItem>
-            <MenuItem value={STARTING_MONTHS}>Normal</MenuItem>
-            <MenuItem value={11}>More</MenuItem>
-          </Select>
-        </Grid>
-        <Grid item>
-          {state.tags.length > 0 ? (
-            <Box sx={omit(chartContainerStyle, ['m'])}>
-              <ResponsiveLine
-                data={state.data}
-                margin={{ top: 10, right: 10, bottom: 50, left: 50 }}
-                xScale={{ type: 'point' }}
-                yScale={{
-                  type: 'linear',
-                  min: 'auto',
-                  max: 'auto',
-                }}
-                theme={{
-                  axis: {
-                    legend: { text: { fill: darkMode ? '#939393' : '#000' } },
-                    ticks: { text: { fill: darkMode ? '#939393' : '#000' } },
-                  },
-                }}
-                // colors={(d) => d.color}
-                yFormat=" >-.2f"
-                pointSize={10}
-                pointColor={{ theme: 'background' }}
-                pointBorderWidth={2}
-                pointBorderColor={{ from: 'serieColor' }}
-                pointLabelYOffset={-12}
-                useMesh={true}
-                tooltip={(e) => (
-                  <FunkyTooltip>
-                    <Typography>
-                      {(e.point.serieId as string).replace('/', '')}
-                    </Typography>
-                    <Typography>
-                      {e.point.data.x}: {e.point.data.y}
-                    </Typography>
-                  </FunkyTooltip>
-                )}
-              />
-            </Box>
-          ) : (
-            <Box>Please choose some filters</Box>
-          )}
-        </Grid>
-      </Grid>
-    </Box>
+        </Box>
+      )}
+    </div>
   );
+}
+
+function convertData(data: ExpenditureTableType[]) {
+  return _(data)
+    .map((row) => ({
+      ...row,
+      datetime: dayjs.unix(row.datetime).format('MMM YY'),
+    }))
+    .groupBy(FormCategories.category)
+    .mapValues((value) =>
+      _(value)
+        .groupBy(FormCategories.datetime)
+        .mapValues((v) => _.sumBy(v, (r) => r.amount as number))
+        .toPairs()
+        .map((row) => ({ x: row[0], y: row[1] }))
+        .sortBy((row) => dayjs(row.x, 'MMM YY'))
+        .value()
+    )
+    .toPairs()
+    .map((row) => ({ id: row[0], data: row[1] }))
+    .value();
 }

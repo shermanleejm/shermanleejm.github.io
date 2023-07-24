@@ -29,7 +29,7 @@ import { useAtom } from 'jotai';
 import { toasterAtom } from '@/components/ExpenditureTracker/Toaster';
 
 const emptyForm = {
-  [FormCategories.category]: [],
+  [FormCategories.category]: '',
   [FormCategories.name]: '',
   [FormCategories.amount]: '',
   [FormCategories.datetime]: dayjs().unix(),
@@ -52,7 +52,7 @@ export default () => {
     const allRecurring = await db.recurring.toArray();
     // TODO: sort by popularity
     const categories = allExpenditure.reduce(
-      (a, b) => [...a, ...JSON.parse(b[FormCategories.category])],
+      (a, b) => [...a, b[FormCategories.category]],
       [] as string[]
     );
 
@@ -99,8 +99,6 @@ export default () => {
       return;
     }
 
-    const categoryString = JSON.stringify(form.category);
-
     if (type === TransactionTypes.RECURRING) {
       if (showRecurringModal === false) {
         setShowRecurringModal(true);
@@ -133,7 +131,7 @@ export default () => {
           amount: parseFloat(form.amount),
           cron: cron,
           start: form.datetime,
-          category: categoryString,
+          category: form.category,
           credit_card: form.credit_card,
         })
         .then(() => {
@@ -144,7 +142,7 @@ export default () => {
     }
 
     db.expenditure
-      .add({ ...form, category: categoryString, [FormCategories.transactionType]: type })
+      .add({ ...form, category: form.category, [FormCategories.transactionType]: type })
       .then(() => {
         setToaster({ message: 'Recorded!', severity: 'success', show: true });
         setForm({ ...emptyForm, [FormCategories.datetime]: dayjs().unix() });
@@ -270,7 +268,6 @@ export default () => {
             freeSolo
             autoSelect
             autoComplete
-            multiple
             options={existing?.categories || []}
             sx={{ width: '80vw' }}
             value={form[FormCategories.category]}
