@@ -3,9 +3,10 @@ import SpecialInput from '@/components/ExpenditureTracker/Input';
 import Insights from '@/components/ExpenditureTracker/Insights';
 import Toaster from '@/components/ExpenditureTracker/Toaster';
 import { Box, Tab, Tabs } from '@mui/material';
-import { useState } from 'react';
-import Toolbar from './Toolbar';
 import 'dayjs/locale/en-sg';
+import { useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import Toolbar from './Toolbar';
 
 const ExpenditureTabs = [
   {
@@ -21,9 +22,9 @@ const ExpenditureTabs = [
     component: Goals,
   },
 ];
-
+const chosenTabAtom = atomWithStorage('chosenTabAtom', ExpenditureTabs[1].name);
 export default function ExpenditureTracker() {
-  const [chosenTab, setChosenTab] = useState(ExpenditureTabs[1].name);
+  const [chosenTab, setChosenTab] = useAtom(chosenTabAtom);
 
   return (
     <Box
