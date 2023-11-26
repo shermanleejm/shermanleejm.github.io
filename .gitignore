@@ -25,5 +25,5 @@ yarn-error.log*
 .Identifier
 
 .vscode/
-venv
-api/expenditure.json
+.venv
+api/
