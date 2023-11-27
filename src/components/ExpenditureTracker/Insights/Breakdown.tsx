@@ -47,7 +47,7 @@ export default function Breakdown() {
             .groupBy('name')
             .mapValues((x: { name: string; amount: number }[]) => ({
               name: x[0].name,
-              amount: _.sumBy(x, 'amount'),
+              amount: _.sumBy(x, 'amount').toFixed(2),
             }))
             .values()
             .value(),
@@ -76,7 +76,7 @@ export default function Breakdown() {
           <AccordionDetails>
             <TableContainer>
               <MUITable>
-                {(row.__children as unknown as { name: string; amount: number }[]).map(
+                {(row.__children as unknown as { name: string; amount: string }[]).map(
                   (x) => (
                     <TableRow>
                       <TableCell>{x.name}</TableCell>
