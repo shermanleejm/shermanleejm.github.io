@@ -418,10 +418,10 @@
   resolved "https://registry.yarnpkg.com/@esbuild/linux-loong64/-/linux-loong64-0.15.13.tgz#64e8825bf0ce769dac94ee39d92ebe6272020dfc"
   integrity sha512-+BoyIm4I8uJmH/QDIH0fu7MG0AEx9OXEDXnqptXCwKOlOqZiS4iraH1Nr7/ObLMokW3sOCeBNyD68ATcV9b9Ag==
 
-"@handsontable/react@^12.3.3":
-  version "12.3.3"
-  resolved "https://registry.yarnpkg.com/@handsontable/react/-/react-12.3.3.tgz#06c7f314c4928ff806bef91ae35efae4139a3324"
-  integrity sha512-/30oBeEsb3WPMTDhpmkeNE4irK3cl2JfpaxaS6sgGQ6aVFFr7wmIwawq9fDoH362IBPe99VgqFFnk3uIrOGklA==
+"@handsontable/react@^13.1.0":
+  version "13.1.0"
+  resolved "https://registry.yarnpkg.com/@handsontable/react/-/react-13.1.0.tgz#0f58a3348a66d38c07100d41b33bbd2d4331043a"
+  integrity sha512-dl5r1VHw2A8UTIprigfIc/DaXXrKovpMcn8s9GDHpdpqBPwOCDsp5ETdqiSeZ2y+TiNydUeJhb/z+N2T+rsP+g==
 
 "@jest/types@^24.9.0":
   version "24.9.0"
@@ -1498,10 +1498,10 @@ core-js-pure@^3.25.1:
   resolved "https://registry.npmjs.org/core-js-pure/-/core-js-pure-3.25.3.tgz"
   integrity sha512-T/7qvgv70MEvRkZ8p6BasLZmOVYKzOaWNBEHAU8FmveCJkl4nko2quqPQOmy6AJIp5MBanhz9no3A94NoRb0XA==
 
-core-js@^3.0.0:
-  version "3.30.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.30.1.tgz#fc9c5adcc541d8e9fa3e381179433cbf795628ba"
-  integrity sha512-ZNS5nbiSwDTq4hFosEDqm65izl2CWmLz0hARJMyNQBgkUZMIF51cQiMvIQKA6hvuaeWxQDP3hEedM1JZIgTldQ==
+core-js@^3.31.1:
+  version "3.33.3"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.33.3.tgz#3c644a323f0f533a0d360e9191e37f7fc059088d"
+  integrity sha512-lo0kOocUlLKmm6kv/FswQL8zbkH7mVsLJ/FULClOhv8WRVmKLVcs6XPNQAzstfeJTCHMyButEwG+z1kHxHoDZw==
 
 cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
   version "7.0.1"
@@ -2111,19 +2111,19 @@ graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.10.tgz"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
 
-handsontable@^12.3.3:
-  version "12.3.3"
-  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-12.3.3.tgz#6dd10a75eac6d3252cb3146e800b81a82cce8f38"
-  integrity sha512-Vc7SwCuH60m9bgYwNTpiAAtaeHHUDGl0HXPY7ozb18DQE/2GexTUArkhcIM1RX5gcoeyUjR+vvpF8hHLW/YJBw==
+handsontable@^13.1.0:
+  version "13.1.0"
+  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-13.1.0.tgz#a820d331088a9e4a7db9f4974661208f51789771"
+  integrity sha512-KqJtS3rJeOWsFWCffnDlM8fcLMTqmW+Vbc7OCVM4X7dYDpfefgFerjNLIxLfT9xohcQoUOS1jcvXwV8dwSppVQ==
   dependencies:
     "@types/pikaday" "1.7.4"
-    core-js "^3.0.0"
+    core-js "^3.31.1"
     dompurify "^2.1.1"
     moment "2.29.4"
     numbro "2.1.2"
     pikaday "1.8.2"
   optionalDependencies:
-    hyperformula "^2.0.0"
+    hyperformula "^2.4.0"
 
 has-flag@^3.0.0:
   version "3.0.0"
@@ -2149,10 +2149,10 @@ hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.1, hoist-non-react-
   dependencies:
     react-is "^16.7.0"
 
-hyperformula@^2.0.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/hyperformula/-/hyperformula-2.3.1.tgz#8d32af3aaa062f5f9837ec2a281a12958a8a5d69"
-  integrity sha512-pvOnQ1OlXBuH2o6Jvh51zi1Zemvk3oQrKz7FdZhnfIHaKH/FdQMScZYiJlB3CY0CyA+kq2x/Fg+bSaiLP+pQxg==
+hyperformula@^2.4.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/hyperformula/-/hyperformula-2.6.0.tgz#6617c0517059a076e3c1b1b0d1b8988b0fe5ba90"
+  integrity sha512-jnEwxG8vFoxVBh7ahx2G6IpUvjH4yB3RNj6C9FX1C3XwQ4Km28dPp6obnRCXk/cZuh6tc/V4pSD9+jwv7r0Xgg==
   dependencies:
     chevrotain "^6.5.0"
     tiny-emitter "^2.1.0"

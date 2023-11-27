@@ -1,11 +1,15 @@
-import { Box, Grid } from '@mui/material';
-import { FC } from 'react';
-import { useAtom } from 'jotai';
 import { darkModeAtom } from '@/App';
+import Breakdown from '@/components/ExpenditureTracker/Insights/Breakdown';
 import CreditCard from '@/components/ExpenditureTracker/Insights/CreditCard';
 import ExpenditureTable from '@/components/ExpenditureTracker/Insights/ExpenditureTable';
 import OverallFiltering from '@/components/ExpenditureTracker/Insights/OverallFiltering';
-import CurrentMonth from '@/components/ExpenditureTracker/Insights/CurrentMonth';
+import { Box, Grid } from '@mui/material';
+import { useAtom } from 'jotai';
+import { FC } from 'react';
+import 'handsontable/dist/handsontable.full.min.css';
+import { registerAllModules } from 'handsontable/registry';
+
+registerAllModules();
 
 export default function Insights() {
   return (
@@ -17,10 +21,10 @@ export default function Insights() {
       spacing={2}
     >
       <Grid item>
-        <CreditCard />
+        <Breakdown />
       </Grid>
       <Grid item>
-        <CurrentMonth />
+        <CreditCard />
       </Grid>
       <Grid item>
         <OverallFiltering />

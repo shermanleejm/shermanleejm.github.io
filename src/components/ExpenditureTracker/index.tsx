@@ -46,7 +46,7 @@ export default function ExpenditureTracker() {
         ))}
       </Tabs>
 
-      <Box sx={{ mt: 2, mb: 6 }}>
+      <Box sx={{ mt: 2, mb: 6, padding: 0 }}>
         {ExpenditureTabs.map((t, i) => {
           if (chosenTab === t.name) {
             return <t.component key={i} />;

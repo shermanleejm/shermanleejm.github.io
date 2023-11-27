@@ -14,7 +14,6 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import React from 'react';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
-import 'handsontable/dist/handsontable.full.min.css';
 
 export const darkModeAtom = atomWithStorage('dark-mode', true);
 
